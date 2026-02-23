@@ -1,3 +1,4 @@
+
 using System.Collections.Generic;
 using System.Linq;
 using Sirenix.OdinInspector;
@@ -103,6 +104,7 @@ public class SpritePhysicsShapeGenerator : OdinEditorWindow
 
     private Sprite[] _sprites;
     private List<Vector2> _previewOutline;
+    private List<List<Vector2>> _existingOutlines; // Current physics shape from the asset
     private Texture2D _readableTexture;
 
     // Cached for eyedropper hit-testing
@@ -110,6 +112,7 @@ public class SpritePhysicsShapeGenerator : OdinEditorWindow
 
     private bool HasSprites => _sprites is { Length: > 0 };
     private bool HasPreview => _previewOutline is { Count: >= 3 } && HasSprites;
+    private bool HasExistingOutline => _existingOutlines is { Count: > 0 };
 
     // ───────────────────────────── Dropdown Values ──────────────────
 
@@ -126,11 +129,9 @@ public class SpritePhysicsShapeGenerator : OdinEditorWindow
 
     private bool IsPixelSolid(Color32 pixel)
     {
-        // First check alpha
         if ((pixel.a / 255f) <= alphaThreshold)
             return false;
 
-        // Then check against ignored colors
         if (ignoredColors is { Count: > 0 })
         {
             Color pixelColor = new Color(pixel.r / 255f, pixel.g / 255f, pixel.b / 255f);
@@ -142,14 +143,62 @@ public class SpritePhysicsShapeGenerator : OdinEditorWindow
                 float db = pixelColor.b - ignored.b;
                 float distance = Mathf.Sqrt(dr * dr + dg * dg + db * db);
 
-                // Max possible distance in RGB space is sqrt(3) ≈ 1.732
-                // Normalize so tolerance 0 = exact, 1 = match anything
                 if (distance <= colorTolerance * 1.732f)
-                    return false; // This pixel matches an ignored color
+                    return false;
             }
         }
 
         return true;
+    }
+
+    // ───────────────────────────── Load Existing Physics Shape ───────
+
+    private void LoadExistingOutlines()
+    {
+        _existingOutlines = null;
+
+        if (!sourceTexture || _sprites == null || _sprites.Length == 0) return;
+        if (selectedSpriteIndex < 0 || selectedSpriteIndex >= _sprites.Length) return;
+
+        string path = AssetDatabase.GetAssetPath(sourceTexture);
+        TextureImporter importer = AssetImporter.GetAtPath(path) as TextureImporter;
+        if (!importer) return;
+
+        SpriteDataProviderFactories factory = new();
+        factory.Init();
+
+        ISpriteEditorDataProvider dataProvider = factory.GetSpriteEditorDataProviderFromObject(importer);
+        if (dataProvider == null) return;
+
+        dataProvider.InitSpriteEditorDataProvider();
+
+        ISpritePhysicsOutlineDataProvider physicsProvider =
+            dataProvider.GetDataProvider<ISpritePhysicsOutlineDataProvider>();
+        if (physicsProvider == null) return;
+
+        SpriteRect[] spriteRects = dataProvider.GetSpriteRects();
+        Sprite selectedSprite = _sprites[selectedSpriteIndex];
+
+        foreach (SpriteRect spriteRect in spriteRects)
+        {
+            if (spriteRect.name != selectedSprite.name) continue;
+
+            List<Vector2[]> outlines = physicsProvider.GetOutlines(spriteRect.spriteID);
+            if (outlines != null && outlines.Count > 0)
+            {
+                _existingOutlines = new List<List<Vector2>>();
+                foreach (Vector2[] outline in outlines)
+                {
+                    if (outline != null && outline.Length >= 3)
+                        _existingOutlines.Add(new List<Vector2>(outline));
+                }
+
+                if (_existingOutlines.Count == 0)
+                    _existingOutlines = null;
+            }
+
+            break;
+        }
     }
 
     // ───────────────────────────── Callbacks ────────────────────────
@@ -158,6 +207,7 @@ public class SpritePhysicsShapeGenerator : OdinEditorWindow
     {
         _sprites = null;
         _previewOutline = null;
+        _existingOutlines = null;
         _readableTexture = null;
         previewInfo = "";
         selectedSpriteIndex = 0;
@@ -209,6 +259,7 @@ public class SpritePhysicsShapeGenerator : OdinEditorWindow
     private void RegeneratePreview()
     {
         _previewOutline = null;
+        _existingOutlines = null;
         previewInfo = "";
 
         if (_sprites == null || _sprites.Length == 0 || _readableTexture == null)
@@ -216,6 +267,9 @@ public class SpritePhysicsShapeGenerator : OdinEditorWindow
 
         if (selectedSpriteIndex < 0 || selectedSpriteIndex >= _sprites.Length)
             return;
+
+        // Load the existing physics shape from the asset
+        LoadExistingOutlines();
 
         Sprite sprite = _sprites[selectedSpriteIndex];
         Rect rect = sprite.rect;
@@ -258,7 +312,8 @@ public class SpritePhysicsShapeGenerator : OdinEditorWindow
         _previewOutline = simplified;
 
         string ignoredInfo = ignoredColors.Count > 0 ? $"  |  {ignoredColors.Count} color(s) ignored" : "";
-        previewInfo = $"Sprite: {sprite.name}  |  {simplified.Count} vertices  |  {w}×{h} px{ignoredInfo}";
+        string existingInfo = HasExistingOutline ? "  |  Has existing shape" : "  |  No existing shape";
+        previewInfo = $"Sprite: {sprite.name}  |  {simplified.Count} vertices  |  {w}×{h} px{ignoredInfo}{existingInfo}";
         Repaint();
     }
 
@@ -280,68 +335,83 @@ public class SpritePhysicsShapeGenerator : OdinEditorWindow
         int w = Mathf.FloorToInt(spriteRect.width);
         int h = Mathf.FloorToInt(spriteRect.height);
 
-        float previewSize = Mathf.Min(position.width - 40f, 300f);
-        Rect area = GUILayoutUtility.GetRect(previewSize, previewSize, GUILayout.ExpandWidth(false));
+        // ── Draw side-by-side: Before (left) | After (right) ──
 
-        EditorGUI.DrawRect(area, new Color(0.15f, 0.15f, 0.15f, 1f));
+        bool hasBefore = HasExistingOutline;
+        float totalWidth = position.width - 40f;
+        float singlePreviewSize;
 
-        const float padding = 10f;
-        float drawW = area.width - padding * 2;
-        float drawH = area.height - padding * 2;
-        float scale = Mathf.Min(drawW / w, drawH / h);
-
-        float offsetX = area.x + padding + (drawW - w * scale) * 0.5f;
-        float offsetY = area.y + padding + (drawH - h * scale) * 0.5f;
-
-        // Cache for eyedropper
-        _lastPreviewDrawRect = new Rect(offsetX, offsetY, w * scale, h * scale);
-
-        // Draw the sprite texture
-        Rect texCoords = new Rect(
-            spriteRect.x / sourceTexture.width,
-            spriteRect.y / sourceTexture.height,
-            spriteRect.width / sourceTexture.width,
-            spriteRect.height / sourceTexture.height
-        );
-
-        Rect drawRect = new Rect(offsetX, offsetY, w * scale, h * scale);
-        GUI.DrawTextureWithTexCoords(drawRect, sourceTexture, texCoords);
-
-        // Draw the outline
-        Handles.BeginGUI();
-        Handles.color = Color.green;
-
-        for (int i = 0; i < _previewOutline.Count; i++)
+        if (hasBefore)
         {
-            Vector2 a = _previewOutline[i];
-            Vector2 b = _previewOutline[(i + 1) % _previewOutline.Count];
-
-            Vector2 screenA = new Vector2(offsetX + a.x * scale, offsetY + (h - a.y) * scale);
-            Vector2 screenB = new Vector2(offsetX + b.x * scale, offsetY + (h - b.y) * scale);
-
-            Handles.DrawLine(new Vector3(screenA.x, screenA.y, 0), new Vector3(screenB.x, screenB.y, 0));
+            singlePreviewSize = Mathf.Min((totalWidth - 20f) * 0.5f, 250f);
+        }
+        else
+        {
+            singlePreviewSize = Mathf.Min(totalWidth, 300f);
         }
 
-        Handles.color = Color.cyan;
-
-        for (int i = 0; i < _previewOutline.Count; i++)
+        // Labels
+        if (hasBefore)
         {
-            Vector2 p = _previewOutline[i];
-            Vector2 screenP = new Vector2(offsetX + p.x * scale, offsetY + (h - p.y) * scale);
-            Handles.DrawSolidDisc(new Vector3(screenP.x, screenP.y, 0), Vector3.forward, 3f);
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
+
+            GUIStyle labelStyle = new GUIStyle(EditorStyles.boldLabel) { alignment = TextAnchor.MiddleCenter };
+            GUILayout.Label("Before (Existing)", labelStyle, GUILayout.Width(singlePreviewSize));
+            GUILayout.Space(10);
+            GUILayout.Label("After (New)", labelStyle, GUILayout.Width(singlePreviewSize));
+
+            GUILayout.FlexibleSpace();
+            EditorGUILayout.EndHorizontal();
+        }
+        else
+        {
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
+
+            GUIStyle labelStyle = new GUIStyle(EditorStyles.boldLabel) { alignment = TextAnchor.MiddleCenter };
+            GUILayout.Label("Preview (No existing shape)", labelStyle, GUILayout.Width(singlePreviewSize));
+
+            GUILayout.FlexibleSpace();
+            EditorGUILayout.EndHorizontal();
         }
 
-        Handles.EndGUI();
+        // Reserve area for both previews
+        EditorGUILayout.BeginHorizontal();
+        GUILayout.FlexibleSpace();
 
-        // Eyedropper: handle click on preview
+        if (hasBefore)
+        {
+            // ── Before panel ──
+            Rect beforeArea = GUILayoutUtility.GetRect(singlePreviewSize, singlePreviewSize, GUILayout.ExpandWidth(false));
+            DrawSpritePanel(beforeArea, spriteRect, w, h, _existingOutlines, Color.red, new Color(1f, 0.5f, 0.5f), true);
+
+            GUILayout.Space(10);
+        }
+
+        // ── After panel ──
+        Rect afterArea = GUILayoutUtility.GetRect(singlePreviewSize, singlePreviewSize, GUILayout.ExpandWidth(false));
+        _lastPreviewDrawRect = DrawSpritePanel(afterArea, spriteRect, w, h,
+            new List<List<Vector2>> { _previewOutline }, Color.green, Color.cyan, false);
+
+        GUILayout.FlexibleSpace();
+        EditorGUILayout.EndHorizontal();
+
+        // Eyedropper: handle click on the After preview
         if (_eyedropperActive && Event.current.type == EventType.MouseDown && Event.current.button == 0)
         {
             Vector2 mousePos = Event.current.mousePosition;
             if (_lastPreviewDrawRect.Contains(mousePos))
             {
-                // Convert screen position to pixel coordinates in the sprite
+                const float padding = 10f;
+                float drawW = afterArea.width - padding * 2;
+                float drawH = afterArea.height - padding * 2;
+                float scale = Mathf.Min(drawW / w, drawH / h);
+                float offsetX = afterArea.x + padding + (drawW - w * scale) * 0.5f;
+                float offsetY = afterArea.y + padding + (drawH - h * scale) * 0.5f;
+
                 float pixelX = (mousePos.x - offsetX) / scale;
-                float pixelY = h - (mousePos.y - offsetY) / scale; // flip Y
+                float pixelY = h - (mousePos.y - offsetY) / scale;
 
                 int px = Mathf.FloorToInt(pixelX);
                 int py = Mathf.FloorToInt(pixelY);
@@ -354,7 +424,6 @@ public class SpritePhysicsShapeGenerator : OdinEditorWindow
                     Color pickedColor = _readableTexture.GetPixel(texX, texY);
                     Color rgbOnly = new Color(pickedColor.r, pickedColor.g, pickedColor.b, 1f);
 
-                    // Check if this color is already in the list (within tolerance)
                     bool alreadyExists = false;
 
                     foreach (Color existing in ignoredColors)
@@ -390,9 +459,86 @@ public class SpritePhysicsShapeGenerator : OdinEditorWindow
             }
         }
 
-        // Show eyedropper cursor over preview
         if (_eyedropperActive)
             EditorGUIUtility.AddCursorRect(_lastPreviewDrawRect, MouseCursor.Zoom);
+    }
+
+    /// <summary>
+    /// Draws a sprite preview panel with outline(s) overlaid. Returns the draw rect used for the sprite image.
+    /// For the "before" panel, outlines are in sprite-local space (centered at 0,0).
+    /// For the "after" panel, outlines are in pixel space (0..w, 0..h).
+    /// </summary>
+    private Rect DrawSpritePanel(Rect area, Rect spriteRect, int w, int h,
+        List<List<Vector2>> outlines, Color lineColor, Color vertexColor, bool outlinesAreCentered)
+    {
+        EditorGUI.DrawRect(area, new Color(0.15f, 0.15f, 0.15f, 1f));
+
+        const float padding = 10f;
+        float drawW = area.width - padding * 2;
+        float drawH = area.height - padding * 2;
+        float scale = Mathf.Min(drawW / w, drawH / h);
+
+        float offsetX = area.x + padding + (drawW - w * scale) * 0.5f;
+        float offsetY = area.y + padding + (drawH - h * scale) * 0.5f;
+
+        Rect texCoords = new Rect(
+            spriteRect.x / sourceTexture.width,
+            spriteRect.y / sourceTexture.height,
+            spriteRect.width / sourceTexture.width,
+            spriteRect.height / sourceTexture.height
+        );
+
+        Rect drawRect = new Rect(offsetX, offsetY, w * scale, h * scale);
+        GUI.DrawTextureWithTexCoords(drawRect, sourceTexture, texCoords);
+
+        if (outlines != null && outlines.Count > 0)
+        {
+            Handles.BeginGUI();
+
+            Vector2 center = new Vector2(w * 0.5f, h * 0.5f);
+
+            foreach (List<Vector2> outline in outlines)
+            {
+                if (outline == null || outline.Count < 3) continue;
+
+                // Draw edges
+                Handles.color = lineColor;
+                for (int i = 0; i < outline.Count; i++)
+                {
+                    Vector2 a = outline[i];
+                    Vector2 b = outline[(i + 1) % outline.Count];
+
+                    // If centered (existing outlines from ISpritePhysicsOutlineDataProvider),
+                    // convert back to pixel-space (0..w, 0..h)
+                    if (outlinesAreCentered)
+                    {
+                        a += center;
+                        b += center;
+                    }
+
+                    Vector2 screenA = new Vector2(offsetX + a.x * scale, offsetY + (h - a.y) * scale);
+                    Vector2 screenB = new Vector2(offsetX + b.x * scale, offsetY + (h - b.y) * scale);
+
+                    Handles.DrawLine(new Vector3(screenA.x, screenA.y, 0), new Vector3(screenB.x, screenB.y, 0));
+                }
+
+                // Draw vertices
+                Handles.color = vertexColor;
+                for (int i = 0; i < outline.Count; i++)
+                {
+                    Vector2 p = outline[i];
+                    if (outlinesAreCentered)
+                        p += center;
+
+                    Vector2 screenP = new Vector2(offsetX + p.x * scale, offsetY + (h - p.y) * scale);
+                    Handles.DrawSolidDisc(new Vector3(screenP.x, screenP.y, 0), Vector3.forward, 2.5f);
+                }
+            }
+
+            Handles.EndGUI();
+        }
+
+        return drawRect;
     }
 
     // ───────────────────────────── Actions ──────────────────────────
@@ -423,6 +569,7 @@ public class SpritePhysicsShapeGenerator : OdinEditorWindow
                 $"[SpritePhysicsShapeGenerator] Applied physics shapes to {count}/{_sprites.Length} sprites in: {path}");
             EditorUtility.DisplayDialog("Sprite Physics Shapes",
                 $"Successfully applied physics shapes to {count} sprite(s).", "OK");
+            RegeneratePreview(); // Refresh so "before" shows the newly applied shape
         }
         else
         {
@@ -454,7 +601,68 @@ public class SpritePhysicsShapeGenerator : OdinEditorWindow
         int count = ApplyPhysicsShapes(importer, targetSprite.name);
 
         if (count > 0)
+        {
             Debug.Log($"[SpritePhysicsShapeGenerator] Applied physics shape to: {targetSprite.name}");
+            RegeneratePreview();
+        }
+    }
+
+    // ───────────────────────────── Remove Actions ───────────────────
+
+    [TitleGroup("Remove Physics Shapes")]
+    [Button(ButtonSizes.Medium), GUIColor(1f, 0.5f, 0.5f)]
+    [ShowIf(nameof(HasSprites))]
+    [Tooltip("Remove custom physics shapes from ALL sprites in this texture.")]
+    private void RemoveAllPhysicsShapes()
+    {
+        if (!sourceTexture || _sprites == null || _sprites.Length == 0) return;
+
+        if (!EditorUtility.DisplayDialog("Remove All Physics Shapes",
+                "Are you sure you want to remove custom physics shapes from ALL sprites in this texture?",
+                "Remove All", "Cancel"))
+            return;
+
+        string path = AssetDatabase.GetAssetPath(sourceTexture);
+        TextureImporter importer = AssetImporter.GetAtPath(path) as TextureImporter;
+        if (!importer) return;
+
+        int count = RemovePhysicsShapes(importer);
+
+        if (count > 0)
+        {
+            Debug.Log($"[SpritePhysicsShapeGenerator] Removed physics shapes from {count} sprite(s) in: {path}");
+            EditorUtility.DisplayDialog("Sprite Physics Shapes",
+                $"Removed physics shapes from {count} sprite(s).", "OK");
+            RegeneratePreview();
+        }
+        else
+        {
+            Debug.Log("[SpritePhysicsShapeGenerator] No physics shapes to remove.");
+        }
+    }
+
+    [TitleGroup("Remove Physics Shapes")]
+    [Button(ButtonSizes.Medium), GUIColor(1f, 0.7f, 0.5f)]
+    [ShowIf(nameof(HasExistingOutline))]
+    [Tooltip("Remove custom physics shape from ONLY the selected sprite.")]
+    private void RemoveSelectedSpritePhysicsShape()
+    {
+        if (!sourceTexture || _sprites == null) return;
+        if (selectedSpriteIndex < 0 || selectedSpriteIndex >= _sprites.Length) return;
+
+        Sprite targetSprite = _sprites[selectedSpriteIndex];
+
+        string path = AssetDatabase.GetAssetPath(sourceTexture);
+        TextureImporter importer = AssetImporter.GetAtPath(path) as TextureImporter;
+        if (!importer) return;
+
+        int count = RemovePhysicsShapes(importer, targetSprite.name);
+
+        if (count > 0)
+        {
+            Debug.Log($"[SpritePhysicsShapeGenerator] Removed physics shape from: {targetSprite.name}");
+            RegeneratePreview();
+        }
     }
 
     // ───────────────────────────── Apply Logic ──────────────────────
@@ -546,6 +754,49 @@ public class SpritePhysicsShapeGenerator : OdinEditorWindow
         CreateReadableTexture(assetPath);
 
         return processed;
+    }
+
+    // ───────────────────────────── Remove Logic ─────────────────────
+
+    private int RemovePhysicsShapes(TextureImporter importer, string onlySpriteName = null)
+    {
+        SpriteDataProviderFactories factory = new();
+        factory.Init();
+
+        ISpriteEditorDataProvider dataProvider = factory.GetSpriteEditorDataProviderFromObject(importer);
+        if (dataProvider == null) return 0;
+
+        dataProvider.InitSpriteEditorDataProvider();
+
+        ISpritePhysicsOutlineDataProvider physicsProvider =
+            dataProvider.GetDataProvider<ISpritePhysicsOutlineDataProvider>();
+        if (physicsProvider == null) return 0;
+
+        SpriteRect[] spriteRects = dataProvider.GetSpriteRects();
+        int removed = 0;
+
+        foreach (SpriteRect spriteRect in spriteRects)
+        {
+            if (onlySpriteName != null && spriteRect.name != onlySpriteName)
+                continue;
+
+            // Check if there's an existing outline to remove
+            List<Vector2[]> existing = physicsProvider.GetOutlines(spriteRect.spriteID);
+            if (existing == null || existing.Count == 0)
+                continue;
+
+            // Set to empty list to clear the custom physics shape
+            physicsProvider.SetOutlines(spriteRect.spriteID, new List<Vector2[]>());
+            removed++;
+        }
+
+        dataProvider.Apply();
+        importer.SaveAndReimport();
+
+        string assetPath = importer.assetPath;
+        CreateReadableTexture(assetPath);
+
+        return removed;
     }
 
     // ───────────────────────────── Outline Tracing ──────────────────
@@ -666,7 +917,7 @@ public class SpritePhysicsShapeGenerator : OdinEditorWindow
 
     private static float PerpendicularDistance(Vector2 point, Vector2 lineStart, Vector2 lineEnd)
     {
-        Vector2 line = lineEnd - lineStart;
+        Vector2 line = lineEnd - lineStart; 
         float len = line.magnitude;
 
         if (len < 0.0001f)
