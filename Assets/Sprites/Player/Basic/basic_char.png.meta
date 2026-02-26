@@ -376,7 +376,7 @@ TextureImporter:
       name: basic_walk_down_0
       rect:
         serializedVersion: 2
-        x: 0
+        x: 2
         y: 1008
         width: 144
         height: 144
@@ -1539,7 +1539,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: basic_char_53
+      name: basic_attack_down_0
       rect:
         serializedVersion: 2
         x: 720
@@ -1561,7 +1561,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: basic_char_54
+      name: basic_attack_down_1
       rect:
         serializedVersion: 2
         x: 864
@@ -1583,7 +1583,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: basic_char_55
+      name: basic_attack_down_2
       rect:
         serializedVersion: 2
         x: 1008
@@ -1605,7 +1605,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: basic_char_56
+      name: basic_attack_down_3
       rect:
         serializedVersion: 2
         x: 1152
@@ -1627,7 +1627,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: basic_char_57
+      name: basic_attack_down_4
       rect:
         serializedVersion: 2
         x: 1296
@@ -1781,7 +1781,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: basic_char_64
+      name: basic_attack_left_0
       rect:
         serializedVersion: 2
         x: 720
@@ -1803,7 +1803,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: basic_char_65
+      name: basic_attack_left_1
       rect:
         serializedVersion: 2
         x: 864
@@ -1825,7 +1825,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: basic_char_66
+      name: basic_attack_left_2
       rect:
         serializedVersion: 2
         x: 1008
@@ -1847,7 +1847,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: basic_char_67
+      name: basic_attack_left_3
       rect:
         serializedVersion: 2
         x: 1152
@@ -1869,7 +1869,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: basic_char_68
+      name: basic_attack_left_4
       rect:
         serializedVersion: 2
         x: 1296
@@ -2023,7 +2023,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: basic_char_75
+      name: basic_attack_right_0
       rect:
         serializedVersion: 2
         x: 720
@@ -2045,7 +2045,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: basic_char_76
+      name: basic_attack_right_1
       rect:
         serializedVersion: 2
         x: 864
@@ -2067,7 +2067,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: basic_char_77
+      name: basic_attack_right_2
       rect:
         serializedVersion: 2
         x: 1008
@@ -2089,7 +2089,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: basic_char_78
+      name: basic_attack_right_3
       rect:
         serializedVersion: 2
         x: 1152
@@ -2111,7 +2111,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: basic_char_79
+      name: basic_attack_right_4
       rect:
         serializedVersion: 2
         x: 1296
@@ -2265,7 +2265,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: basic_char_86
+      name: basic_attack_up_0
       rect:
         serializedVersion: 2
         x: 720
@@ -2287,11 +2287,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: basic_char_87
+      name: basic_attack_up_1
       rect:
         serializedVersion: 2
         x: 864
-        y: 0
+        y: 2
         width: 144
         height: 144
       alignment: 0
@@ -2309,11 +2309,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: basic_char_88
+      name: basic_attack_up_2
       rect:
         serializedVersion: 2
         x: 1008
-        y: 0
+        y: 2
         width: 144
         height: 144
       alignment: 0
@@ -2331,7 +2331,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: basic_char_89
+      name: basic_attack_up_3
       rect:
         serializedVersion: 2
         x: 1152
@@ -2353,7 +2353,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: basic_char_90
+      name: basic_attack_up_4
       rect:
         serializedVersion: 2
         x: 1296
@@ -2412,6 +2412,27 @@ TextureImporter:
       - key: SpriteEditor.SliceSettings
         value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":144.0,"y":144.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":1,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
+      attack_up_: 4861886412460173671
+      basic_attack_down_0: -2309257864853554651
+      basic_attack_down_1: -3508947765838877946
+      basic_attack_down_2: 4112540500862518357
+      basic_attack_down_3: -740143773673873129
+      basic_attack_down_4: -3886052726760012873
+      basic_attack_left_0: 3988581775667897222
+      basic_attack_left_1: -3782091956109122800
+      basic_attack_left_2: -4611925752552608084
+      basic_attack_left_3: 2127619932009200133
+      basic_attack_left_4: 1801691338634998002
+      basic_attack_right_0: -7836603312551502534
+      basic_attack_right_1: -4898369493387609505
+      basic_attack_right_2: 7938643815385808814
+      basic_attack_right_3: -4130838791015237716
+      basic_attack_right_4: -1455340199805746506
+      basic_attack_up_0: -2230912548172486723
+      basic_attack_up_1: 4861886412460173671
+      basic_attack_up_2: 1864605165994568606
+      basic_attack_up_3: 7349283483262283097
+      basic_attack_up_4: -8529913735174195465
       basic_char_10: 5339338461323762841
       basic_char_11: -8588825189641821472
       basic_char_15: -9053564521500372564
@@ -2449,11 +2470,6 @@ TextureImporter:
       basic_char_50: -5602635480424860479
       basic_char_51: -2164494243295233500
       basic_char_52: -6481698155213737546
-      basic_char_53: -2309257864853554651
-      basic_char_54: -3508947765838877946
-      basic_char_55: 4112540500862518357
-      basic_char_56: -740143773673873129
-      basic_char_57: -3886052726760012873
       basic_char_58: 8081961141563586485
       basic_char_59: 6168270397965382081
       basic_char_6: 3347002159978025831
@@ -2461,11 +2477,6 @@ TextureImporter:
       basic_char_61: 1053486223714322101
       basic_char_62: -6606487919399582250
       basic_char_63: -4858058046547670183
-      basic_char_64: 3988581775667897222
-      basic_char_65: -3782091956109122800
-      basic_char_66: -4611925752552608084
-      basic_char_67: 2127619932009200133
-      basic_char_68: 1801691338634998002
       basic_char_69: 8242492176434376160
       basic_char_7: -968343153462378383
       basic_char_70: 7670405130557005255
@@ -2473,11 +2484,6 @@ TextureImporter:
       basic_char_72: 3382397055091762647
       basic_char_73: 6629072623267068818
       basic_char_74: 6626938788796026305
-      basic_char_75: -7836603312551502534
-      basic_char_76: -4898369493387609505
-      basic_char_77: 7938643815385808814
-      basic_char_78: -4130838791015237716
-      basic_char_79: -1455340199805746506
       basic_char_8: 5613884564007390635
       basic_char_80: -3440444315436359501
       basic_char_81: 8724179103555040985
@@ -2485,12 +2491,7 @@ TextureImporter:
       basic_char_83: -6512071983540329055
       basic_char_84: 5839396020033096293
       basic_char_85: -1230218186257429011
-      basic_char_86: -2230912548172486723
-      basic_char_87: 4861886412460173671
-      basic_char_88: 1864605165994568606
-      basic_char_89: 7349283483262283097
       basic_char_9: 3602348166207390172
-      basic_char_90: -8529913735174195465
       basic_char_91: 5722678576297924068
       basic_walk_down_0: 7483975511563551941
       basic_walk_down_1: 8945221668925728468

@@ -23,6 +23,9 @@ namespace StateMachine.States.PlayerStates
         public override void Update()
         {
             base.Update();
+            
+            if(Input.Player.Attack.WasPressedThisFrame())
+                StateMachine.ChangeState(Player.BasicAttackState);
         }
 
         protected void SetFacingFloats(float x, float y)

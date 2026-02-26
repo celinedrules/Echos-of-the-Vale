@@ -439,6 +439,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player.PlayerController
   <MoveSpeed>k__BackingField: 3
+  <AttackVelocity>k__BackingField:
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  <AttackVelocityDuration>k__BackingField: 0.1
+  <ComboResetDuration>k__BackingField: 1
 --- !u!61 &232980082
 BoxCollider2D:
   m_ObjectHideFlags: 0
