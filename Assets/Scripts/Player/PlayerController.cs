@@ -21,7 +21,9 @@ namespace Player
         public float MoveSpeed { get; set; } = 5.0f;
         
         [field: SerializeField, Header("Attack Settings")]
-        public Vector2[] AttackVelocity { get; set; }
+        public Animator swordAnimator { get; set; }
+        [field: SerializeField] public GameObject swordParent { get; set; }
+        [field: SerializeField] public Vector2[] AttackVelocity { get; set; }
         [field: SerializeField] public float AttackVelocityDuration { get; set; } = 0.1f;
         [field: SerializeField] public float ComboResetDuration { get; set; } = 1f;
 
@@ -30,6 +32,9 @@ namespace Player
             base.Awake();
             
             Input = GetComponent<PlayerInputHandler>();
+            
+            if (swordAnimator)
+                swordAnimator.keepAnimatorStateOnDisable = true;
             
             _factory = new PlayerStateFactory(this, StateMachine);
             

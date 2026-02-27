@@ -31,6 +31,14 @@ namespace StateMachine.States.PlayerStates
             _attackDirection = Input.MoveInput.x != 0 ? (Direction)Input.MoveInput.x : Player.FacingDirection;
             
             Animator.SetInteger(BasicAttackIndex, _comboIndex);
+            
+            if (Player.swordParent)
+                Player.swordParent.SetActive(true);
+            
+            if(Player.swordAnimator)
+            {
+                Player.swordAnimator.Play("Attack", 0, 0f);
+            }
 
             ApplyAttackVelocity();
             SetupTimers();
@@ -52,6 +60,9 @@ namespace StateMachine.States.PlayerStates
         public override void Exit()
         {
             base.Exit();
+            
+            if (Player.swordParent)
+                Player.swordParent.SetActive(false);
 
             SetNextComboIndex();
 

@@ -32,6 +32,12 @@ namespace StateMachine.States.PlayerStates
         {
             Animator.SetFloat("FacingX", x);
             Animator.SetFloat("FacingY", y);
+            
+            if (Player.swordAnimator)
+            {
+                Player.swordAnimator.SetFloat("FacingX", x);
+                Player.swordAnimator.SetFloat("FacingY", y);
+            }
         }
 
         protected void SetFacingFloatsFromDirection()
