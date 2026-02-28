@@ -13,11 +13,5 @@ namespace StateMachine.States.PlayerStates
             
             Player.SetVelocity(new Vector2(Input.MoveInput.x * Player.MoveSpeed, Input.MoveInput.y * Player.MoveSpeed));
         }
-
-        protected override void UpdateAnimationParams()
-        {
-            base.UpdateAnimationParams();
-            SetFacingFloatsFromDirection();
-        }
     }
 }

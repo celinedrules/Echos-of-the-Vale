@@ -1,10 +1,8 @@
-using System;
 using System.Collections;
 using Core;
 using Data.WeaponData;
 using StateMachine.States.PlayerStates;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Player
 {
@@ -48,7 +46,7 @@ namespace Player
             BasicAttackState = _factory.Create<BasicAttackState>("BasicAttack");
         }
 
-        protected void Start()
+        protected override void Start()
         {
             base.Start();
             

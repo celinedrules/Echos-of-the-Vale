@@ -1,12 +1,13 @@
 using Core;
 using Player;
-using Unity.VisualScripting.Antlr3.Runtime.Misc;
-using UnityEngine.InputSystem;
+using UnityEngine;
 
 namespace StateMachine.States.PlayerStates
 {
     public class PlayerState : EntityState
     {
+        private static readonly int FacingX = Animator.StringToHash("FacingX");
+        private static readonly int FacingY = Animator.StringToHash("FacingY");
         protected PlayerController Player;
         protected PlayerInputHandler Input;
 
@@ -29,21 +30,21 @@ namespace StateMachine.States.PlayerStates
                 StateMachine.ChangeState(Player.BasicAttackState);
         }
 
-        protected void SetFacingFloats(float x, float y)
+        private void SetFacingFloats(float x, float y)
         {
-            Animator.SetFloat("FacingX", x);
-            Animator.SetFloat("FacingY", y);
+            Animator.SetFloat(FacingX, x);
+            Animator.SetFloat(FacingY, y);
+
+            if (!Player.SwordAnimator)
+                return;
             
-            if (Player.SwordAnimator)
-            {
-                Player.SwordAnimator.SetFloat("FacingX", x);
-                Player.SwordAnimator.SetFloat("FacingY", y);
-            }
+            Player.SwordAnimator.SetFloat(FacingX, x);
+            Player.SwordAnimator.SetFloat(FacingY, y);
         }
 
-        protected void SetFacingFloatsFromDirection()
+        private void SetFacingFloatsFromDirection()
         {
-            var (x, y) = Player.FacingDirection switch
+            (float x, float y) = Player.FacingDirection switch
             {
                 Direction.Up    => ( 0f,  1f),
                 Direction.Down  => ( 0f, -1f),
@@ -57,6 +58,7 @@ namespace StateMachine.States.PlayerStates
         protected override void UpdateAnimationParams()
         {
             base.UpdateAnimationParams();
+            SetFacingFloatsFromDirection();
         }
     }
 }

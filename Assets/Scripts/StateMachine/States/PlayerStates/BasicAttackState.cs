@@ -26,6 +26,8 @@ namespace StateMachine.States.PlayerStates
 
             _comboAttachedQueued = false;
             
+            Player.SetVelocity(0f, 0f);
+            
             SyncAttackSpeed();
             
             _attackDirection = Input.MoveInput.x != 0 ? (Direction)Input.MoveInput.x : Player.FacingDirection;
@@ -34,6 +36,8 @@ namespace StateMachine.States.PlayerStates
             
             if (Player.SwordParent)
                 Player.SwordParent.SetActive(true);
+            
+            UpdateAnimationParams();
             
             if(Player.SwordAnimator)
             {
@@ -46,7 +50,8 @@ namespace StateMachine.States.PlayerStates
         
         public override void Update()
         {
-            base.Update();
+            // Ensure the velocity stays zero while attacking (input won't move the player)
+            Player.SetVelocity(0f, 0f);
 
             if (Input.Player.Attack.WasPressedThisFrame())
                 QueueNextAttack();

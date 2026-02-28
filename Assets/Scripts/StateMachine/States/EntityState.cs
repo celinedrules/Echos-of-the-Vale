@@ -48,7 +48,7 @@ namespace StateMachine.States
             return stateInfo.normalizedTime >= 1f && !Animator.IsInTransition(0);
         }
         
-        protected void TriggerOnFrame(int frameIndex, System.Action action)
+        protected void TriggerOnFrame(int frameIndex, Action action)
         {
             if (_triggeredActions.Contains(action))
                 return;

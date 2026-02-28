@@ -1,5 +1,3 @@
-using System;
-using Core;
 using UnityEngine;
 
 namespace StateMachine.States.PlayerStates
@@ -22,12 +20,6 @@ namespace StateMachine.States.PlayerStates
 
             // Otherwise, movement happened -> go to MoveState
             StateMachine.ChangeState(Player.MoveState);
-        }
-
-        protected override void UpdateAnimationParams()
-        {
-            base.UpdateAnimationParams();
-            SetFacingFloatsFromDirection();
         }
     }
 }
