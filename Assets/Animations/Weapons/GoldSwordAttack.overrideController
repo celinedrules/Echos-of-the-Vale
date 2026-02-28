@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!221 &22100000
+AnimatorOverrideController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: GoldSwordAttack
+  m_Controller: {fileID: 9100000, guid: dc002bf259151e7b78cbd2570d2be766, type: 2}
+  m_Clips:
+  - m_OriginalClip: {fileID: 7400000, guid: 3b7aed142a12a40b79d6e6f8935a425b, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: d36b0301abd50d336917600287bf5370, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 94d927073ad2037c28e15318674190b0, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 5ea55043bd9b20519879bf52b754bde9, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 568d8a5b5290a06a1b86d97177d70352, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: b95e1d1403c8f223891c1de7e2167124, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 73f0f1aba9e1b747086ed53fba65ecef, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: f2deb6bd411c3c182ae38ff104aea563, type: 2}

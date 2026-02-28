@@ -1,8 +1,10 @@
 using System;
 using System.Collections;
 using Core;
+using Data.WeaponData;
 using StateMachine.States.PlayerStates;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Player
 {
@@ -21,8 +23,9 @@ namespace Player
         public float MoveSpeed { get; set; } = 5.0f;
         
         [field: SerializeField, Header("Attack Settings")]
-        public Animator swordAnimator { get; set; }
-        [field: SerializeField] public GameObject swordParent { get; set; }
+        public Animator SwordAnimator { get; set; }
+        [field: SerializeField] public GameObject SwordParent { get; set; }
+        [field: SerializeField] public SwordData ActiveSword { get; set; }
         [field: SerializeField] public Vector2[] AttackVelocity { get; set; }
         [field: SerializeField] public float AttackVelocityDuration { get; set; } = 0.1f;
         [field: SerializeField] public float ComboResetDuration { get; set; } = 1f;
@@ -33,8 +36,10 @@ namespace Player
             
             Input = GetComponent<PlayerInputHandler>();
             
-            if (swordAnimator)
-                swordAnimator.keepAnimatorStateOnDisable = true;
+            if (SwordAnimator)
+                SwordAnimator.keepAnimatorStateOnDisable = true;
+            
+            SwordAnimator.runtimeAnimatorController = ActiveSword.AnimatorController;
             
             _factory = new PlayerStateFactory(this, StateMachine);
             
@@ -71,6 +76,14 @@ namespace Player
         {
             yield return new WaitForEndOfFrame();
             StateMachine.ChangeState(BasicAttackState);
+        }
+        
+        public void EquipSword(SwordData sword)
+        {
+            ActiveSword = sword;
+            
+            if(SwordAnimator && sword)
+                SwordAnimator.runtimeAnimatorController = sword.AnimatorController;
         }
     }
 }

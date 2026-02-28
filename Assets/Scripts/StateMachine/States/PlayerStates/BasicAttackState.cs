@@ -32,12 +32,12 @@ namespace StateMachine.States.PlayerStates
             
             Animator.SetInteger(BasicAttackIndex, _comboIndex);
             
-            if (Player.swordParent)
-                Player.swordParent.SetActive(true);
+            if (Player.SwordParent)
+                Player.SwordParent.SetActive(true);
             
-            if(Player.swordAnimator)
+            if(Player.SwordAnimator)
             {
-                Player.swordAnimator.Play("Attack", 0, 0f);
+                Player.SwordAnimator.Play("Attack", 0, 0f);
             }
 
             ApplyAttackVelocity();
@@ -61,8 +61,8 @@ namespace StateMachine.States.PlayerStates
         {
             base.Exit();
             
-            if (Player.swordParent)
-                Player.swordParent.SetActive(false);
+            if (Player.SwordParent)
+                Player.SwordParent.SetActive(false);
 
             SetNextComboIndex();
 

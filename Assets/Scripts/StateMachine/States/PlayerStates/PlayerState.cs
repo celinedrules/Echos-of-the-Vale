@@ -1,6 +1,7 @@
 using Core;
 using Player;
 using Unity.VisualScripting.Antlr3.Runtime.Misc;
+using UnityEngine.InputSystem;
 
 namespace StateMachine.States.PlayerStates
 {
@@ -33,10 +34,10 @@ namespace StateMachine.States.PlayerStates
             Animator.SetFloat("FacingX", x);
             Animator.SetFloat("FacingY", y);
             
-            if (Player.swordAnimator)
+            if (Player.SwordAnimator)
             {
-                Player.swordAnimator.SetFloat("FacingX", x);
-                Player.swordAnimator.SetFloat("FacingY", y);
+                Player.SwordAnimator.SetFloat("FacingX", x);
+                Player.SwordAnimator.SetFloat("FacingY", y);
             }
         }
 
