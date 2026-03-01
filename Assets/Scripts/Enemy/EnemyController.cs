@@ -1,3 +1,4 @@
+using Control;
 using Core;
 using StateMachine.States.EnemyStates;
 using UnityEngine;
@@ -10,14 +11,14 @@ namespace Enemy
         
         [field: SerializeField, Header("Player Detection")]
         public LayerMask PlayerLayer { get; set; }
-        [field: SerializeField] public Transform PlayerCheck { get; set; }
+        [field: SerializeField] public AISensor Sensor { get; set; }
 
         private Transform _player;
 
         public float IdleTime => 2.0f; //Data.IdleTime;
         public float MoveTime => 2.0f; //Data.MoveTime;
         public float MoveSpeed => 1.0f; //Data.MoveSpeed;
-        [field: SerializeField] public float RandomMoveRadius { get; set; } = 5.0f;
+        public float RandomMoveRadius => 5.0f; //Data.RandomMoveRadius;
 
         public Vector2 OriginalPosition { get; private set; }
         
@@ -53,6 +54,18 @@ namespace Enemy
             StateMachine.Initialize(IdleState);
         }
 
+        protected override void Update()
+        {
+            base.Update();
+            Sensor.SetFacingDirection(FacingDirection);
+
+            if (Sensor.IsPlayerInRange())
+            {
+                Debug.Log("Player detected!");
+            }
+        }
+        
+
         public Vector2 GetRandomDirection()
         {
             int x, y;
@@ -69,8 +82,8 @@ namespace Enemy
         
         protected override void OnDrawGizmos()
         {
-            Gizmos.color = Color.red;
-            Vector2 center = Application.isPlaying ? OriginalPosition : (Vector2)transform.position;
+            Gizmos.color = Color.green;
+            Vector2 center = Application.isPlaying ? OriginalPosition : transform.position;
             Gizmos.DrawWireSphere(center, RandomMoveRadius);
         }
     }
