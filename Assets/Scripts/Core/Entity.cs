@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace Core
@@ -47,6 +48,11 @@ namespace Core
                 FacingDirection = velocity.x > 0 ? Direction.Right : Direction.Left;
             else
                 FacingDirection = velocity.y > 0 ? Direction.Up : Direction.Down;
+        }
+
+        protected virtual void OnDrawGizmos()
+        {
+            
         }
     }
 }

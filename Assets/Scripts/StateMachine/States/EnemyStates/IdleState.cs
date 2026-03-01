@@ -11,16 +11,14 @@ namespace StateMachine.States.EnemyStates
         public override void Enter()
         {
             base.Enter();
+            Enemy.SetVelocity(Vector2.zero);
             SetupTimers();
         }
 
         private void SetupTimers()
         {
-            _idleTimer = TimerManager.Instance.CreateTimer(Enemy.IdleTime, () =>
-            {
-                Debug.Log("Idle timer completed");
-                StateMachine.ChangeState(Enemy.MoveState);
-            });
+                _idleTimer = TimerManager.Instance.CreateTimer(Enemy.IdleTime,
+                    () => { StateMachine.ChangeState(Enemy.MoveState); });
         }
         
         public override void Exit()

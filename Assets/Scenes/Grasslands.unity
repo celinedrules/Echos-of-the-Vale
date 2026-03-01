@@ -15296,6 +15296,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   <PlayerCheck>k__BackingField: {fileID: 0}
+  <RandomMoveRadius>k__BackingField: 5
 --- !u!50 &1771438840
 Rigidbody2D:
   serializedVersion: 5
