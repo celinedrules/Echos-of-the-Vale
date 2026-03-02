@@ -58,6 +58,7 @@ namespace Enemy
             base.Awake();
             
             Factory = new EnemyStateFactory(this, StateMachine);
+            Health = GetComponent<EnemyHealth>();
         }
 
         protected override void Start()

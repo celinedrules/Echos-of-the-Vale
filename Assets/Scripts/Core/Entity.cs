@@ -22,6 +22,8 @@ namespace Core
         public Animator Animator  { get; private set; }
         public Rigidbody2D Rigidbody { get; private set; }
         public Direction FacingDirection { get; private set; } = Direction.Down;
+        
+        public EntityHealth Health { get; protected set; }
 
         protected virtual void Awake()
         {

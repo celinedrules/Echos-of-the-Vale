@@ -16,6 +16,7 @@ namespace StateMachine.States.EnemyStates
             base.Enter();
             // Enemy.EnemyFx.EnableAttackAlert(false);
             Enemy.CanBeStunned = false;
+            Enemy.Health.CanTakeDamage = false;
 
             //SetupTimers();
 
@@ -48,6 +49,7 @@ namespace StateMachine.States.EnemyStates
             
             //_stunnedTimer?.Cancel();
             KnockBack = false;
+            Enemy.Health.CanTakeDamage = true;
         }
     }
 }

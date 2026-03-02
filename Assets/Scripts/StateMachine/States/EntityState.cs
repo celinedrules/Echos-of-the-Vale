@@ -48,6 +48,12 @@ namespace StateMachine.States
             return stateInfo.normalizedTime >= 1f && !Animator.IsInTransition(0);
         }
         
+        protected float GetAnimationLength()
+        {
+            AnimatorClipInfo[] clipInfo = Animator.GetCurrentAnimatorClipInfo(0);
+            return clipInfo.Length > 0 ? clipInfo[0].clip.length : 0.1f;
+        }
+        
         protected void TriggerOnFrame(int frameIndex, Action action)
         {
             if (_triggeredActions.Contains(action))
