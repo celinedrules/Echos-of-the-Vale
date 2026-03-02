@@ -16,7 +16,7 @@ namespace Enemy
         private Transform _player;
 
         public float BattleMoveSpeed => 2.0f; //Data.BattleMoveSpeed;
-        public float AttackDistance => 2.0f; //Data.AttackDistance;
+        public float AttackDistance => 1.5f; //Data.AttackDistance;
         public float BattleTimeDuration => 5.0f; //Data.BattleTimeDuration;
         public float MinRetreatDistance => 5.0f; //Data.MinRetreatDistance;
         public Vector2 RetreatVelocity => Vector2.zero; //Data.RetreatVelocity;

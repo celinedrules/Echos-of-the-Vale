@@ -1,4 +1,5 @@
 using Managers;
+using UnityEngine;
 using Utilities;
 
 namespace StateMachine.States.EnemyStates
@@ -10,6 +11,7 @@ namespace StateMachine.States.EnemyStates
         public override void Enter()
         {
             base.Enter();
+            Enemy.SetVelocity(Vector2.zero);
             SyncAttackSpeed();
         }
 

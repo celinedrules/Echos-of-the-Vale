@@ -26,8 +26,7 @@ namespace StateMachine.States.EnemyStates
             base.Update();
 
             if (Enemy.PlayerDetected && StateMachine.CurrentState != Enemy.BattleState 
-                                     && StateMachine.CurrentState != Enemy.AttackState
-                                     && StateMachine.CurrentState != Enemy.RetreatState)
+                                     && StateMachine.CurrentState != Enemy.AttackState)
             {
                 StateMachine.ChangeState(Enemy.BattleState);
             }

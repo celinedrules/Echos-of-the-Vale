@@ -207,7 +207,7 @@ Transform:
   m_GameObject: {fileID: 68813000}
   serializedVersion: 2
   m_LocalRotation: {x: -3.469447e-18, y: 0.000000012493773, z: 4.3346483e-26, w: 1}
-  m_LocalPosition: {x: -2.1982415, y: -0.58, z: -10}
+  m_LocalPosition: {x: 3.2462027, y: -3.86201, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -496,7 +496,7 @@ Transform:
   m_GameObject: {fileID: 232980076}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3.72, y: -0.58, z: 0}
+  m_LocalPosition: {x: 4.04, y: -6.47, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -15220,7 +15220,7 @@ Transform:
   m_GameObject: {fileID: 1691819611}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3.72, y: -0.58, z: -10}
+  m_LocalPosition: {x: 4.04, y: -6.47, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -15337,7 +15337,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Control.AISensor
   distance: 5
-  angle: 30
+  angle: 180
   meshColor: {r: 1, g: 0, b: 0, a: 0.3}
   scanFrequency: 30
   layers:
