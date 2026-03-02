@@ -21,6 +21,20 @@ namespace StateMachine.States.EnemyStates
             // Stats = enemy.Stats;
         }
 
+        public override void Update()
+        {
+            base.Update();
+
+            if (Enemy.PlayerDetected && StateMachine.CurrentState != Enemy.BattleState 
+                                     && StateMachine.CurrentState != Enemy.AttackState
+                                     && StateMachine.CurrentState != Enemy.RetreatState)
+            {
+                StateMachine.ChangeState(Enemy.BattleState);
+            }
+            // if (Enemy.PlayerDetected)
+            //     StateMachine.ChangeState(Enemy.BattleState);
+        }
+
         private void SetFacingFloats(float x, float y)
         {
             Animator.SetFloat(FacingX, x);

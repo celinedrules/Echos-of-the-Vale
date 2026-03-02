@@ -28,7 +28,13 @@ namespace Control
         public float Angle => angle;
         public List<GameObject> Objects => objects;
 
-        public bool IsPlayerInRange() => objects.Any(obj => obj.CompareTag("Player"));
+        public Transform GetPlayerTransform()
+        {
+            GameObject player = objects.FirstOrDefault(obj => obj.CompareTag("Player"));
+            return player ? player.transform : null;
+        }
+
+        public bool IsPlayerInRange() => GetPlayerTransform() != null;
 
         public void SetFacingDirection(Direction direction)
         {
