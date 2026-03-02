@@ -33,7 +33,6 @@ namespace Core
         {
             if(other.GetComponent<HurtBox>())
             {
-                Debug.Log("Hitbox hit something");
                 _hitSomething = true;
                 
                 // if(Owner is EnemyController enemy)

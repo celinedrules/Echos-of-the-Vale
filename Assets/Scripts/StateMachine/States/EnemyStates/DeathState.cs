@@ -6,9 +6,17 @@ namespace StateMachine.States.EnemyStates
     {
         public override void Enter()
         {
-            Animator.enabled = false;
+            base.Enter();
             Enemy.GetComponent<Collider2D>().enabled = false;
             StateMachine.CanChangeState = false;
+        }
+
+        public override void Update()
+        {
+            base.Update();
+
+            if (HasAnimationFinished())
+                Enemy.Death();
         }
     }
 }

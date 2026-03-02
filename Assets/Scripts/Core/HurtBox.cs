@@ -30,8 +30,6 @@ namespace Core
             if(Owner == null)
                 return;
             
-            Debug.Log("Hurtbox hit something");
-            
             _sourceEntity = hitBox.Owner;
             
             if(!_sourceEntity)
@@ -53,15 +51,12 @@ namespace Core
             
             //tookDamage = Owner.TakeDamage(physicalDamage, elementalDamage, elementType, _sourceEntity);
             tookDamage = Owner.TakeDamage(1, 1, ElementType.None, _sourceEntity);
-
-            Debug.Log(Owner + "Took damage");
             
             // if(elementType != ElementType.None)
             //     targetStatusHandler?.ApplyEffect(elementType, attackData.EffectData);
 
             if (tookDamage)
             {
-                Debug.Log("Took damage");
                 // _sourceEntity?.OnDealtPhysicalDamage(physicalDamage);
                 // _sourceEntity?.EntityFx.SetElementColor(elementType);
                 // _sourceEntity?.EntityFx?.CreateHitEffect(transform, attackData.IsCritical);

@@ -624,6 +624,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12889fb746414a4aae0ea78fe87740e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player.PlayerHealth
+  normalDamageKnockback:
+    power: {x: 0, y: 0}
+    duration: 0
+  heavyDamageKnockback:
+    power: {x: 0, y: 0}
+    duration: 0
+  heavyDamageThreshold: 0.3
+  <CurrentHealth>k__BackingField: 100
+  regenInterval: 1
+  canRegenerateHealth: 1
+  alwaysRegenerate: 0
 --- !u!1 &233407669
 GameObject:
   m_ObjectHideFlags: 0
@@ -15703,6 +15714,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 084336e37d8e4f5b9f0a9a7c9053212e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy.EnemyHealth
+  normalDamageKnockback:
+    power: {x: 0, y: 0}
+    duration: 0
+  heavyDamageKnockback:
+    power: {x: 0, y: 0}
+    duration: 0
+  heavyDamageThreshold: 0.3
+  <CurrentHealth>k__BackingField: 30
+  regenInterval: 1
+  canRegenerateHealth: 1
+  alwaysRegenerate: 0
 --- !u!1 &1948277057
 GameObject:
   m_ObjectHideFlags: 0

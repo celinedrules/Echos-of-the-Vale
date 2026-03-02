@@ -74,6 +74,14 @@ namespace Enemy
             Sensor.SetFacingDirection(FacingDirection);
         }
         
+        public void TryEnterBattleState()
+        {
+            if (StateMachine.CurrentState == BattleState || StateMachine.CurrentState == AttackState)
+                return;
+
+            StateMachine.ChangeState(BattleState);
+        }
+        
         public bool PlayerDetected => Sensor.IsPlayerInRange();
         
         public Vector2 GetRandomDirection()
@@ -98,7 +106,18 @@ namespace Enemy
         }
         
         public float GetMoveSpeed() => MoveSpeed * ActiveSlowMultiplier;
-        
+
+        public override void EntityDeath()
+        {
+            base.EntityDeath();
+            StateMachine.ChangeState(DeathState);
+        }
+
+        public void Death()
+        {
+            Destroy(gameObject);
+        }
+
         protected override void OnDrawGizmos()
         {
             Gizmos.color = Color.green;

@@ -49,6 +49,10 @@ namespace Core
             else
                 FacingDirection = velocity.y > 0 ? Direction.Up : Direction.Down;
         }
+        
+        public virtual void EntityDeath()
+        {
+        }
 
         protected virtual void OnDrawGizmos()
         {
