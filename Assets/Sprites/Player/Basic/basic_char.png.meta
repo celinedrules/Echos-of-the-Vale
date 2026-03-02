@@ -1649,7 +1649,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: basic_char_58
+      name: basic_death_down_0
       rect:
         serializedVersion: 2
         x: 1440
@@ -1891,7 +1891,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: basic_char_69
+      name: basic_death_left_0
       rect:
         serializedVersion: 2
         x: 1440
@@ -2133,11 +2133,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: basic_char_80
+      name: basic_death_right_0
       rect:
         serializedVersion: 2
         x: 1440
-        y: 144
+        y: 146
         width: 144
         height: 144
       alignment: 0
@@ -2375,7 +2375,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: basic_char_91
+      name: basic_death_up_0
       rect:
         serializedVersion: 2
         x: 1440
@@ -2470,14 +2470,12 @@ TextureImporter:
       basic_char_50: -5602635480424860479
       basic_char_51: -2164494243295233500
       basic_char_52: -6481698155213737546
-      basic_char_58: 8081961141563586485
       basic_char_59: 6168270397965382081
       basic_char_6: 3347002159978025831
       basic_char_60: -6447388524037169595
       basic_char_61: 1053486223714322101
       basic_char_62: -6606487919399582250
       basic_char_63: -4858058046547670183
-      basic_char_69: 8242492176434376160
       basic_char_7: -968343153462378383
       basic_char_70: 7670405130557005255
       basic_char_71: 2236120545531500112
@@ -2485,14 +2483,16 @@ TextureImporter:
       basic_char_73: 6629072623267068818
       basic_char_74: 6626938788796026305
       basic_char_8: 5613884564007390635
-      basic_char_80: -3440444315436359501
       basic_char_81: 8724179103555040985
       basic_char_82: 4550162231761218743
       basic_char_83: -6512071983540329055
       basic_char_84: 5839396020033096293
       basic_char_85: -1230218186257429011
       basic_char_9: 3602348166207390172
-      basic_char_91: 5722678576297924068
+      basic_death_down_0: 8081961141563586485
+      basic_death_left_0: 8242492176434376160
+      basic_death_right_0: -3440444315436359501
+      basic_death_up_0: 5722678576297924068
       basic_walk_down_0: 7483975511563551941
       basic_walk_down_1: 8945221668925728468
       basic_walk_down_2: -3807217450069277735

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using Core;
 using Data.WeaponData;
@@ -8,6 +9,8 @@ namespace Player
 {
     public class PlayerController : Entity
     {
+        public static event Action OnPlayerDeath;
+        
         private PlayerStateFactory _factory;
         private Coroutine _queuedAttackCo;
         
@@ -16,7 +19,8 @@ namespace Player
         public IdleState IdleState { get; private set; }
         public MoveState MoveState { get; private set; }
         public BasicAttackState BasicAttackState { get; private set; }
-
+        public DeathState DeathState { get; private set; }
+        
         [field: SerializeField, Header("Movement Settings")]
         public float MoveSpeed { get; set; } = 5.0f;
         
@@ -44,6 +48,7 @@ namespace Player
             IdleState = _factory.Create<IdleState>("Idle");
             MoveState = _factory.Create<MoveState>("Move");
             BasicAttackState = _factory.Create<BasicAttackState>("BasicAttack");
+            DeathState = _factory.Create<DeathState>("Death");
         }
 
         protected override void Start()
@@ -82,6 +87,13 @@ namespace Player
             
             if(SwordAnimator && sword)
                 SwordAnimator.runtimeAnimatorController = sword.AnimatorController;
+        }
+
+        public override void EntityDeath()
+        {
+            base.EntityDeath();
+            OnPlayerDeath?.Invoke();
+            StateMachine.ChangeState(DeathState);
         }
     }
 }

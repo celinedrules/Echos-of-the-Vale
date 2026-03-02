@@ -1,5 +1,6 @@
 using Control;
 using Core;
+using Player;
 using StateMachine.States.EnemyStates;
 using UnityEngine;
 
@@ -52,6 +53,10 @@ namespace Enemy
         public RetreatState RetreatState { get; protected set; }
         public StunnedState StunnedState { get; protected set; }
         public DeathState DeathState { get; protected set; }
+
+        private void OnEnable() => PlayerController.OnPlayerDeath += HandlePlayerDeath;
+        private void OnDisable() => PlayerController.OnPlayerDeath -= HandlePlayerDeath;
+        
 
         protected override void Awake()
         {
@@ -126,6 +131,8 @@ namespace Enemy
         {
             Destroy(gameObject);
         }
+
+        private void HandlePlayerDeath() => StateMachine.ChangeState(IdleState);
 
         protected override void OnDrawGizmos()
         {
