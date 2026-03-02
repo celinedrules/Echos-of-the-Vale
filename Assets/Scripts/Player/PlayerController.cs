@@ -19,6 +19,7 @@ namespace Player
         public IdleState IdleState { get; private set; }
         public MoveState MoveState { get; private set; }
         public BasicAttackState BasicAttackState { get; private set; }
+        public CounterAttackState CounterAttackState { get; private set; }
         public DeathState DeathState { get; private set; }
         
         [field: SerializeField, Header("Movement Settings")]
@@ -49,6 +50,7 @@ namespace Player
             IdleState = _factory.Create<IdleState>("Idle");
             MoveState = _factory.Create<MoveState>("Move");
             BasicAttackState = _factory.Create<BasicAttackState>("BasicAttack");
+            CounterAttackState = _factory.Create<CounterAttackState>("CounterAttack");
             DeathState = _factory.Create<DeathState>("Death");
         }
 

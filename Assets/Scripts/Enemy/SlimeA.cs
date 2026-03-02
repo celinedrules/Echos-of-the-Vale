@@ -1,9 +1,12 @@
+using Core.Interfaces;
 using StateMachine.States.EnemyStates;
 
 namespace Enemy
 {
-    public class SlimeA : EnemyController
+    public class SlimeA : EnemyController, ICounterable
     {
+        public bool CanBeCountered => CanBeStunned;
+        
         protected override void Awake()
         {
             base.Awake();
@@ -21,6 +24,14 @@ namespace Enemy
         {
             base.Start();
             StateMachine.Initialize(IdleState);
+        }
+        
+        public void HandleCounter()
+        {
+            if (!CanBeCountered)
+                return;
+
+            StateMachine.ChangeState(StunnedState);
         }
     }
 }

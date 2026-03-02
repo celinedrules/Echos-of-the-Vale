@@ -28,6 +28,9 @@ namespace StateMachine.States.PlayerStates
             
             if(Input.Player.Attack.WasPressedThisFrame())
                 StateMachine.ChangeState(Player.BasicAttackState);
+            
+            if(Input.Player.CounterAttack.WasPressedThisFrame())
+                StateMachine.ChangeState(Player.CounterAttackState);
         }
 
         private void SetFacingFloats(float x, float y)
