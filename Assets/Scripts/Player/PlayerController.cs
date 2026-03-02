@@ -37,6 +37,7 @@ namespace Player
             base.Awake();
             
             Input = GetComponent<PlayerInputHandler>();
+            Health = GetComponent<PlayerHealth>();
             
             if (SwordAnimator)
                 SwordAnimator.keepAnimatorStateOnDisable = true;

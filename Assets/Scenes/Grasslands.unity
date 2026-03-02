@@ -625,13 +625,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player.PlayerHealth
   normalDamageKnockback:
-    power: {x: 0, y: 0}
-    duration: 0
+    power: 7
+    duration: 0.12
   heavyDamageKnockback:
-    power: {x: 0, y: 0}
+    power: 0
     duration: 0
   heavyDamageThreshold: 0.3
-  <CurrentHealth>k__BackingField: 100
+  <CurrentHealth>k__BackingField: 30
   regenInterval: 1
   canRegenerateHealth: 1
   alwaysRegenerate: 0
@@ -15715,10 +15715,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy.EnemyHealth
   normalDamageKnockback:
-    power: {x: 0, y: 0}
+    power: 0
     duration: 0
   heavyDamageKnockback:
-    power: {x: 0, y: 0}
+    power: 0
     duration: 0
   heavyDamageThreshold: 0.3
   <CurrentHealth>k__BackingField: 30

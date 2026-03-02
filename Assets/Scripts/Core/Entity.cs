@@ -67,11 +67,13 @@ namespace Core
         private IEnumerator KnockbackRoutine(Vector2 knockbackPower, float knockbackTime)
         {
             _isKnockedBack = true;
+            Health.CanTakeDamage = false;
             Rigidbody.linearVelocity = knockbackPower;
 
             yield return new WaitForSeconds(knockbackTime);
 
             Rigidbody.linearVelocity = Vector2.zero;
+            Health.CanTakeDamage = true;
             _isKnockedBack = false;
         }
         

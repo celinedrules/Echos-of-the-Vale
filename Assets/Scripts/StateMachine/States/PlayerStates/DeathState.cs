@@ -4,13 +4,13 @@ namespace StateMachine.States.PlayerStates
 {
     public class DeathState : PlayerState
     {
-        private bool _enteredtThisFrame;
+        private bool _enteredThisFrame;
 
         public override void Enter()
         {
             base.Enter();
 
-            _enteredtThisFrame = true;
+            _enteredThisFrame = true;
             Input.Player.Disable();
         }
 
@@ -18,9 +18,9 @@ namespace StateMachine.States.PlayerStates
         {
             base.Update();
 
-            if (_enteredtThisFrame)
+            if (_enteredThisFrame)
             {
-                _enteredtThisFrame = false;
+                _enteredThisFrame = false;
                 return;
             }
 

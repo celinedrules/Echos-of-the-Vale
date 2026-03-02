@@ -12,7 +12,7 @@ namespace Core
         [Serializable]
         public struct KnockbackSettings
         {
-            public Vector2 power;
+            public float power;
             public float duration;
         }
         
@@ -25,13 +25,13 @@ namespace Core
         // [field: SerializeField] public EntityFx DamageEffect { get; set; }
 
         [Header("Knockback")]
-        [SerializeField] private KnockbackSettings normalDamageKnockback;
-        [SerializeField] private KnockbackSettings heavyDamageKnockback;
+        [SerializeField] protected KnockbackSettings normalDamageKnockback;
+        [SerializeField] protected KnockbackSettings heavyDamageKnockback;
         
         [Header("Heavy Damage")]
         [SerializeField] private float heavyDamageThreshold = 0.3f;
         
-        private Entity _entity;
+        protected Entity entity;
         // private EntityDropManager _dropManager;
         // private Slider _healthBar;
         // private Timer _healthBarTimer;
@@ -59,7 +59,7 @@ namespace Core
 
         private void Start()
         {
-            _entity = GetComponent<Entity>();
+            entity = GetComponent<Entity>();
             // _dropManager = GetComponent<EntityDropManager>();
             // _entityStats = _entity?.Stats;
             // _healthBar = GetComponentInChildren<Slider>();
@@ -157,26 +157,13 @@ namespace Core
         protected virtual void Die()
         {
             IsDead = true;
-            _entity?.EntityDeath();
+            entity?.EntityDeath();
             //_dropManager?.DropItems();
         }
         
-        private void HandleDamageKnockback(Entity attacker, int finalDamage)
+        protected virtual void HandleDamageKnockback(Entity attacker, int finalDamage)
         {
-            // bool heavy = IsHeavyDamage(finalDamage);
-            // KnockbackSettings kb = heavy ? heavyDamageKnockback : normalDamageKnockback;
-            // if (attacker)
-            // {
-            //     {
-            //         _entity?.Knockback(new Vector2(kb.power.x * GetHorizontalDirectionFrom(attacker), kb.power.y),
-            //             kb.duration);
-            //     }
-            // }
-            // else
-            // {
-            //     // Get Skeleton Direction
-            //     _entity?.Knockback(kb.power * -(int)_entity.FacingDirection, kb.duration);
-            // }
+           
         }
         
         // private bool IsHeavyDamage(int damage)
