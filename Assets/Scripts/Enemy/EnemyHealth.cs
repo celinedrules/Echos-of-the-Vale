@@ -23,7 +23,8 @@ namespace Enemy
             if (attacker is PlayerController player)
             {
                 _enemy.PlayerTransform = player.transform;
-                _enemy.TryEnterBattleState();
+                _enemy.Stun(true);
+                //_enemy.TryEnterBattleState();
             }
             
             return true;

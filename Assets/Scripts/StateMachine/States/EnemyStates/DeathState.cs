@@ -7,7 +7,13 @@ namespace StateMachine.States.EnemyStates
         public override void Enter()
         {
             base.Enter();
-            Enemy.GetComponent<Collider2D>().enabled = false;
+            
+            Collider2D[] colliders = Enemy.GetComponentsInChildren<Collider2D>();
+            
+            foreach (Collider2D collider in colliders)
+                collider.enabled = false;
+            
+            //Enemy.GetComponent<Collider2D>().enabled = false;
             StateMachine.CanChangeState = false;
         }
 

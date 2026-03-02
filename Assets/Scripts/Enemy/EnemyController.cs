@@ -20,7 +20,7 @@ namespace Enemy
         public float BattleTimeDuration => 5.0f; //Data.BattleTimeDuration;
         public float MinRetreatDistance => 5.0f; //Data.MinRetreatDistance;
         public Vector2 RetreatVelocity => Vector2.zero; //Data.RetreatVelocity;
-        public Vector2 StunnedVelocity => new Vector2(7, 7); //Data.StunnedVelocity;
+        public float StunnedVelocity => 7.0f; //Data.StunnedVelocity;
         public bool CanBeStunned { get; set; } = false; //Data.CanBeStunned;
         public int StartStunnedFrame => 20; //Data.StartStunnedFrame;
         public float StunnedFrameDuration => 0.25f; //Data.StunnedFrameDuration;
@@ -74,6 +74,8 @@ namespace Enemy
             Sensor.SetFacingDirection(FacingDirection);
         }
         
+        
+        
         public void TryEnterBattleState()
         {
             if (StateMachine.CurrentState == BattleState || StateMachine.CurrentState == AttackState)
@@ -106,6 +108,12 @@ namespace Enemy
         }
         
         public float GetMoveSpeed() => MoveSpeed * ActiveSlowMultiplier;
+
+        public override void Stun(bool knockback)
+        {
+            StunnedState.KnockBack = knockback;
+            StateMachine.ChangeState(StunnedState);
+        }
 
         public override void EntityDeath()
         {
