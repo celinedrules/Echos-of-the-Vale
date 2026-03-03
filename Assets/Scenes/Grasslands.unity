@@ -15735,7 +15735,7 @@ MonoBehaviour:
     power: 0
     duration: 0
   heavyDamageThreshold: 0.3
-  <CurrentHealth>k__BackingField: 30
+  <CurrentHealth>k__BackingField: 1000
   regenInterval: 1
   canRegenerateHealth: 1
   alwaysRegenerate: 0

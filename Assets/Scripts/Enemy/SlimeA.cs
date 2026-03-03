@@ -31,7 +31,7 @@ namespace Enemy
             if (!CanBeCountered)
                 return;
 
-            StateMachine.ChangeState(StunnedState);
+            Stun(true);
         }
     }
 }

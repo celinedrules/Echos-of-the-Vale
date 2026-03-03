@@ -1,6 +1,7 @@
 using System;
 using Core;
 using Core.Interfaces;
+using Enemy;
 using UnityEngine;
 
 namespace Player
@@ -23,7 +24,7 @@ namespace Player
             
             WeaponHitBox hitBox = other.GetComponent<WeaponHitBox>();
 
-            if (hitBox != null && hitBox.Owner is ICounterable counterable)
+            if (hitBox && hitBox.Owner is ICounterable counterable)
             {
                 if (counterable.CanBeCountered)
                 {

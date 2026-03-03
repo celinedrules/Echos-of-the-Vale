@@ -29,7 +29,7 @@ namespace StateMachine.States.PlayerStates
             if(Input.Player.Attack.WasPressedThisFrame())
                 StateMachine.ChangeState(Player.BasicAttackState);
             
-            if(Input.Player.CounterAttack.WasPressedThisFrame())
+            if(Input.Player.CounterAttack.WasPressedThisFrame() && StateMachine.CurrentState != Player.CounterAttackState)
                 StateMachine.ChangeState(Player.CounterAttackState);
         }
 

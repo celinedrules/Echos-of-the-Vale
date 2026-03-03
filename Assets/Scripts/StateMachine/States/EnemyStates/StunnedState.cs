@@ -1,4 +1,3 @@
-using Managers;
 using UnityEngine;
 using Utilities;
 
@@ -13,10 +12,8 @@ namespace StateMachine.States.EnemyStates
         public override void Enter()
         {
             base.Enter();
-            // Enemy.EnemyFx.EnableAttackAlert(false);
+            
             Enemy.CanBeStunned = false;
-
-            //SetupTimers();
 
             if (KnockBack)
             {
@@ -35,17 +32,9 @@ namespace StateMachine.States.EnemyStates
                 
         }
 
-        // private void SetupTimers()
-        // {
-        //     _stunnedTimer = TimerManager.Instance.CreateTimer(Enemy.StunnedFrameDuration,
-        //         () => { StateMachine.ChangeState(Enemy.IdleState); });
-        // }
-
         public override void Exit()
         {
             base.Exit();
-            
-            //_stunnedTimer?.Cancel();
             KnockBack = false;
         }
     }

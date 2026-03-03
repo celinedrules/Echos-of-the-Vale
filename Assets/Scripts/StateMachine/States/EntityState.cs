@@ -42,9 +42,13 @@ namespace StateMachine.States
             // Animator.SetFloat(AttackSpeedMultiplier, attackSpeed);
         }
         
-        protected bool HasAnimationFinished()
+        protected bool HasAnimationFinished(int animationHash = -1)
         {
             AnimatorStateInfo stateInfo = Animator.GetCurrentAnimatorStateInfo(0);
+            
+            if (animationHash != -1 && stateInfo.shortNameHash != animationHash)
+                return false;
+            
             return stateInfo.normalizedTime >= 1f && !Animator.IsInTransition(0);
         }
         

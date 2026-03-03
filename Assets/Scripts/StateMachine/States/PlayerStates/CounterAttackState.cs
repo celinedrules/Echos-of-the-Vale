@@ -8,6 +8,10 @@ namespace StateMachine.States.PlayerStates
     public class CounterAttackState : PlayerState
     {
         private static readonly int CounterAttackTrigger = Animator.StringToHash("CounterAttackTrigger");
+        private static readonly int CounterAttackPerformedState = Animator.StringToHash("PlayerCounterAttackPerformed");
+        private static readonly int CounterPrep = Animator.StringToHash("CounterPrep");
+        private static readonly int Counter = Animator.StringToHash("Counter");
+        private static readonly int Attack = Animator.StringToHash("Attack");
 
         private Timer _counterAttackTimer;
         private PlayerCounterAttack _playerCounterAttack;
@@ -15,7 +19,6 @@ namespace StateMachine.States.PlayerStates
 
         public override void Enter()
         {
-            Debug.Log("CounterAttackState entered");
             base.Enter();
             
             if(!_playerCounterAttack)
@@ -24,13 +27,12 @@ namespace StateMachine.States.PlayerStates
             _playerCounterAttack.OnCounterSuccess += HandleCounterSuccess;
             _playerCounterAttack.SetCounterWindow(true);
             Player.SwordParent.SetActive(true);
+         
             if (Player.SwordAnimator)
             {
-                Player.SwordAnimator.SetBool("Counter", true);
-                //Player.SwordAnimator.enabled = false;
+                Player.SwordAnimator.Play(CounterPrep, 0, 0f);
+                Player.SwordAnimator.SetBool(Counter, true);
             }
-            //Player.SwordAnimator.playbackTime = 0f;
-            //Player.SwordAnimator.Play("Attack", 0, 0f);
             
             _countered = false;
             
@@ -39,7 +41,7 @@ namespace StateMachine.States.PlayerStates
                 if (!_countered || HasAnimationFinished())
                 {
                     StateMachine.ChangeState(Player.IdleState);
-                    Player.SwordAnimator.SetBool("Counter", false);
+                    Player.SwordAnimator.SetBool(Counter, false);
                 }
             });
         }
@@ -47,9 +49,10 @@ namespace StateMachine.States.PlayerStates
         public override void Update()
         {
             base.Update();
-            //Player.SetVelocity(0, Rigidbody.linearVelocity.y);
-            
-            if (_countered && HasAnimationFinished())
+
+            UpdateAnimationParams();
+
+            if (_countered && HasAnimationFinished(CounterAttackPerformedState))
                 StateMachine.ChangeState(Player.IdleState);
         }
 
@@ -58,11 +61,10 @@ namespace StateMachine.States.PlayerStates
             base.Exit();
             _playerCounterAttack.OnCounterSuccess -= HandleCounterSuccess;
             _playerCounterAttack.SetCounterWindow(false);
+            
             if (Player.SwordAnimator)
-            {
-                Player.SwordAnimator.SetBool("Counter", false);
-                //Player.SwordAnimator.enabled = true;
-            }
+                Player.SwordAnimator.SetBool(Counter, false);
+
             Player.SwordParent.SetActive(false);
         }
 
@@ -70,13 +72,13 @@ namespace StateMachine.States.PlayerStates
         {
             _countered = true;
             _counterAttackTimer?.Cancel();
+            
             if (Player.SwordAnimator)
             {
-                Debug.Log("Enable Counter Attack Animator");
-                Player.SwordAnimator.enabled = true;
-                Player.SwordAnimator.SetBool("Counter", false);
-                Player.SwordAnimator.Play("Attack", 0, 0f);
+                Player.SwordAnimator.SetBool(Counter, false);
+                Player.SwordAnimator.Play(Attack, 0, 0f);
             }
+
             Animator.SetTrigger(CounterAttackTrigger);
         }
     }
