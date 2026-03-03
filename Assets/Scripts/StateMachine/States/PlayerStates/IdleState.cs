@@ -14,6 +14,9 @@ namespace StateMachine.States.PlayerStates
         {
             base.Update();
             
+            if (Player.IsKnockedBack)
+                return;
+            
             // No input → stay idle
             if (Input.MoveInput == Vector2.zero)
                 return;

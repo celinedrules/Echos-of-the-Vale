@@ -1,5 +1,9 @@
 using System;
 using Core.Interfaces;
+using Enemy;
+using Player;
+using StateMachine.States.EnemyStates;
+using StateMachine.States.PlayerStates;
 using UnityEngine;
 using Utilities.Enums;
 
@@ -23,18 +27,66 @@ namespace Core
         private void OnTriggerEnter2D(Collider2D other)
         {
             WeaponHitBox hitBox = other.GetComponent<WeaponHitBox>();
-            
-            if(!hitBox)
+
+            if (hitBox)
+            {
+                HandleWeaponHit(hitBox);
                 return;
+            }
+
+            HandleContactDamage(other);
             
-            if(Owner == null)
-                return;
+            // if(Owner == null)
+            //     return;
+            //
+            // _sourceEntity = hitBox.Owner;
+            //  
+            // if(!_sourceEntity)
+            //     return;
+
+            //Debug.Log(gameObject.transform.root.name);
             
-            _sourceEntity = hitBox.Owner;
-            
-            if(!_sourceEntity)
+            // if(_targetEntity is PlayerController player)
+            // {
+            //     if(player.CurrentState == player.BasicAttackState)
+            //     {
+            //         Debug.Log("Perform Attack");
+            //         PerformAttack();
+            //     }
+            // }
+            //PerformAttack();
+        }
+        
+        private void HandleWeaponHit(WeaponHitBox hitBox)
+        {
+            if (Owner == null)
                 return;
 
+            _sourceEntity = hitBox.Owner;
+
+            if (!_sourceEntity)
+                return;
+
+            PerformAttack();
+        }
+        
+        private void HandleContactDamage(Collider2D other)
+        {
+            // Only the player should take contact damage from enemies
+            if (_targetEntity is not PlayerController player)
+                return;
+
+            if (Owner == null)
+                return;
+
+            // Check if the collider belongs to an enemy
+            Entity contactEntity = other.GetComponentInParent<Entity>();
+
+            if (contactEntity is not EnemyController)
+                return;
+
+            _sourceEntity = contactEntity;
+            
             PerformAttack();
         }
 

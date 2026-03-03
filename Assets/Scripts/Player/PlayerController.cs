@@ -63,8 +63,8 @@ namespace Player
         
         public void SetVelocity(float velocityX, float velocityY)
         {
-            // if (_isKnockedBack)
-            //     return;
+            if (IsKnockedBack)
+                return;
 
             Rigidbody.linearVelocity = new Vector2(velocityX, velocityY);
             //HandleFlip(velocityX);

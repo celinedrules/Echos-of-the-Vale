@@ -8,6 +8,9 @@ namespace StateMachine.States.PlayerStates
         {
             base.Update();
             
+            if(Player.IsKnockedBack)
+                return;
+            
             if(Input.MoveInput == Vector2.zero)
                 StateMachine.ChangeState(Player.IdleState);
             

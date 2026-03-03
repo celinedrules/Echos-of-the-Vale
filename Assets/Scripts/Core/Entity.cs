@@ -1,5 +1,7 @@
 using System;
 using System.Collections;
+using StateMachine.States;
+using StateMachine.States.PlayerStates;
 using UnityEngine;
 
 namespace Core
@@ -19,6 +21,8 @@ namespace Core
         private bool _isKnockedBack;
         private Coroutine _knockbackRoutine;
         
+        public bool IsKnockedBack => _isKnockedBack;
+        public EntityState CurrentState => StateMachine.CurrentState;
         public Animator Animator  { get; private set; }
         public Rigidbody2D Rigidbody { get; private set; }
         public Direction FacingDirection { get; private set; } = Direction.Down;
