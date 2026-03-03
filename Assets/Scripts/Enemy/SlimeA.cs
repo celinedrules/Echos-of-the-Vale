@@ -5,7 +5,7 @@ namespace Enemy
 {
     public class SlimeA : EnemyController, ICounterable
     {
-        public bool CanBeCountered => CanBeStunned;
+        public bool CanBeCountered => IsAttacking;
         
         protected override void Awake()
         {

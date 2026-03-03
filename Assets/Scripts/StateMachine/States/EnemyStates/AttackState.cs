@@ -12,6 +12,7 @@ namespace StateMachine.States.EnemyStates
         {
             base.Enter();
             Enemy.SetVelocity(Vector2.zero);
+            Enemy.IsAttacking = true;
             SyncAttackSpeed();
         }
 
@@ -30,6 +31,7 @@ namespace StateMachine.States.EnemyStates
         public override void Exit()
         {
             base.Exit();
+            Enemy.IsAttacking = false;
             _stunTimer?.Cancel();
         }
 

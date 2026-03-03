@@ -93,7 +93,6 @@ namespace Core
         
         public virtual bool TakeDamage(int amount, int elementalDamage, ElementType elementType, Entity attacker)
         {
-            Debug.Log($"{gameObject.name} taking damage");
             if(IsDead || !CanTakeDamage)
                 return false;
 
@@ -147,7 +146,6 @@ namespace Core
             //DamageEffect?.Flash();
 
             CurrentHealth -= amount;
-            Debug.Log($"{gameObject.name} reduced {amount} to {CurrentHealth}");
             OnHealthUpdate?.Invoke();
 
             if (CurrentHealth <= 0)

@@ -20,8 +20,6 @@ namespace StateMachine.States.EnemyStates
             
             if(!ShouldRetreat())
                 return;
-            
-            Debug.Log("Retreat");
         }
 
         public override void Update()
@@ -43,7 +41,6 @@ namespace StateMachine.States.EnemyStates
             if(InAttackRange() && Enemy.PlayerDetected)
             {
                 StateMachine.ChangeState(Enemy.AttackState);
-                Debug.Log("BattleState: In attack range");
             }
             else
             {

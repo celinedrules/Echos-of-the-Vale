@@ -12,7 +12,6 @@ namespace StateMachine.States.EnemyStates
 
         public override void Enter()
         {
-            Debug.Log("Entered StunnedState");
             base.Enter();
             // Enemy.EnemyFx.EnableAttackAlert(false);
             Enemy.CanBeStunned = false;

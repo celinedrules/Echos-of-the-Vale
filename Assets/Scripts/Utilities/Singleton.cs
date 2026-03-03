@@ -15,7 +15,6 @@ namespace Utilities
         {
             set
             {
-                Debug.Log("Persistent");
                 isPersistent = value;
                 SetPersistence();
             }
