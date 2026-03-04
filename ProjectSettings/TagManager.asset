@@ -17,9 +17,9 @@ TagManager:
   - Enemy
   - PlayerAttack
   - EnemyAttack
-  - 
-  - 
-  - 
+  - Interactable
+  - Pickups
+  - Npc
   - 
   - 
   - 
