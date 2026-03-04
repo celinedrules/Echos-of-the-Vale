@@ -1,5 +1,7 @@
 using System;
+using System.Collections;
 using Core.Interfaces;
+using Managers;
 using Stats;
 using UnityEngine;
 using UnityEngine.UI;
@@ -34,10 +36,10 @@ namespace Core
         
         protected Entity entity;
         // private EntityDropManager _dropManager;
-        // private Slider _healthBar;
-        // private Timer _healthBarTimer;
-        // private float _regenTimer;
-        // private Coroutine _regenRoutine;
+        private Slider _healthBar;
+        private Timer _healthBarTimer;
+        private float _regenTimer;
+        private Coroutine _regenRoutine;
         
         [field: SerializeField, Header("Health")]
         public int CurrentHealth { get; set; }
@@ -52,18 +54,18 @@ namespace Core
         public bool CanTakeDamage { get; set; } = true;
         public bool IsDead { get; private set; }
         public float LastDamageTakenTime { get; private set; }
-        // public bool MiniHealthBarActive
-        // {
-        //     get => _healthBar.transform.parent.gameObject.activeSelf;
-        //     set => _healthBar?.transform.parent.gameObject.SetActive(value);
-        // }
+        public bool MiniHealthBarActive
+        {
+            get => _healthBar.transform.parent.gameObject.activeSelf;
+            set => _healthBar?.transform.parent.gameObject.SetActive(value);
+        }
 
         private void Start()
         {
             entity = GetComponent<Entity>();
             // _dropManager = GetComponent<EntityDropManager>();
             // _entityStats = _entity?.Stats;
-            // _healthBar = GetComponentInChildren<Slider>();
+            _healthBar = GetComponentInChildren<Slider>();
         }
 
         public void Initialize()
@@ -133,14 +135,80 @@ namespace Core
             return false;
         }
         
-        // public void IncreaseHealth(int amount)
-        // {
-        //     if (IsDead)
-        //         return;
-        //
-        //     CurrentHealth = Mathf.Clamp(CurrentHealth + amount, 0, _entityStats.GetMaxHealth());
-        //     OnHealthUpdate?.Invoke();
-        // }
+        public void DisplayHealthBar()
+        {
+            if(!_healthBar)
+                return;
+            
+            healthBar.SetActive(true);
+
+            if (_healthBarTimer != null && !_healthBarTimer.IsCompleted)
+                _healthBarTimer.Restart();
+            else
+                _healthBarTimer =
+                    TimerManager.Instance.CreateTimer(healthBarFadeTime, () => { healthBar.SetActive(false); });
+        }
+
+        public void StartRegen(int totalAmount, bool infinite = false)
+        {
+            if (IsDead || !canRegenerateHealth) return;
+
+            if (infinite)
+                alwaysRegenerate = true;
+
+            if (_regenRoutine != null)
+                StopCoroutine(_regenRoutine);
+
+            _regenRoutine = StartCoroutine(RegenRoutine(totalAmount, infinite));
+        }
+
+        public void StopRegen()
+        {
+            alwaysRegenerate = false;
+
+            if (_regenRoutine != null)
+                StopCoroutine(_regenRoutine);
+
+            _regenRoutine = null;
+        }
+
+        private IEnumerator RegenRoutine(int amountLeftToHeal, bool infinite = false)
+        {
+            int healPerTick = _entityStats.ResourceStats.HealthRegen.Value;
+
+            // Safety check to prevent infinite loops if regen is 0
+            if (healPerTick <= 0) healPerTick = 1;
+
+            // Change the while loop condition here:
+            while ((infinite || amountLeftToHeal > 0) && !IsDead)
+            {
+                // Move the CurrentHealth check INSIDE the loop
+                // This allows the infinite loop to stay alive even when health is full,
+                // so it's ready to heal again as soon as damage is taken.
+                if (CurrentHealth < _entityStats.GetMaxHealth())
+                {
+                    int amountThisTick = infinite ? healPerTick : Mathf.Min(healPerTick, amountLeftToHeal);
+
+                    IncreaseHealth(amountThisTick);
+
+                    if (!infinite)
+                        amountLeftToHeal -= amountThisTick;
+                }
+
+                yield return new WaitForSeconds(regenInterval);
+            }
+
+            _regenRoutine = null;
+        }
+        
+        public void IncreaseHealth(int amount)
+        {
+            if (IsDead)
+                return;
+        
+            CurrentHealth = Mathf.Clamp(CurrentHealth + amount, 0, _entityStats.GetMaxHealth());
+            OnHealthUpdate?.Invoke();
+        }
         
         public void ReduceHealth(int amount)
         {
@@ -180,6 +248,15 @@ namespace Core
         
         public void NotifyHealthChanged() => OnHealthUpdate?.Invoke();
 
+        public void UpdateHealthBar()
+        {
+            if (!_healthBar && !_healthBar.transform.parent.gameObject.activeSelf)
+                return;
+
+            _healthBar.value = CurrentHealth / (float)_entityStats.GetMaxHealth();
+            DisplayHealthBar();
+        }
+        
         protected virtual void HandleDamageKnockback(Entity attacker, int finalDamage)
         {
            
