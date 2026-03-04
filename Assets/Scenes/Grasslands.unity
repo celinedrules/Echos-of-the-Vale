@@ -477,10 +477,11 @@ GameObject:
   m_Component:
   - component: {fileID: 232980077}
   - component: {fileID: 232980078}
+  - component: {fileID: 232980082}
   - component: {fileID: 232980081}
   - component: {fileID: 232980080}
-  - component: {fileID: 232980082}
   - component: {fileID: 232980083}
+  - component: {fileID: 232980084}
   m_Layer: 7
   m_Name: Player
   m_TagString: Player
@@ -635,6 +636,44 @@ MonoBehaviour:
   regenInterval: 1
   canRegenerateHealth: 1
   alwaysRegenerate: 0
+--- !u!114 &232980084
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 232980076}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 310c1d74d1db48b69ede555a5ab40909, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InventorySystem.InventoryPlayer
+  itemDatabase: {fileID: 0}
+  maxInventorySize: 10
+  itemList: []
+  gold: 10000
+  equipList:
+  - slotType: 1
+    equippedItem:
+      itemData: {fileID: 0}
+      _stackSize: 0
+  - slotType: 2
+    equippedItem:
+      itemData: {fileID: 0}
+      _stackSize: 0
+  - slotType: 3
+    equippedItem:
+      itemData: {fileID: 0}
+      _stackSize: 0
+  - slotType: 3
+    equippedItem:
+      itemData: {fileID: 0}
+      _stackSize: 0
+  quickItems:
+  - itemData: {fileID: 0}
+    _stackSize: 0
+  - itemData: {fileID: 0}
+    _stackSize: 0
 --- !u!1 &233407669
 GameObject:
   m_ObjectHideFlags: 0
@@ -2391,6 +2430,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Managers.GameManager
   isPersistent: 1
+  player: {fileID: 0}
+  inventoryRuntimeData: {fileID: 0}
 --- !u!1 &1256949529
 GameObject:
   m_ObjectHideFlags: 0

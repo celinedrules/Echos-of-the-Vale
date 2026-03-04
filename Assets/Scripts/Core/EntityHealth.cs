@@ -159,6 +159,26 @@ namespace Core
             //_dropManager?.DropItems();
         }
         
+        // public float GetHealthPercentage()
+        // {
+        //     if (EntityStats == null)
+        //         return 1;
+        //     
+        //     return CurrentHealth / (float)EntityStats.GetMaxHealth();
+        // }
+
+        // public void SetHealthToPercentage(float percentage)
+        // {
+        //     if(EntityStats == null)
+        //         return;
+        //     
+        //     CurrentHealth = Mathf.RoundToInt(Mathf.Clamp01(percentage) * EntityStats.GetMaxHealth());
+        //     //UpdateHealthBar();
+        //     OnHealthUpdate?.Invoke();
+        // }
+        
+        public void NotifyHealthChanged() => OnHealthUpdate?.Invoke();
+
         protected virtual void HandleDamageKnockback(Entity attacker, int finalDamage)
         {
            
