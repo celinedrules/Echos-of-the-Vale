@@ -6,6 +6,7 @@ using Data.InventoryData;
 using Data.WeaponData;
 using InventorySystem;
 using StateMachine.States.PlayerStates;
+using Stats;
 using UnityEngine;
 
 namespace Player
@@ -40,7 +41,8 @@ namespace Player
         protected override void Awake()
         {
             base.Awake();
-            
+
+            Stats = new PlayerStats();
             Inventory = GetComponent<InventoryPlayer>();
 
             SetupInventory();
@@ -68,8 +70,8 @@ namespace Player
             
             StateMachine.Initialize(IdleState);
             
-            if (!Managers.GameManager.Instance.InventoryRuntimeData.HasValidData)
-                SetupEquipment();
+            // if (!Managers.GameManager.Instance.InventoryRuntimeData.HasValidData)
+            //     SetupEquipment();
 
             //((PlayerStats)Stats)?.LoadFromRuntimeData();
         }
