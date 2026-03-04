@@ -1,5 +1,6 @@
 using System;
 using Core.Interfaces;
+using Stats;
 using UnityEngine;
 using UnityEngine.UI;
 using Utilities;
@@ -19,10 +20,10 @@ namespace Core
         public event Action OnTakingDamage;
         public event Action OnHealthUpdate;
         
-        // [SerializeField] private GameObject healthBar;
-        // [SerializeField] private float healthBarFadeTime = 1.5f;
-        //
-        // [field: SerializeField] public EntityFx DamageEffect { get; set; }
+        [SerializeField] private GameObject healthBar;
+        [SerializeField] private float healthBarFadeTime = 1.5f;
+        
+        //[field: SerializeField] public EntityFx DamageEffect { get; set; }
 
         [Header("Knockback")]
         [SerializeField] protected KnockbackSettings normalDamageKnockback;
@@ -45,8 +46,8 @@ namespace Core
         [SerializeField] private bool canRegenerateHealth = true;
         [SerializeField] private bool alwaysRegenerate;
         
-        // private EntityStats _entityStats;
-        // private EntityStats EntityStats => _entityStats ??= _entity?.Stats;
+        private EntityStats _entityStats;
+        private EntityStats EntityStats => _entityStats ??= entity?.Stats;
         
         public bool CanTakeDamage { get; set; } = true;
         public bool IsDead { get; private set; }
@@ -67,7 +68,7 @@ namespace Core
 
         public void Initialize()
         {
-            //_entityStats = _entity?.Stats;
+            _entityStats = entity?.Stats;
             SetupHealth();
         }
 
@@ -159,23 +160,23 @@ namespace Core
             //_dropManager?.DropItems();
         }
         
-        // public float GetHealthPercentage()
-        // {
-        //     if (EntityStats == null)
-        //         return 1;
-        //     
-        //     return CurrentHealth / (float)EntityStats.GetMaxHealth();
-        // }
+        public float GetHealthPercentage()
+        {
+            if (EntityStats == null)
+                return 1;
+            
+            return CurrentHealth / (float)EntityStats.GetMaxHealth();
+        }
 
-        // public void SetHealthToPercentage(float percentage)
-        // {
-        //     if(EntityStats == null)
-        //         return;
-        //     
-        //     CurrentHealth = Mathf.RoundToInt(Mathf.Clamp01(percentage) * EntityStats.GetMaxHealth());
-        //     //UpdateHealthBar();
-        //     OnHealthUpdate?.Invoke();
-        // }
+        public void SetHealthToPercentage(float percentage)
+        {
+            if(EntityStats == null)
+                return;
+            
+            CurrentHealth = Mathf.RoundToInt(Mathf.Clamp01(percentage) * EntityStats.GetMaxHealth());
+            //UpdateHealthBar();
+            OnHealthUpdate?.Invoke();
+        }
         
         public void NotifyHealthChanged() => OnHealthUpdate?.Invoke();
 

@@ -19,7 +19,7 @@ namespace StateMachine.States.PlayerStates
             Rigidbody = Player.Rigidbody;
             Animator = Player.Animator;
             //Stats =  Player.Stats;
-            Input = Player.Input;
+            Input = Player.InputHandler;
         }
 
         public override void Update()

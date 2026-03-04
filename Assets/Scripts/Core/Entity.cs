@@ -1,7 +1,10 @@
 using System;
 using System.Collections;
+using Data.EntityData;
+using Sirenix.OdinInspector;
 using StateMachine.States;
 using StateMachine.States.PlayerStates;
+using Stats;
 using UnityEngine;
 
 namespace Core
@@ -16,18 +19,30 @@ namespace Core
     
     public class Entity : MonoBehaviour
     {
+        public event Action<int> OnDoingPhysicalDamage;
+        
+        [SerializeField, PropertyOrder(-10)]
+        [ValidateInput(nameof(ValidateEntityData), "Wrong EntityData type for this ENTITY!")]
+        [LabelText("$DataLabel")]
+        protected EntityData entityData;
+        
         protected StateMachine.StateMachine StateMachine;
+        
+        [ReadOnly, ShowInInspector, PropertyOrder(-1)]
+        public string EntityName => entityData ? entityData.EntityName : string.Empty;
         
         private bool _isKnockedBack;
         private Coroutine _knockbackRoutine;
         
         public bool IsKnockedBack => _isKnockedBack;
-        public EntityState CurrentState => StateMachine.CurrentState;
+        public EntityStats Stats { get; protected set; }
         public Animator Animator  { get; private set; }
         public Rigidbody2D Rigidbody { get; private set; }
         public Direction FacingDirection { get; private set; } = Direction.Down;
         
         public EntityHealth Health { get; protected set; }
+        
+        protected virtual Type RequiredDataType => typeof(NpcData);
 
         protected virtual void Awake()
         {
@@ -45,6 +60,19 @@ namespace Core
         protected virtual void Update()
         {
             StateMachine.UpdateActiveState();
+        }
+        
+        protected virtual void InitializeStatsFromData()
+        {
+            if (entityData?.StatsData == null || Stats == null)
+                return;
+
+            // Copy values from the ScriptableObject data to the runtime stats
+            Stats.ResourceStats.MaxHealth.Value = entityData.StatsData.MaxHealth;
+            Stats.ResourceStats.HealthRegen.Value = entityData.StatsData.HealthRegen;
+            Stats.OffenseStats.AttackSpeed.Value = entityData.StatsData.AttackSpeed;
+            Stats.OffenseStats.Damage.Value = entityData.StatsData.Damage;
+            Stats.DefenseStats.Armor.Value = entityData.StatsData.Armor;
         }
         
         public void SetVelocity(Vector2 velocity)
@@ -89,6 +117,26 @@ namespace Core
         {
         }
 
+        private string DataLabel => RequiredDataType.Name.Replace("Data", "") is { Length: > 0 } label
+            ? $"{label} Data"
+            : "Entity Data";
+        
+        private bool ValidateEntityData(EntityData value, ref string errorMessage)
+        {
+            if (!value)
+            {
+                errorMessage = "EntityData cannot be null";
+                return false;
+            }
+
+            if (RequiredDataType.IsInstanceOfType(value))
+                return true;
+            
+            errorMessage = $"Expected {RequiredDataType.Name} but got {value.GetType().Name}";
+            return false;
+
+        }
+        
         protected virtual void OnDrawGizmos()
         {
             

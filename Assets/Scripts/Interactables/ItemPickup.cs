@@ -80,18 +80,6 @@ namespace Interactables
             gameObject.name = "Object Item Pickup - " + itemData.ItemName;
         }
         
-        // private void OnCollisionEnter2D(Collision2D collision)
-        // {
-        //     if (collision.gameObject.layer == LayerMask.NameToLayer("Ground") && !_collider.isTrigger)
-        //     {
-        //         _collider.isTrigger = true;
-        //         //_rigidbody.constraints = RigidbodyConstraints2D.FreezeAll;
-        //         
-        //         if(GameManager.Instance.Player.TryGetComponent(out Collider2D playerCollider))
-        //             Physics2D.IgnoreCollision(_collider, playerCollider, false);
-        //     }
-        // }
-        
         private void OnTriggerEnter2D(Collider2D other)
         {
             if(!other.CompareTag("Player"))

@@ -1,7 +1,10 @@
 using System;
 using System.Collections;
 using Core;
+using Data.EntityData;
+using Data.InventoryData;
 using Data.WeaponData;
+using InventorySystem;
 using StateMachine.States.PlayerStates;
 using UnityEngine;
 
@@ -14,7 +17,8 @@ namespace Player
         private PlayerStateFactory _factory;
         private Coroutine _queuedAttackCo;
         
-        public PlayerInputHandler Input { get; private set; }
+        public InventoryPlayer Inventory { get; private set; }
+        public PlayerInputHandler InputHandler { get; private set; }
         
         public IdleState IdleState { get; private set; }
         public MoveState MoveState { get; private set; }
@@ -37,7 +41,11 @@ namespace Player
         {
             base.Awake();
             
-            Input = GetComponent<PlayerInputHandler>();
+            Inventory = GetComponent<InventoryPlayer>();
+
+            SetupInventory();
+            
+            InputHandler = GetComponent<PlayerInputHandler>();
             Health = GetComponent<PlayerHealth>();
             
             if (SwordAnimator)
@@ -59,6 +67,60 @@ namespace Player
             base.Start();
             
             StateMachine.Initialize(IdleState);
+            
+            if (!Managers.GameManager.Instance.InventoryRuntimeData.HasValidData)
+                SetupEquipment();
+
+            //((PlayerStats)Stats)?.LoadFromRuntimeData();
+        }
+        
+        private void SetupEquipment()
+        {
+            PlayerData playerData = entityData as PlayerData;
+
+            if (!playerData)
+                return;
+
+            TryEquipStartingItem(playerData.EquipData.Weapon);
+            TryEquipStartingItem(playerData.EquipData.Armor);
+            TryEquipStartingItem(playerData.EquipData.Accessory1);
+            TryEquipStartingItem(playerData.EquipData.Accessory2);
+        }
+
+        private void TryEquipStartingItem(InventoryItem sourceItem)
+        {
+            if (sourceItem?.ItemData == null)
+                return;
+
+            InventoryItem item = new InventoryItem(sourceItem.ItemData);
+            Inventory.AddItem(item);
+            Inventory.TryEquipItem(item);
+        }
+        
+        private void SetupInventory()
+        {
+            PlayerData playerData = entityData as PlayerData;
+
+            if (!playerData)
+                return;
+
+            Inventory.ItemList.Clear();
+
+            foreach (InventoryItem quickItem in Inventory.QuickItems)
+                quickItem.ItemData = null;
+
+            foreach (ItemSlotData slotData in playerData.Inventory.Slots)
+            {
+                if (slotData.Item)
+                {
+                    InventoryItem item = new InventoryItem(slotData.Item)
+                    {
+                        StackSize = slotData.Amount
+                    };
+
+                    Inventory.AddItem(item);
+                }
+            }
         }
         
         public void SetVelocity(float velocityX, float velocityY)

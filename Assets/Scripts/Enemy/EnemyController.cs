@@ -1,5 +1,6 @@
 using Control;
 using Core;
+using Data.EntityData;
 using Player;
 using StateMachine.States.EnemyStates;
 using UnityEngine;
@@ -15,25 +16,29 @@ namespace Enemy
         [field: SerializeField] public AISensor Sensor { get; set; }
 
         private Transform _player;
+        
+        public EnemyData Data => entityData as EnemyData;
 
-        public float BattleMoveSpeed => 2.0f; //Data.BattleMoveSpeed;
-        public float AttackDistance => 1.5f; //Data.AttackDistance;
-        public float BattleTimeDuration => 5.0f; //Data.BattleTimeDuration;
-        public float MinRetreatDistance => 5.0f; //Data.MinRetreatDistance;
-        public Vector2 RetreatVelocity => Vector2.zero; //Data.RetreatVelocity;
-        public float StunnedVelocity => 7.0f; //Data.StunnedVelocity;
-        public bool CanBeStunned { get; set; } //Data.CanBeStunned;
+        public float BattleMoveSpeed => /*2.0f;*/ Data.BattleMoveSpeed;
+        public float AttackDistance => /*1.5f;*/ Data.AttackDistance;
+        public float BattleTimeDuration => /*5.0f;*/ Data.BattleTimeDuration;
+        public float MinRetreatDistance => /*5.0f;*/ Data.MinRetreatDistance;
+        public Vector2 RetreatVelocity => /*Vector2.zero;*/ Data.RetreatVelocity;
+        public float StunnedVelocity => /*7.0f;*/ Data.StunnedVelocity;
+        public bool CanBeStunned { get; set; }
         public bool IsAttacking { get; set; }
-        public int StartStunnedFrame => 20; //Data.StartStunnedFrame;
-        public float StunnedFrameDuration => 0.25f; //Data.StunnedFrameDuration;
-        public float IdleTime => 2.0f; //Data.IdleTime;
-        public float MoveTime => 2.0f; //Data.MoveTime;
-        public float MoveSpeed => 1.0f; //Data.MoveSpeed;
-        public float RandomMoveRadius => 5.0f; //Data.RandomMoveRadius;
+        public int StartStunnedFrame => /*20;*/ Data.StartStunnedFrame;
+        public float StunnedFrameDuration => /*0.25f;*/ Data.StunnedFrameDuration;
+        public float IdleTime => /*2.0f;*/ Data.IdleTime;
+        public float MoveTime => /*2.0f;*/ Data.MoveTime;
+        public float MoveSpeed => /*1.0f;*/ Data.MoveSpeed;
+        public float RandomMoveRadius => /*5.0f;*/ Data.RandomMoveRadius;
 
         public Vector2 OriginalPosition { get; private set; }
         
         public float ActiveSlowMultiplier { get; private set; } = 1.0f;
+        
+        protected override System.Type RequiredDataType => typeof(EnemyData);
 
         public Transform PlayerTransform
         {
@@ -72,7 +77,7 @@ namespace Enemy
             base.Start();
             OriginalPosition = Rigidbody.position;
             StateMachine.Initialize(IdleState);
-            CanBeStunned = true; //Data.CanBeStunned;
+            CanBeStunned = /*true;*/ Data.CanBeStunned;
         }
 
         protected override void Update()

@@ -1,0 +1,139 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e80092d0863e47d4bc3b8e4c68462d11, type: 3}
+  m_Name: Enemy Data -  SlimeA
+  m_EditorClassIdentifier: Assembly-CSharp::Data.EntityData.EnemyData
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes: []
+  icon: {fileID: 1795335949, guid: a2f67b012e3259ac8b517a4b6bce749d, type: 3}
+  entityName: 
+  statsData:
+    resourceStats:
+      maxHealth:
+        baseValue: 100
+        modifiers: []
+      healthRegen:
+        baseValue: 0
+        modifiers: []
+    offenseStats:
+      attackSpeed:
+        baseValue: 1
+        modifiers: []
+      damage:
+        baseValue: 10
+        modifiers: []
+      criticalPower:
+        baseValue: 0
+        modifiers: []
+      criticalChance:
+        baseValue: 0
+        modifiers: []
+      armorReduction:
+        baseValue: 0
+        modifiers: []
+      fireDamage:
+        baseValue: 0
+        modifiers: []
+      iceDamage:
+        baseValue: 0
+        modifiers: []
+      lightningDamage:
+        baseValue: 0
+        modifiers: []
+    defenseStats:
+      armor:
+        baseValue: 0
+        modifiers: []
+      evasion:
+        baseValue: 0
+        modifiers: []
+      fireResistance:
+        baseValue: 0
+        modifiers: []
+      iceResistance:
+        baseValue: 0
+        modifiers: []
+      lightningResistance:
+        baseValue: 0
+        modifiers: []
+  enemyStatsData:
+    resourceStats:
+      maxHealth:
+        baseValue: 100
+        modifiers: []
+      healthRegen:
+        baseValue: 0
+        modifiers: []
+    offenseStats:
+      attackSpeed:
+        baseValue: 1
+        modifiers: []
+      damage:
+        baseValue: 10
+        modifiers: []
+      criticalPower:
+        baseValue: 0
+        modifiers: []
+      criticalChance:
+        baseValue: 0
+        modifiers: []
+      armorReduction:
+        baseValue: 0
+        modifiers: []
+      fireDamage:
+        baseValue: 0
+        modifiers: []
+      iceDamage:
+        baseValue: 0
+        modifiers: []
+      lightningDamage:
+        baseValue: 0
+        modifiers: []
+    defenseStats:
+      armor:
+        baseValue: 0
+        modifiers: []
+      evasion:
+        baseValue: 0
+        modifiers: []
+      fireResistance:
+        baseValue: 0
+        modifiers: []
+      iceResistance:
+        baseValue: 0
+        modifiers: []
+      lightningResistance:
+        baseValue: 0
+        modifiers: []
+  battleMoveSpeed: 3
+  attackDistance: 2
+  battleTimeDuration: 5
+  minRetreatDistance: 1
+  retreatVelocity: {x: 0, y: 0}
+  stunnedDuration: 1
+  stunnedVelocity: 7
+  canBeStunned: 0
+  startStunnedFrame: 20
+  stunnedFrameDuration: 0.25
+  idleTime: 2
+  moveTime: 2
+  moveSpeed: 1.4
+  randomMoveRadius: 5
+  moveAnimSpeedMultiplier: 1
+  playerCheckDistance: 10
