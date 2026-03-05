@@ -1,9 +1,7 @@
-using System;
 using Core.Interfaces;
+using Data.DamageData;
 using Enemy;
 using Player;
-using StateMachine.States.EnemyStates;
-using StateMachine.States.PlayerStates;
 using UnityEngine;
 using Utilities.Enums;
 
@@ -11,7 +9,7 @@ namespace Core
 {
     public class HurtBox : MonoBehaviour
     {
-        // [SerializeField] private DamageScaleData basicAttackScale;
+        [SerializeField] private DamageScaleData basicAttackScale;
         
         private Entity _targetEntity;
         private Entity _sourceEntity;
@@ -35,26 +33,6 @@ namespace Core
             }
 
             HandleContactDamage(other);
-            
-            // if(Owner == null)
-            //     return;
-            //
-            // _sourceEntity = hitBox.Owner;
-            //  
-            // if(!_sourceEntity)
-            //     return;
-
-            //Debug.Log(gameObject.transform.root.name);
-            
-            // if(_targetEntity is PlayerController player)
-            // {
-            //     if(player.CurrentState == player.BasicAttackState)
-            //     {
-            //         Debug.Log("Perform Attack");
-            //         PerformAttack();
-            //     }
-            // }
-            //PerformAttack();
         }
         
         private void HandleWeaponHit(WeaponHitBox hitBox)
@@ -90,29 +68,28 @@ namespace Core
             PerformAttack();
         }
 
-        private void PerformAttack()
+        private void PerformAttack() 
         {
-            //AttackData attackData = _sourceEntity.Stats.GeAttackData(basicAttackScale);
-            //EntityStatusHandler targetStatusHandler = _targetEntity?.GetComponent<EntityStatusHandler>();
+            AttackData attackData = _sourceEntity.Stats.GeAttackData(basicAttackScale);
+            EntityStatusHandler targetStatusHandler = _targetEntity?.GetComponent<EntityStatusHandler>();
 
-            //int physicalDamage = attackData.PhysicalDamage;
-            //int elementalDamage = attackData.ElementalDamage;
+            int physicalDamage = attackData.PhysicalDamage;
+            int elementalDamage = attackData.ElementalDamage;
             bool tookDamage;
 
-            //ElementType elementType = attackData.ElementType;
+            ElementType elementType = attackData.ElementType;
             
-            //tookDamage = Owner.TakeDamage(physicalDamage, elementalDamage, elementType, _sourceEntity);
-            tookDamage = Owner.TakeDamage(1, 1, ElementType.None, _sourceEntity);
+            tookDamage = Owner.TakeDamage(physicalDamage, elementalDamage, elementType, _sourceEntity);
             
-            // if(elementType != ElementType.None)
-            //     targetStatusHandler?.ApplyEffect(elementType, attackData.EffectData);
+            if(elementType != ElementType.None)
+                targetStatusHandler?.ApplyEffect(elementType, attackData.EffectData);
 
             if (tookDamage)
             {
-                // _sourceEntity?.OnDealtPhysicalDamage(physicalDamage);
-                // _sourceEntity?.EntityFx.SetElementColor(elementType);
-                // _sourceEntity?.EntityFx?.CreateHitEffect(transform, attackData.IsCritical);
-                //
+                _sourceEntity?.OnDealtPhysicalDamage(physicalDamage);
+                _sourceEntity?.EntityFx.SetElementColor(elementType);
+                _sourceEntity?.EntityFx?.CreateHitEffect(transform, attackData.IsCritical);
+                
                 // if(_targetEntity is Player.Player)
                 //     FusionAudioManager.Instance.PlayAudio(PlayerAudioId.PlayerHitAttack);
                 // else if (_targetEntity is Enemy.Enemy enemy)

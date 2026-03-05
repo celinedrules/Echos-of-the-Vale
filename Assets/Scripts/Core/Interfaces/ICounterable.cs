@@ -1,3 +1,4 @@
+// Done
 namespace Core.Interfaces
 {
     public interface ICounterable

@@ -38,6 +38,8 @@ namespace Player
         [field: SerializeField] public float AttackVelocityDuration { get; set; } = 0.1f;
         [field: SerializeField] public float ComboResetDuration { get; set; } = 1f;
 
+        protected override Type RequiredDataType => typeof(PlayerData);
+        
         protected override void Awake()
         {
             base.Awake();

@@ -2,8 +2,6 @@ using System;
 using System.Collections;
 using Data.EntityData;
 using Sirenix.OdinInspector;
-using StateMachine.States;
-using StateMachine.States.PlayerStates;
 using Stats;
 using UnityEngine;
 
@@ -33,6 +31,7 @@ namespace Core
         
         private bool _isKnockedBack;
         private Coroutine _knockbackRoutine;
+        private Coroutine _slowDownRoutine;
         
         public bool IsKnockedBack => _isKnockedBack;
         public EntityStats Stats { get; protected set; }
@@ -41,20 +40,26 @@ namespace Core
         public Direction FacingDirection { get; private set; } = Direction.Down;
         
         public EntityHealth Health { get; protected set; }
+        public EntityFx EntityFx { get; private set; }
         
         protected virtual Type RequiredDataType => typeof(NpcData);
 
         protected virtual void Awake()
         {
+            Stats = new EntityStats();
+            
             Animator = GetComponentInChildren<Animator>();
             Rigidbody = GetComponent<Rigidbody2D>();
+            EntityFx = GetComponentInChildren<EntityFx>();
             
             StateMachine = new StateMachine.StateMachine();
         }
 
         protected virtual void Start()
         {
-            
+            InitializeStatsFromData();
+            SetupHealth();
+            Health?.Initialize();
         }
 
         protected virtual void Update()
@@ -74,6 +79,13 @@ namespace Core
             Stats.OffenseStats.Damage.Value = entityData.StatsData.Damage;
             Stats.DefenseStats.Armor.Value = entityData.StatsData.Armor;
         }
+
+        public virtual void SetupHealth()
+        {
+            
+        }
+
+        public void ResetStats() => Stats?.ResetStats();
         
         public void SetVelocity(Vector2 velocity)
         {
@@ -109,6 +121,8 @@ namespace Core
             _isKnockedBack = false;
         }
         
+        public void OnDealtPhysicalDamage(int damage) => OnDoingPhysicalDamage?.Invoke(damage);
+        
         public virtual void Stun(bool knockback)
         {
         }
@@ -117,6 +131,29 @@ namespace Core
         {
         }
 
+        public virtual void SlowDownEntity(float duration, float slowdownFactor, bool canOverrideSlowEffect = false)
+        {
+            if (_slowDownRoutine != null)
+            {
+                if(canOverrideSlowEffect)
+                    StopCoroutine(_slowDownRoutine);
+                else
+                    return;
+            }
+
+            _slowDownRoutine = StartCoroutine(SlowDownRoutine(duration, slowdownFactor));
+        }
+
+        protected virtual IEnumerator SlowDownRoutine(float duration, float slowdownFactor)
+        {
+            yield return null;
+        }
+
+        public virtual void StopSlowDown()
+        {
+            _slowDownRoutine = null;
+        }
+        
         private string DataLabel => RequiredDataType.Name.Replace("Data", "") is { Length: > 0 } label
             ? $"{label} Data"
             : "Entity Data";

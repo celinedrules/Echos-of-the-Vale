@@ -1,3 +1,4 @@
+// Done
 using System;
 using System.Collections;
 using Core.Interfaces;
@@ -7,6 +8,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Utilities;
 using Utilities.Enums;
+using Random = UnityEngine.Random;
 
 namespace Core
 {
@@ -25,7 +27,7 @@ namespace Core
         [SerializeField] private GameObject healthBar;
         [SerializeField] private float healthBarFadeTime = 1.5f;
         
-        //[field: SerializeField] public EntityFx DamageEffect { get; set; }
+        [field: SerializeField] public EntityFx DamageEffect { get; set; }
 
         [Header("Knockback")]
         [SerializeField] protected KnockbackSettings normalDamageKnockback;
@@ -35,7 +37,7 @@ namespace Core
         [SerializeField] private float heavyDamageThreshold = 0.3f;
         
         protected Entity entity;
-        // private EntityDropManager _dropManager;
+        private EntityDropManager _dropManager;
         private Slider _healthBar;
         private Timer _healthBarTimer;
         private float _regenTimer;
@@ -63,8 +65,8 @@ namespace Core
         private void Start()
         {
             entity = GetComponent<Entity>();
-            // _dropManager = GetComponent<EntityDropManager>();
-            // _entityStats = _entity?.Stats;
+            _dropManager = GetComponent<EntityDropManager>();
+            _entityStats = entity?.Stats;
             _healthBar = GetComponentInChildren<Slider>();
         }
 
@@ -76,22 +78,20 @@ namespace Core
 
         private void SetupHealth()
         {
-            // if (_entityStats == null)
-            //     return;
-            //
+            if (_entityStats == null)
+                return;
+            
             CurrentHealth = 100;
-            // CurrentHealth = _entityStats.GetMaxHealth();
-            // OnHealthUpdate += UpdateHealthBar;
-            // //OnHealthUpdate += DisplayHealthBar;
-            // //UpdateHealthBar();
-            // OnHealthUpdate?.Invoke();
-            // healthBar.SetActive(false);
-            //
-            // if (alwaysRegenerate)
-            //     StartRegen(_entityStats.ResourceStats.HealthRegen.Value, true);
-            //
-            // if (_entityStats is PlayerStats playerStats)
-            //     playerStats.LoadFromRuntimeData();
+            CurrentHealth = _entityStats.GetMaxHealth();
+            OnHealthUpdate += UpdateHealthBar;
+            OnHealthUpdate?.Invoke();
+            healthBar.SetActive(false);
+            
+            if (alwaysRegenerate)
+                StartRegen(_entityStats.ResourceStats.HealthRegen.Value, true);
+            
+            if (_entityStats is PlayerStats playerStats)
+                playerStats.LoadFromRuntimeData();
         }
         
         public virtual bool TakeDamage(int amount, int elementalDamage, ElementType elementType, Entity attacker)
@@ -105,15 +105,13 @@ namespace Core
                 return false;
             }
             
-            // float armorReduction = attacker?.Stats?.GetArmorReduction() ?? 0;
-            //
-            // float mitigation = _entityStats?.GetArmorMitigation(armorReduction) ?? 0;
-            int physicalDamageTaken = 10;
-            // int physicalDamageTaken = Mathf.RoundToInt(amount * (1 - mitigation));
-            //
-            // float resistance = _entityStats?.GetElementalResistance(elementType) ?? 0;
-            int elementalDamageTaken = 0;
-            // int elementalDamageTaken = Mathf.RoundToInt(elementalDamage * (1 - resistance));
+            float armorReduction = attacker?.Stats?.GetArmorReduction() ?? 0;
+            
+            float mitigation = _entityStats?.GetArmorMitigation(armorReduction) ?? 0;
+            int physicalDamageTaken = Mathf.RoundToInt(amount * (1 - mitigation));
+            
+            float resistance = _entityStats?.GetElementalResistance(elementType) ?? 0;
+            int elementalDamageTaken = Mathf.RoundToInt(elementalDamage * (1 - resistance));
             
             HandleDamageKnockback(attacker, physicalDamageTaken);
             ReduceHealth(physicalDamageTaken + elementalDamageTaken);
@@ -127,12 +125,10 @@ namespace Core
         
         private bool AttackEvaded()
         {
-            // if (_entityStats == null)
-            //     return false;
-            //
-            // return Random.Range(0, 100) < _entityStats.GetEvasion();
-
-            return false;
+            if (_entityStats == null)
+                return false;
+            
+            return Random.Range(0, 100) < _entityStats.GetEvasion();
         }
         
         public void DisplayHealthBar()
@@ -210,9 +206,10 @@ namespace Core
             OnHealthUpdate?.Invoke();
         }
         
+        
         public void ReduceHealth(int amount)
         {
-            //DamageEffect?.Flash();
+            DamageEffect?.Flash();
 
             CurrentHealth -= amount;
             OnHealthUpdate?.Invoke();
@@ -225,7 +222,7 @@ namespace Core
         {
             IsDead = true;
             entity?.EntityDeath();
-            //_dropManager?.DropItems();
+            _dropManager?.DropItems();
         }
         
         public float GetHealthPercentage()
@@ -242,7 +239,6 @@ namespace Core
                 return;
             
             CurrentHealth = Mathf.RoundToInt(Mathf.Clamp01(percentage) * EntityStats.GetMaxHealth());
-            //UpdateHealthBar();
             OnHealthUpdate?.Invoke();
         }
         
@@ -262,12 +258,12 @@ namespace Core
            
         }
         
-        // private bool IsHeavyDamage(int damage)
-        // {
-        //     if(_entityStats == null)
-        //         return false;
-        //     
-        //     return (float)damage / _entityStats.GetMaxHealth() > heavyDamageThreshold;
-        // }
+        private bool IsHeavyDamage(int damage)
+        {
+            if(_entityStats == null)
+                return false;
+            
+            return (float)damage / _entityStats.GetMaxHealth() > heavyDamageThreshold;
+        }
     }
 }

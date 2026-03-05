@@ -1,6 +1,3 @@
-using System;
-using Enemy;
-using Player;
 using UnityEngine;
 
 namespace Core
@@ -12,22 +9,19 @@ namespace Core
 
         private bool _hitSomething;
 
-        private void OnEnable()
-        {
-            _hitSomething = false;
-        }
+        private void OnEnable() => _hitSomething = false;
 
-        // private void OnDisable()
-        // {
-        //     if (!_hitSomething && Owner && FusionAudioManager.Instance)
-        //     {
-        //         if (Owner is PlayerController)
-        //             FusionAudioManager.Instance.PlayAudio(PlayerAudioId.PlayerMissAttack,
-        //                 speed: Random.Range(0.95f, 1.1f));
-        //         else if (Owner is EnemyController enemy)
-        //             FusionAudioManager.Instance.PlayAudio(EnemyAudioId.EnemyMissAttack, enemy.AudioEmitter.Source);
-        //     }
-        // }
+        private void OnDisable()
+        {
+            // if (!_hitSomething && Owner && FusionAudioManager.Instance)
+            // {
+            //     if (Owner is PlayerController)
+            //         FusionAudioManager.Instance.PlayAudio(PlayerAudioId.PlayerMissAttack,
+            //             speed: Random.Range(0.95f, 1.1f));
+            //     else if (Owner is EnemyController enemy)
+            //         FusionAudioManager.Instance.PlayAudio(EnemyAudioId.EnemyMissAttack, enemy.AudioEmitter.Source);
+            // }
+        }
 
         private void OnTriggerEnter2D(Collider2D other)
         {

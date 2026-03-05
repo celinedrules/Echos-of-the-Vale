@@ -63,7 +63,7 @@ namespace Stats
                 _ => 0
             };
         }
-        
+
         public override float GetElementalResistance(ElementType elementType)
         {
             float bonusResistance = MajorStats.Intelligence.Value * 0.5f;
@@ -184,29 +184,29 @@ namespace Stats
         //     runtimeData.HasValidData = true;
         // }
 
-        // public void LoadFromRuntimeData()
-        // {
-        //     StatsRuntimeData runtimeData = GameManager.Instance.StatsRuntimeData;
-        //
-        //     if (!runtimeData.HasValidData)
-        //         return;
-        //
-        //     Debug.Log("Loading Stats");
-        //
-        //     PlayerController player = GameManager.Instance.Player;
-        //
-        //     if (!player)
-        //         return;
-        //
-        //     player.Health.CurrentHealth = runtimeData.CurrentHealth;
-        //     player.Stats.ResourceStats.HealthRegen.Value = runtimeData.HealthRegen;
-        //     player.Stats.OffenseStats.AttackSpeed.Value = runtimeData.AttackSpeed;
-        //     player.Stats.OffenseStats.ArmorReduction.Value = runtimeData.ArmorReduction;
-        //     player.Stats.OffenseStats.FireDamage.Value = runtimeData.FireDamage;
-        //     player.Stats.OffenseStats.IceDamage.Value = runtimeData.IceDamage;
-        //     player.Stats.OffenseStats.LightningDamage.Value = runtimeData.LightningDamage;
-        //     
-        //     player.Health.NotifyHealthChanged();
-        // }
+        public void LoadFromRuntimeData()
+        {
+            //     StatsRuntimeData runtimeData = GameManager.Instance.StatsRuntimeData;
+            //
+            //     if (!runtimeData.HasValidData)
+            //         return;
+            //
+            //     Debug.Log("Loading Stats");
+            //
+            //     PlayerController player = GameManager.Instance.Player;
+            //
+            //     if (!player)
+            //         return;
+            //
+            //     player.Health.CurrentHealth = runtimeData.CurrentHealth;
+            //     player.Stats.ResourceStats.HealthRegen.Value = runtimeData.HealthRegen;
+            //     player.Stats.OffenseStats.AttackSpeed.Value = runtimeData.AttackSpeed;
+            //     player.Stats.OffenseStats.ArmorReduction.Value = runtimeData.ArmorReduction;
+            //     player.Stats.OffenseStats.FireDamage.Value = runtimeData.FireDamage;
+            //     player.Stats.OffenseStats.IceDamage.Value = runtimeData.IceDamage;
+            //     player.Stats.OffenseStats.LightningDamage.Value = runtimeData.LightningDamage;
+            //     
+            //     player.Health.NotifyHealthChanged();
+        }
     }
 }
