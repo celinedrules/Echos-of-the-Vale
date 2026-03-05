@@ -16,7 +16,7 @@ namespace UI
         [SerializeField] private TextMeshProUGUI savePlayTime;
         [SerializeField] private TextMeshProUGUI characterName;
         [SerializeField] private TextMeshProUGUI gold;
-        [SerializeField] private TextMeshProUGUI crystals;
+        [SerializeField] private TextMeshProUGUI echoShards;
         [SerializeField] private Image screenshot;
 
         private int _slotIndex;
