@@ -1,4 +1,6 @@
+// Done
 using Managers;
+using SaveSystem;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -22,56 +24,56 @@ namespace UI
         private int _slotIndex;
         protected int SlotIndex => _slotIndex;
 
-        // public void SetSaveSlotData(int slotIndex, SaveMetadata metadata)
-        // {
-        //     _slotIndex = slotIndex;
-        //     saveSlotNumber.text = $"Slot: {slotIndex + 1}";
-        //     
-        //     bool exists = metadata != null;
-        //     existingSaveSlot.SetActive(exists);
-        //     newSaveSlot.SetActive(!exists);
-        //     
-        //     if (exists)
-        //         UpdateUi(metadata);
-        // }
+        public void SetSaveSlotData(int slotIndex, SaveMetadata metadata)
+        {
+            _slotIndex = slotIndex;
+            saveSlotNumber.text = $"Slot: {slotIndex + 1}";
+            
+            bool exists = metadata != null;
+            existingSaveSlot.SetActive(exists);
+            newSaveSlot.SetActive(!exists);
+            
+            if (exists)
+                UpdateUi(metadata);
+        }
     
         public void OnPointerDown(PointerEventData eventData)
         {
-            // if(UiManager.Instance.IsSaving)
-            // {
-            //     SaveMetadata metadata = SaveManager.Instance.SaveGameToSlot(_slotIndex);
-            //     ScreenshotManager.Instance.SaveScreenshot(_slotIndex);
-            //     UpdateUi(metadata);
-            //     UiManager.Instance.ShowNotification("Game Saved!", () =>
-            //     {
-            //         UiManager.Instance.OpenOptions();
-            //     });
-            // }
-            // else
-            // {
-            //     SaveManager.Instance.LoadGameFromSlot(_slotIndex);
-            //     UiManager.Instance.ShowNotification("Game Loaded!", () =>
-            //     {
-            //         UiManager.Instance.TryCloseActiveUi();
-            //     });
-            // }
+            if(UiManager.Instance.IsSaving)
+            {
+                SaveMetadata metadata = SaveManager.Instance.SaveGameToSlot(_slotIndex);
+                ScreenshotManager.Instance.SaveScreenshot(_slotIndex);
+                UpdateUi(metadata);
+                UiManager.Instance.ShowNotification("Game Saved!", () =>
+                {
+                    UiManager.Instance.OpenOptions();
+                });
+            }
+            else
+            {
+                SaveManager.Instance.LoadGameFromSlot(_slotIndex);
+                UiManager.Instance.ShowNotification("Game Loaded!", () =>
+                {
+                    UiManager.Instance.TryCloseActiveUi();
+                });
+            }
         }
 
-        // private void UpdateUi(SaveMetadata metadata)
-        // {
-        //     existingSaveSlot.SetActive(true);
-        //     newSaveSlot.SetActive(false);
-        //     
-        //     saveSlotLocation.text = metadata.location;
-        //     saveDateTime.text = metadata.FormattedDateTime;
-        //     savePlayTime.text = metadata.FormattedPlayTime;
-        //     characterName.text = metadata.characterName;
-        //     gold.text = metadata.gold.ToString();
-        //     crystals.text = metadata.crystals.ToString();
-        //     
-        //     Sprite sc = ScreenshotManager.Instance.LoadScreenshot(_slotIndex);
-        //     if (sc != null)
-        //         screenshot.sprite = sc;
-        // }
+        private void UpdateUi(SaveMetadata metadata)
+        {
+            existingSaveSlot.SetActive(true);
+            newSaveSlot.SetActive(false);
+            
+            saveSlotLocation.text = metadata.location;
+            saveDateTime.text = metadata.FormattedDateTime;
+            savePlayTime.text = metadata.FormattedPlayTime;
+            characterName.text = metadata.characterName;
+            gold.text = metadata.gold.ToString();
+            echoShards.text = metadata.crystals.ToString();
+            
+            Sprite sc = ScreenshotManager.Instance.LoadScreenshot(_slotIndex);
+            if (sc != null)
+                screenshot.sprite = sc;
+        }
     }
 }

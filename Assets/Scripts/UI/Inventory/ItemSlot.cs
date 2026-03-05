@@ -1,3 +1,4 @@
+// Done
 using InventorySystem;
 using Managers;
 using TMPro;
@@ -36,7 +37,6 @@ namespace UI.Inventory
             if (ItemInSlot == null)
             {
                 stackCount.text = "";
-                //icon.color = Color.clear;
                 icon.sprite = defaultSprite;
                 return;
             }
@@ -74,10 +74,10 @@ namespace UI.Inventory
                 }
             }
 
-            // if (ItemInSlot == null)
-            //     UiManager.Instance.ItemTooltip.ShowTooltip(false, null);
-            // else
-            //     UiManager.Instance.ItemTooltip.ShowTooltip(true, Rect, ItemInSlot);
+            if (ItemInSlot == null)
+                UiManager.Instance.ItemTooltip.ShowTooltip(false, null);
+            else
+                UiManager.Instance.ItemTooltip.ShowTooltip(true, Rect, ItemInSlot);
         }
 
         public virtual void OnPointerEnter(PointerEventData eventData)
@@ -85,12 +85,12 @@ namespace UI.Inventory
             if (ItemInSlot == null || ItemInSlot.ItemData == null)
                 return;
 
-            //UiManager.Instance.ItemTooltip.ShowTooltip(true, Rect, ItemInSlot);
+            UiManager.Instance.ItemTooltip.ShowTooltip(true, Rect, ItemInSlot);
         }
 
         public void OnPointerExit(PointerEventData eventData)
         {
-            //UiManager.Instance.ItemTooltip.ShowTooltip(false, null);
+            UiManager.Instance.ItemTooltip.ShowTooltip(false, null);
         }
     }
 }

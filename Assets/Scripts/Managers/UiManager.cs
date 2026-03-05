@@ -35,13 +35,13 @@ namespace Managers
         [SerializeField] private SimplePanel quickItemSlotOptions;
         //[SerializeField] private Dialogue dialogue;
         
-        // [Header("Tooltips")]
+        [Header("Tooltips")]
         // [SerializeField] private SkillTooltip skillTooltip;
-        // [SerializeField] private ItemTooltip itemTooltip;
-        // [SerializeField] private StatTooltip statTooltip;
-        //
-        // [Header("Notifications")]
-        // [SerializeField] private NotificationPopup notificationPopup;
+        [SerializeField] private ItemTooltip itemTooltip;
+        [SerializeField] private StatTooltip statTooltip;
+        
+        [Header("Notifications")]
+        [SerializeField] private NotificationPopup notificationPopup;
         
         private CanvasGroup _activePanel;
         private IUiPanel _activeUiPanel;
@@ -59,8 +59,8 @@ namespace Managers
         public Storage Storage => storage;
         // public SkillTree SkillTree => skillTree;
         // public SkillTooltip SkillTooltip => skillTooltip;
-        // public ItemTooltip ItemTooltip => itemTooltip;
-        // public StatTooltip StatTooltip => statTooltip;
+        public ItemTooltip ItemTooltip => itemTooltip;
+        public StatTooltip StatTooltip => statTooltip;
         // public Quest Quest => quest;
         // public  ActiveQuest ActiveQuest => activeQuest;
         // public Dialogue Dialogue => dialogue;
@@ -174,14 +174,14 @@ namespace Managers
             if(_activePanelHasTooltips)
             {
                 // HideTooltip(skillTooltip.CanvasGroup);
-                // HideTooltip(statTooltip.CanvasGroup);
-                // HideTooltip(itemTooltip.CanvasGroup);
+                HideTooltip(statTooltip.CanvasGroup);
+                HideTooltip(itemTooltip.CanvasGroup);
             }
         }
         
         private static void HideTooltip(CanvasGroup tooltip) => tooltip.alpha = 0;
 
-        // public void ShowNotification(string message, Action onComplete = null) =>
-        //     notificationPopup?.Show(message, onComplete);
+        public void ShowNotification(string message, Action onComplete = null) =>
+            notificationPopup?.Show(message, onComplete);
     }
 }

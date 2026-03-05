@@ -1,3 +1,4 @@
+// Done
 using InventorySystem;
 using Managers;
 using UI.Inventory;
@@ -51,7 +52,7 @@ namespace UI
                 _merchant.TryBuyItem(ItemInSlot, sellFullStack);
             }
             
-            //UiManager.Instance.ItemTooltip.ShowTooltip(false, null);
+            UiManager.Instance.ItemTooltip.ShowTooltip(false, null);
         }
 
         public override void OnPointerEnter(PointerEventData eventData)
@@ -59,10 +60,10 @@ namespace UI
             if(ItemInSlot == null)
                 return;
             
-            // if(SlotType == MerchantSlotType.MerchantSlot)
-            //     UiManager.Instance.ItemTooltip.ShowTooltip(true, Rect, ItemInSlot, true, true);
-            // else
-            //     UiManager.Instance.ItemTooltip.ShowTooltip(true, Rect, ItemInSlot, false, true);
+            if(SlotType == MerchantSlotType.MerchantSlot)
+                UiManager.Instance.ItemTooltip.ShowTooltip(true, Rect, ItemInSlot, true, true);
+            else
+                UiManager.Instance.ItemTooltip.ShowTooltip(true, Rect, ItemInSlot, false, true);
         }
     }
 }

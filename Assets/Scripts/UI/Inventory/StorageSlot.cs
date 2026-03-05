@@ -1,3 +1,4 @@
+// Done
 using System;
 using InventorySystem;
 using Managers;
@@ -50,7 +51,7 @@ namespace UI.Inventory
                     throw new ArgumentOutOfRangeException();
             }
             
-            //UiManager.Instance.ItemTooltip.ShowTooltip(false, null);
+            UiManager.Instance.ItemTooltip.ShowTooltip(false, null);
         }
     }
 }

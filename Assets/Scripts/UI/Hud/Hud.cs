@@ -25,12 +25,12 @@ namespace UI.Hud
         private PlayerController _player;
         private InventoryPlayer _inventory;
         // private SkillSlot[] _skillSlots;
-        // private QuickItemSlotOption[] _quickItemOptions;
-        // private QuickItemSlot[] _quickItemSlots;
+        private QuickItemSlotOption[] _quickItemOptions;
+        private QuickItemSlot[] _quickItemSlots;
         
         private void Start()
         {
-            //_quickItemSlots = GetComponentsInChildren<QuickItemSlot>();
+            _quickItemSlots = GetComponentsInChildren<QuickItemSlot>();
             
             _player = GameManager.Instance.Player;
             _initialMaxHealth = _player.Stats.GetMaxHealth();
@@ -41,50 +41,50 @@ namespace UI.Hud
             //_skillSlots = GetComponentsInChildren<SkillSlot>(true);
             
             _inventory = _player.Inventory;
-            //_inventory.OnInventoryChanged += UpdateQuickSlots;
-            //_inventory.OnQuickSlotUse += PlayQuickSlotFeedback;
+            _inventory.OnInventoryChanged += UpdateQuickSlots;
+            _inventory.OnQuickSlotUse += PlayQuickSlotFeedback;
         }
         
-        //public void PlayQuickSlotFeedback(int slotNumber) => _quickItemSlots[slotNumber].SimilulateButtonFeedback();
+        public void PlayQuickSlotFeedback(int slotNumber) => _quickItemSlots[slotNumber].SimilulateButtonFeedback();
         
-        // public void UpdateQuickSlots()
-        // {
-        //     InventoryItem[] quickItems = _inventory.QuickItems;
-        //     
-        //     for (int i = 0; i < quickItems.Length; i++)
-        //         _quickItemSlots[i].UpdateQuickSlot(quickItems[i]);
-        // }
+        public void UpdateQuickSlots()
+        {
+            InventoryItem[] quickItems = _inventory.QuickItems;
+            
+            for (int i = 0; i < quickItems.Length; i++)
+                _quickItemSlots[i].UpdateQuickSlot(quickItems[i]);
+        }
         
         
-        // public void OpenQuickItemOptions(QuickItemSlot quickItemSlot, RectTransform targetRect)
-        // {
-        //     if(_quickItemOptions == null || _quickItemOptions.Length == 0)
-        //         _quickItemOptions = quickItemOptionsParent.GetComponentsInChildren<QuickItemSlotOption>(true);
-        //     
-        //     List<InventoryItem> consumables = _inventory.ItemList.FindAll(i => i.ItemData.ItemType == ItemType.Consumable);
-        //     
-        //     if(consumables.Count == 0)
-        //         return;
-        //
-        //     for (int i = 0; i < _quickItemOptions.Length; i++)
-        //     {
-        //         if (i < consumables.Count)
-        //         {
-        //             _quickItemOptions[i].gameObject.SetActive(true);
-        //             _quickItemOptions[i].SetupOption(quickItemSlot, consumables[i]);
-        //         }
-        //         else
-        //         {
-        //             _quickItemOptions[i].gameObject.SetActive(false);
-        //         }
-        //     }
-        //     
-        //     quickItemOptionsParent.position = targetRect.position + Vector3.up * yOffsetQuickItemParent;
-        //     UiManager.Instance.OpenQuickItemSlotOptions();
-        // }
+        public void OpenQuickItemOptions(QuickItemSlot quickItemSlot, RectTransform targetRect)
+        {
+            if(_quickItemOptions == null || _quickItemOptions.Length == 0)
+                _quickItemOptions = quickItemOptionsParent.GetComponentsInChildren<QuickItemSlotOption>(true);
+            
+            List<InventoryItem> consumables = _inventory.ItemList.FindAll(i => i.ItemData.ItemType == ItemType.Consumable);
+            
+            if(consumables.Count == 0)
+                return;
+        
+            for (int i = 0; i < _quickItemOptions.Length; i++)
+            {
+                if (i < consumables.Count)
+                {
+                    _quickItemOptions[i].gameObject.SetActive(true);
+                    _quickItemOptions[i].SetupOption(quickItemSlot, consumables[i]);
+                }
+                else
+                {
+                    _quickItemOptions[i].gameObject.SetActive(false);
+                }
+            }
+            
+            quickItemOptionsParent.position = targetRect.position + Vector3.up * yOffsetQuickItemParent;
+            //UiManager.Instance.OpenQuickItemSlotOptions();
+        }
 
         
-        //public void HideQuickItemOptions() => UiManager.Instance.TryCloseActiveUi();
+        public void HideQuickItemOptions() => UiManager.Instance.TryCloseActiveUi();
 
         // public SkillSlot GetSkillSlot(SkillType skillType)
         // {
