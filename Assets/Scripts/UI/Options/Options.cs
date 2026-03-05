@@ -43,7 +43,10 @@ namespace UI
             //FusionAudioManager.Instance.SetTrackVolume(AudioTrackType.Background, value);
         }
         
-        private void OnHealthBarToggleChanged(bool value) => _player.Health.MiniHealthBarActive = value;
+        private void OnHealthBarToggleChanged(bool value)
+        {
+            //_player.Health.MiniHealthBarActive = value;
+        }
 
         public void OnOpened()
         {
@@ -60,7 +63,7 @@ namespace UI
             if (_player != null && _player.Health != null)
             {
                 healthBarToggle.onValueChanged.RemoveListener(OnHealthBarToggleChanged);
-                healthBarToggle.isOn = _player.Health.MiniHealthBarActive;
+                healthBarToggle.isOn = false; // _player.Health.MiniHealthBarActive;
                 healthBarToggle.onValueChanged.AddListener(OnHealthBarToggleChanged);
             }
         }

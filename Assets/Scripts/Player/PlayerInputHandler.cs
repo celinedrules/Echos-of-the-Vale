@@ -47,6 +47,12 @@ namespace Player
         private void OnDisable()
         {
             _input.Disable();
+            
+            if(!_uiManager)
+                return;
+            
+            _uiManager.OnUiOpened -= DisablePlayerInput;
+            _uiManager.OnUiClosed -= EnablePlayerInput;
         }
         
         private void EnablePlayerInput()
