@@ -27,6 +27,7 @@ namespace StateMachine.States.EnemyStates
 
             if (Enemy.PlayerDetected && StateMachine.CurrentState != Enemy.BattleState 
                                      && StateMachine.CurrentState != Enemy.AttackState
+                                     && StateMachine.CurrentState != Enemy.RetreatState
                                      && StateMachine.CurrentState != Enemy.StunnedState
                                      && StateMachine.CurrentState != Enemy.DeathState)
             {

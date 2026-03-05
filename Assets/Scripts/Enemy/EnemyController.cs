@@ -22,8 +22,8 @@ namespace Enemy
         public float BattleMoveSpeed => /*2.0f;*/ Data.BattleMoveSpeed;
         public float AttackDistance => /*1.5f;*/ Data.AttackDistance;
         public float BattleTimeDuration => /*5.0f;*/ Data.BattleTimeDuration;
-        public float MinRetreatDistance => /*5.0f;*/ Data.MinRetreatDistance;
-        public Vector2 RetreatVelocity => /*Vector2.zero;*/ Data.RetreatVelocity;
+        // public float MinRetreatDistance => /*5.0f;*/ Data.MinRetreatDistance;
+        // public Vector2 RetreatVelocity => /*Vector2.zero;*/ Data.RetreatVelocity;
         public float StunnedVelocity => /*7.0f;*/ Data.StunnedVelocity;
         public bool CanBeStunned { get; set; }
         public bool IsAttacking { get; set; }

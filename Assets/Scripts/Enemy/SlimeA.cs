@@ -1,5 +1,6 @@
 using Core.Interfaces;
 using StateMachine.States.EnemyStates;
+using UnityEngine;
 
 namespace Enemy
 {
@@ -25,7 +26,14 @@ namespace Enemy
             base.Start();
             StateMachine.Initialize(IdleState);
         }
-        
+
+        protected override void Update()
+        {
+            base.Update();
+            
+            Debug.Log(StateMachine.CurrentState);
+        }
+
         public void HandleCounter()
         {
             if (!CanBeCountered)

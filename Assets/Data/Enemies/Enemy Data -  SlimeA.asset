@@ -121,7 +121,7 @@ MonoBehaviour:
       lightningResistance:
         baseValue: 0
         modifiers: []
-  battleMoveSpeed: 3
+  battleMoveSpeed: 2.0338984
   attackDistance: 2
   battleTimeDuration: 5
   minRetreatDistance: 1

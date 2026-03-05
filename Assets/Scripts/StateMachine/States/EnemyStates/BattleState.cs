@@ -18,25 +18,26 @@ namespace StateMachine.States.EnemyStates
 
             _player ??= Enemy.PlayerTransform;
             
-            if(!ShouldRetreat())
-                return;
+            // if(!ShouldRetreat())
+            //     return;
         }
 
         public override void Update()
         {
             base.Update();
 
-            if (ShouldRetreat())
+            //if (ShouldRetreat())
+            if(!Enemy.PlayerDetected)
             {
                 StateMachine.ChangeState(Enemy.RetreatState);
                 return;
             }
             
-            if (Enemy.PlayerDetected)
-            {
+            // if (Enemy.PlayerDetected)
+            // {
                 UpdateTargetIfNeeded();
                 UpdateBattleTimer();
-            }
+            // }
             
             if(InAttackRange() && Enemy.PlayerDetected)
             {
@@ -79,6 +80,5 @@ namespace StateMachine.States.EnemyStates
         private void OnBattleTimeExpired() => StateMachine.ChangeState(Enemy.IdleState);
         private bool InAttackRange() => GetDistanceToPlayer() < Enemy.AttackDistance;
         private float GetDistanceToPlayer() => !_player ? float.MaxValue : Vector3.Distance(Enemy.transform.position, _player.position);
-        private bool ShouldRetreat() => GetDistanceToPlayer() > Enemy.MinRetreatDistance;
     }
 }
