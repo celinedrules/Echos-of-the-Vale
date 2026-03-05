@@ -258,7 +258,7 @@ namespace Core
            
         }
         
-        private bool IsHeavyDamage(int damage)
+        protected bool IsHeavyDamage(int damage)
         {
             if(_entityStats == null)
                 return false;

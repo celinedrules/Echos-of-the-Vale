@@ -1,9 +1,11 @@
+// Done
 using System;
 using System.Text;
 using Data.ItemData;
 using Data.ItemEffects;
 using Player;
 using Sirenix.OdinInspector;
+using Stats;
 using UI.Common;
 using UnityEngine;
 using Utilities.Enums;
@@ -57,23 +59,23 @@ namespace InventorySystem
             SellPrice = itemData.ItemPrice * 0.35f;
         }
         
-        // public void AddModifiers(EntityStats playerStats)
-        // {
-        //     foreach (ItemModifier modifier in Modifiers)
-        //     {
-        //         Stat statToModify = playerStats.GetStatByType(modifier.StatType);
-        //         statToModify.AddModifier(_itemId, modifier.Value);
-        //     }
-        // }
-        //
-        // public void RemoveModifiers(EntityStats playerStats)
-        // {
-        //     foreach (ItemModifier modifier in Modifiers)
-        //     {
-        //         Stat statToModify = playerStats.GetStatByType(modifier.StatType);
-        //         statToModify.RemoveModifier(_itemId);
-        //     }
-        // }
+        public void AddModifiers(EntityStats playerStats)
+        {
+            foreach (ItemModifier modifier in Modifiers)
+            {
+                Stat statToModify = playerStats.GetStatByType(modifier.StatType);
+                statToModify.AddModifier(_itemId, modifier.Value);
+            }
+        }
+        
+        public void RemoveModifiers(EntityStats playerStats)
+        {
+            foreach (ItemModifier modifier in Modifiers)
+            {
+                Stat statToModify = playerStats.GetStatByType(modifier.StatType);
+                statToModify.RemoveModifier(_itemId);
+            }
+        }
         
         public void AddItemEffect(PlayerController player) => ItemEffect?.Subscribe(player);
         public void RemoveItemEffect() => ItemEffect?.Unsubscribe();

@@ -1,4 +1,5 @@
-using UnityEngine;
+// Done
+using Managers;
 
 namespace StateMachine.States.PlayerStates
 {
@@ -26,8 +27,7 @@ namespace StateMachine.States.PlayerStates
 
             if (HasAnimationFinished())
             {
-                Debug.Log("GAME OVER!");
-                //UiManager.Instance.OpenGameOver();
+                UiManager.Instance.OpenGameOver();
             }
         }
     }

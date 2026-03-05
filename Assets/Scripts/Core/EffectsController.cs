@@ -2,7 +2,7 @@
 using System.Collections;
 using UnityEngine;
 
-namespace DefaultNamespace
+namespace Core
 {
     public class EffectsController : MonoBehaviour
     {

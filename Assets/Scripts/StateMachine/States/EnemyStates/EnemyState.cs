@@ -1,3 +1,4 @@
+// Done
 using Core;
 using UnityEngine;
 using Enemy;
@@ -18,7 +19,7 @@ namespace StateMachine.States.EnemyStates
             Enemy = enemy;
             Rigidbody = enemy.Rigidbody;
             Animator = enemy.Animator;
-            // Stats = enemy.Stats;
+            Stats = enemy.Stats;
         }
 
         public override void Update()
@@ -33,8 +34,6 @@ namespace StateMachine.States.EnemyStates
             {
                 StateMachine.ChangeState(Enemy.BattleState);
             }
-            // if (Enemy.PlayerDetected)
-            //     StateMachine.ChangeState(Enemy.BattleState);
         }
 
         private void SetFacingFloats(float x, float y)

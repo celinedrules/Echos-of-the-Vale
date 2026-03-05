@@ -1,7 +1,9 @@
+// Done
 using System;
 using System.Collections.Generic;
 using Core.Attributes;
 using Data.ItemEffects;
+using Data.StatsData;
 using Managers;
 using Player;
 using Sirenix.OdinInspector;
@@ -165,48 +167,48 @@ namespace Stats
             _activeBuffs.Clear();
         }
 
-        // public void SaveToRuntimeData()
-        // {
-        //     Debug.Log("Saving Stats");
-        //     PlayerController player = GameManager.Instance.Player;
-        //
-        //     if (!player)
-        //         return;
-        //
-        //     StatsRuntimeData runtimeData = GameManager.Instance.StatsRuntimeData;
-        //     runtimeData.CurrentHealth = player.Health.CurrentHealth;
-        //     runtimeData.HealthRegen = player.Stats.ResourceStats.HealthRegen.Value;
-        //     runtimeData.AttackSpeed = player.Stats.OffenseStats.AttackSpeed.Value;
-        //     runtimeData.ArmorReduction = player.Stats.OffenseStats.ArmorReduction.Value;
-        //     runtimeData.FireDamage = player.Stats.OffenseStats.FireDamage.Value;
-        //     runtimeData.IceDamage = player.Stats.OffenseStats.IceDamage.Value;
-        //     runtimeData.LightningDamage = player.Stats.OffenseStats.LightningDamage.Value;
-        //     runtimeData.HasValidData = true;
-        // }
+        public void SaveToRuntimeData()
+        {
+            Debug.Log("Saving Stats");
+            PlayerController player = GameManager.Instance.Player;
+        
+            if (!player)
+                return;
+        
+            StatsRuntimeData runtimeData = GameManager.Instance.StatsRuntimeData;
+            runtimeData.CurrentHealth = player.Health.CurrentHealth;
+            runtimeData.HealthRegen = player.Stats.ResourceStats.HealthRegen.Value;
+            runtimeData.AttackSpeed = player.Stats.OffenseStats.AttackSpeed.Value;
+            runtimeData.ArmorReduction = player.Stats.OffenseStats.ArmorReduction.Value;
+            runtimeData.FireDamage = player.Stats.OffenseStats.FireDamage.Value;
+            runtimeData.IceDamage = player.Stats.OffenseStats.IceDamage.Value;
+            runtimeData.LightningDamage = player.Stats.OffenseStats.LightningDamage.Value;
+            runtimeData.HasValidData = true;
+        }
 
         public void LoadFromRuntimeData()
         {
-            //     StatsRuntimeData runtimeData = GameManager.Instance.StatsRuntimeData;
-            //
-            //     if (!runtimeData.HasValidData)
-            //         return;
-            //
-            //     Debug.Log("Loading Stats");
-            //
-            //     PlayerController player = GameManager.Instance.Player;
-            //
-            //     if (!player)
-            //         return;
-            //
-            //     player.Health.CurrentHealth = runtimeData.CurrentHealth;
-            //     player.Stats.ResourceStats.HealthRegen.Value = runtimeData.HealthRegen;
-            //     player.Stats.OffenseStats.AttackSpeed.Value = runtimeData.AttackSpeed;
-            //     player.Stats.OffenseStats.ArmorReduction.Value = runtimeData.ArmorReduction;
-            //     player.Stats.OffenseStats.FireDamage.Value = runtimeData.FireDamage;
-            //     player.Stats.OffenseStats.IceDamage.Value = runtimeData.IceDamage;
-            //     player.Stats.OffenseStats.LightningDamage.Value = runtimeData.LightningDamage;
-            //     
-            //     player.Health.NotifyHealthChanged();
+            StatsRuntimeData runtimeData = GameManager.Instance.StatsRuntimeData;
+            
+            if (!runtimeData.HasValidData)
+                return;
+            
+            Debug.Log("Loading Stats");
+            
+            PlayerController player = GameManager.Instance.Player;
+            
+            if (!player)
+                return;
+            
+            player.Health.CurrentHealth = runtimeData.CurrentHealth;
+            player.Stats.ResourceStats.HealthRegen.Value = runtimeData.HealthRegen;
+            player.Stats.OffenseStats.AttackSpeed.Value = runtimeData.AttackSpeed;
+            player.Stats.OffenseStats.ArmorReduction.Value = runtimeData.ArmorReduction;
+            player.Stats.OffenseStats.FireDamage.Value = runtimeData.FireDamage;
+            player.Stats.OffenseStats.IceDamage.Value = runtimeData.IceDamage;
+            player.Stats.OffenseStats.LightningDamage.Value = runtimeData.LightningDamage;
+            
+            player.Health.NotifyHealthChanged();
         }
     }
 }

@@ -1,3 +1,4 @@
+// Done
 using Managers;
 using UnityEngine;
 using Utilities;
@@ -13,7 +14,6 @@ namespace StateMachine.States.EnemyStates
             base.Enter();
             Enemy.SetVelocity(Vector2.zero);
             Enemy.IsAttacking = true;
-            SyncAttackSpeed();
         }
 
         public override void Update()
@@ -41,14 +41,7 @@ namespace StateMachine.States.EnemyStates
             _stunTimer = TimerManager.Instance.CreateTimer(Enemy.StunnedFrameDuration, DisableStun);
         }
 
-        private void DisableStun()
-        {
-            Enemy.CanBeStunned = false;
-        }
-
-        private void HandleStateChange()
-        {
-            StateMachine.ChangeState(Enemy.BattleState);
-        }
+        private void DisableStun() => Enemy.CanBeStunned = false;
+        private void HandleStateChange() => StateMachine.ChangeState(Enemy.BattleState);
     }
 }

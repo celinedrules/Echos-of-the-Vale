@@ -1,3 +1,4 @@
+// Done
 using System.Collections;
 using Core;
 using UnityEngine;
@@ -14,10 +15,7 @@ namespace Player
         private PlayerController _player;
         private Coroutine _imageEchoRoutine;
 
-        private void Awake()
-        {
-            _player = GetComponentInParent<PlayerController>();
-        }
+        private void Awake() => _player = GetComponentInParent<PlayerController>();
 
         public void PlayImageEchoEffect(float duration)
         {
@@ -52,9 +50,7 @@ namespace Player
             );
         }
 
-        public void CreateEffectOf(GameObject effect, Transform target)
-        {
+        public void CreateEffectOf(GameObject effect, Transform target) =>
             Instantiate(effect, target.position, Quaternion.identity);
-        }
     }
 }

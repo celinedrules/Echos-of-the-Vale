@@ -1,3 +1,4 @@
+// Done
 using Core;
 using Managers;
 using UnityEngine;
@@ -27,8 +28,6 @@ namespace StateMachine.States.PlayerStates
             _comboAttachedQueued = false;
             
             Player.SetVelocity(0f, 0f);
-            
-            SyncAttackSpeed();
             
             _attackDirection = Input.MoveInput.x != 0 ? (Direction)Input.MoveInput.x : Player.FacingDirection;
             

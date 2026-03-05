@@ -1,3 +1,4 @@
+// Done
 using Managers;
 using Player;
 using UnityEngine;
@@ -11,9 +12,9 @@ namespace Data.ItemEffects
         
         public override void ExecuteEffect()
         {
-            // PlayerController player = GameManager.Instance.Player;
-            // float healAmount = player.Stats.GetMaxHealth() * healPercent;
-            // player.Health.IncreaseHealth(Mathf.RoundToInt(healAmount));
+            PlayerController player = GameManager.Instance.Player;
+            float healAmount = player.Stats.GetMaxHealth() * healPercent;
+            player.Health.IncreaseHealth(Mathf.RoundToInt(healAmount));
         }
     }
 }

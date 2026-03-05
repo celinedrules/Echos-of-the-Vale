@@ -1,7 +1,7 @@
+// Done
 using System;
 using Core;
 using Core.Interfaces;
-using Enemy;
 using UnityEngine;
 
 namespace Player
@@ -29,9 +29,7 @@ namespace Player
                 if (counterable.CanBeCountered)
                 {
                     counterable.HandleCounter();
-                    
                     OnCounterSuccess?.Invoke();
-                    
                     SetCounterWindow(false);
                 }
             }

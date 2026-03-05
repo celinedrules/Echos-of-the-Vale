@@ -1,3 +1,6 @@
+// Done - Cleanup
+using System.Collections;
+using Audio;
 using Control;
 using Core;
 using Data.EntityData;
@@ -10,13 +13,15 @@ namespace Enemy
     public class EnemyController : Entity
     {
         protected EnemyStateFactory Factory;
-        
+
+        [field: SerializeField, Header("Quest Info")]
+        public string QuestTargetId { get; set; }
         [field: SerializeField, Header("Player Detection")]
         public LayerMask PlayerLayer { get; set; }
         [field: SerializeField] public AISensor Sensor { get; set; }
 
         private Transform _player;
-        
+
         public EnemyData Data => entityData as EnemyData;
 
         public float BattleMoveSpeed => /*2.0f;*/ Data.BattleMoveSpeed;
@@ -35,9 +40,10 @@ namespace Enemy
         public float RandomMoveRadius => /*5.0f;*/ Data.RandomMoveRadius;
 
         public Vector2 OriginalPosition { get; private set; }
-        
         public float ActiveSlowMultiplier { get; private set; } = 1.0f;
-        
+        public EnemyFx EnemyFx { get; private set; }
+        public SpatialAudioEmitter AudioEmitter { get; private set; }
+
         protected override System.Type RequiredDataType => typeof(EnemyData);
 
         public Transform PlayerTransform
@@ -46,12 +52,12 @@ namespace Enemy
             {
                 if (!_player)
                     _player = Sensor.GetPlayerTransform();
-                
+
                 return _player;
             }
             set => _player = value;
         }
-        
+
         public IdleState IdleState { get; protected set; }
         public MoveState MoveState { get; protected set; }
         public AttackState AttackState { get; protected set; }
@@ -62,14 +68,16 @@ namespace Enemy
 
         private void OnEnable() => PlayerController.OnPlayerDeath += HandlePlayerDeath;
         private void OnDisable() => PlayerController.OnPlayerDeath -= HandlePlayerDeath;
-        
+
 
         protected override void Awake()
         {
             base.Awake();
-            
+
             Factory = new EnemyStateFactory(this, StateMachine);
             Health = GetComponent<EnemyHealth>();
+            EnemyFx = Health.DamageEffect as EnemyFx;
+            AudioEmitter = GetComponentInChildren<SpatialAudioEmitter>();
         }
 
         protected override void Start()
@@ -85,9 +93,7 @@ namespace Enemy
             base.Update();
             Sensor.SetFacingDirection(FacingDirection);
         }
-        
-        
-        
+
         public void TryEnterBattleState()
         {
             if (StateMachine.CurrentState == BattleState || StateMachine.CurrentState == AttackState)
@@ -95,9 +101,9 @@ namespace Enemy
 
             StateMachine.ChangeState(BattleState);
         }
-        
+
         public bool PlayerDetected => Sensor.IsPlayerInRange();
-        
+
         public Vector2 GetRandomDirection()
         {
             int x, y;
@@ -112,13 +118,13 @@ namespace Enemy
 
         public void MoveTowardPlayer()
         {
-            if(!PlayerTransform)
+            if (!PlayerTransform)
                 return;
-            
+
             Vector2 direction = ((Vector2)PlayerTransform.position - Rigidbody.position).normalized;
             SetVelocity(direction * BattleMoveSpeed);
         }
-        
+
         public float GetMoveSpeed() => MoveSpeed * ActiveSlowMultiplier;
 
         public override void Stun(bool knockback)
@@ -133,12 +139,25 @@ namespace Enemy
             StateMachine.ChangeState(DeathState);
         }
 
-        public void Death()
+        public void Death() => Destroy(gameObject);
+        private void HandlePlayerDeath() => StateMachine.ChangeState(IdleState);
+
+        protected override IEnumerator SlowDownRoutine(float duration, float slowdownFactor)
         {
-            Destroy(gameObject);
+            ActiveSlowMultiplier = 1 - slowdownFactor;
+            Animator.speed *= ActiveSlowMultiplier;
+            
+            yield return new WaitForSeconds(duration);
+            
+            StopSlowDown();
         }
 
-        private void HandlePlayerDeath() => StateMachine.ChangeState(IdleState);
+        public override void StopSlowDown()
+        {
+            ActiveSlowMultiplier = 1.0f;
+            Animator.speed = 1.0f;
+            base.StopSlowDown();
+        }
 
         protected override void OnDrawGizmos()
         {
@@ -168,7 +187,6 @@ namespace Enemy
 
             if (moveDir.sqrMagnitude > 0.01f)
                 Gizmos.DrawLine(pos, pos + (Vector3)(moveDir * AttackDistance));
-            
         }
     }
 }

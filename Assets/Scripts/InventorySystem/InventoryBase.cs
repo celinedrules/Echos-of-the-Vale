@@ -1,13 +1,15 @@
 using System;
 using System.Collections.Generic;
+using Core.Interfaces;
 using Data.ItemData;
 using Managers;
 using Player;
+using SaveSystem;
 using UnityEngine;
 
 namespace InventorySystem
 {
-    public class InventoryBase : MonoBehaviour
+    public class InventoryBase : MonoBehaviour, ISavable
     {
         public event Action OnInventoryChanged;
 
@@ -138,5 +140,15 @@ namespace InventorySystem
             itemList.Find(i => i.ItemData == itemToFind.ItemData);
 
         protected void TriggerUpdateUi() => OnInventoryChanged?.Invoke();
+        
+        public virtual void LoadData(GameData gameData)
+        {
+            
+        }
+
+        public virtual void SaveData(ref GameData gameData)
+        {
+            
+        }
     }
 }

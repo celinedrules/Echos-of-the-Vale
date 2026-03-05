@@ -1,18 +1,18 @@
+// Done
 using System;
 using System.Collections.Generic;
+using Stats;
 using UnityEngine;
 
 namespace StateMachine.States
 {
     public abstract class EntityState
     {
-        //private static readonly int AttackSpeedMultiplier = Animator.StringToHash("AttackSpeedMultiplier");
-        
         protected StateMachine StateMachine;
         protected string AnimBoolName;
         protected Animator Animator;
         protected Rigidbody2D Rigidbody;
-        //protected EntityStats EntityStats;
+        protected EntityStats Stats;
 
         private readonly HashSet<Action> _triggeredActions = new();
 
@@ -35,12 +35,6 @@ namespace StateMachine.States
         }
 
         protected virtual void UpdateAnimationParams() { }
-
-        public void SyncAttackSpeed()
-        {
-            // float attackSpeed = Stats.OffenseStats.AttackSpeed.Value;
-            // Animator.SetFloat(AttackSpeedMultiplier, attackSpeed);
-        }
         
         protected bool HasAnimationFinished(int animationHash = -1)
         {

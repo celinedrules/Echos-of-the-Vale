@@ -6256,6 +6256,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Player.PlayerController
   entityData: {fileID: 11400000, guid: c05483bd90e4faeeab55c68b2ba74eb4, type: 2}
   <MoveSpeed>k__BackingField: 3
+  <DashSpeed>k__BackingField: 20
+  <DashDuration>k__BackingField: 0.25
   <SwordAnimator>k__BackingField: {fileID: 379337190}
   <SwordParent>k__BackingField: {fileID: 601809342}
   <ActiveSword>k__BackingField: {fileID: 11400000, guid: 31fee6ed5c1716b8e93d7423526ff642, type: 2}
@@ -6265,6 +6267,7 @@ MonoBehaviour:
   - {x: 0, y: 0}
   <AttackVelocityDuration>k__BackingField: 0.1
   <ComboResetDuration>k__BackingField: 1
+  <PlayerFx>k__BackingField: {fileID: 0}
 --- !u!61 &232980082
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -36018,10 +36021,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Managers.GameManager
   isPersistent: 1
-  defaultScene: {fileID: 0}
-  mainMenu: {fileID: 0}
-  player: {fileID: 0}
-  inventoryRuntimeData: {fileID: 0}
+  defaultScene: {fileID: 102900000, guid: e12d2415210798a0190e167b18342216, type: 3}
+  mainMenu: {fileID: 102900000, guid: 5137bd69d73c73f8380904721c701c4a, type: 3}
+  player: {fileID: 232980081}
+  resetStatsOnStart: 1
+  locationDatabase: {fileID: 11400000, guid: 2524a3c53a92b8fda84cf197f62d38e2, type: 2}
+  worldRuntimeData: {fileID: 11400000, guid: c0f54129e2e38c1b09e7a2cf1d0787cd, type: 2}
+  inventoryRuntimeData: {fileID: 11400000, guid: 31214fc7c40ba85a3a18a56f3462a228, type: 2}
+  statsRuntimeData: {fileID: 11400000, guid: a22cb63b8f4b8894aabccdf4369335fb, type: 2}
 --- !u!1 &1135813758
 GameObject:
   m_ObjectHideFlags: 0
@@ -66773,6 +66780,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Managers.SaveManager
   isPersistent: 0
+  encryptData: 1
+  numberOfSaveSlots: 3
+  currentSaveSlot: 0
 --- !u!4 &1703636909
 Transform:
   m_ObjectHideFlags: 0
@@ -68317,6 +68327,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy.SlimeA
   entityData: {fileID: 11400000, guid: 9c319f7c328debe9c8a81e4f6682109f, type: 2}
+  <QuestTargetId>k__BackingField: 
   <PlayerLayer>k__BackingField:
     serializedVersion: 2
     m_Bits: 128

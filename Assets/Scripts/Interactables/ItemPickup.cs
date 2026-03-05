@@ -1,14 +1,16 @@
+using Core.Interfaces;
 using Data.ItemData;
 using InventorySystem;
 using Managers;
+using SaveSystem;
 using UnityEngine;
 
 namespace Interactables
 {
-    public class ItemPickup : MonoBehaviour
+    public class ItemPickup : MonoBehaviour, ISavable
     {
         [SerializeField] private string pickupId;
-        [SerializeField] private Vector2 dropForce = new Vector2(3.0f, 10.0f);
+        [SerializeField] private Vector2 dropForce = new(3.0f, 10.0f);
         [SerializeField] private ItemData itemData;
         [SerializeField, HideInInspector] private int lastKnownInstanceId;
         
@@ -29,8 +31,8 @@ namespace Interactables
         private void Start()
         {
             // Check if already collected in runtime data
-            // if (!string.IsNullOrEmpty(pickupId) && GameManager.Instance.WorldRuntimeData.IsPickupCollected(pickupId))
-            //     Destroy(gameObject);
+            if (!string.IsNullOrEmpty(pickupId) && GameManager.Instance.WorldRuntimeData.IsPickupCollected(pickupId))
+                Destroy(gameObject);
         }
         
 #if UNITY_EDITOR
@@ -106,22 +108,22 @@ namespace Interactables
             Destroy(gameObject);
         }
         
-        // public void SaveData(ref GameData gameData)
-        // {
-        //     if (string.IsNullOrEmpty(pickupId))
-        //         return;
-        //
-        //     if (_isCollected && !gameData.collectedPickups.ContainsKey(pickupId))
-        //         gameData.collectedPickups.Add(pickupId, true);
-        // }
+        public void SaveData(ref GameData gameData)
+        {
+            if (string.IsNullOrEmpty(pickupId))
+                return;
         
-        // public void LoadData(GameData gameData)
-        // {
-        //     if (string.IsNullOrEmpty(pickupId))
-        //         return;
-        //
-        //     if (gameData.collectedPickups.ContainsKey(pickupId))
-        //         Destroy(gameObject);
-        // }
+            // if (_isCollected && !gameData.collectedPickups.ContainsKey(pickupId))
+            //     gameData.collectedPickups.Add(pickupId, true);
+        }
+        
+        public void LoadData(GameData gameData)
+        {
+            if (string.IsNullOrEmpty(pickupId))
+                return;
+        
+            // if (gameData.collectedPickups.ContainsKey(pickupId))
+            //     Destroy(gameObject);
+        }
     }
 }

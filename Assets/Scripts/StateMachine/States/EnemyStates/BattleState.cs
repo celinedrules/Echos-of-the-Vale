@@ -1,3 +1,4 @@
+// Done
 using Managers;
 using UnityEngine;
 using Utilities;
@@ -17,36 +18,25 @@ namespace StateMachine.States.EnemyStates
             UpdateBattleTimer();
 
             _player ??= Enemy.PlayerTransform;
-            
-            // if(!ShouldRetreat())
-            //     return;
         }
 
         public override void Update()
         {
             base.Update();
 
-            //if (ShouldRetreat())
-            if(!Enemy.PlayerDetected)
+            if (!Enemy.PlayerDetected)
             {
                 StateMachine.ChangeState(Enemy.RetreatState);
                 return;
             }
-            
-            // if (Enemy.PlayerDetected)
-            // {
-                UpdateTargetIfNeeded();
-                UpdateBattleTimer();
-            // }
-            
-            if(InAttackRange() && Enemy.PlayerDetected)
-            {
+
+            UpdateTargetIfNeeded();
+            UpdateBattleTimer();
+
+            if (InAttackRange() && Enemy.PlayerDetected)
                 StateMachine.ChangeState(Enemy.AttackState);
-            }
             else
-            {
                 Enemy.MoveTowardPlayer();
-            }
         }
 
         public override void Exit()
@@ -57,7 +47,7 @@ namespace StateMachine.States.EnemyStates
 
         private void UpdateTargetIfNeeded()
         {
-            if(!Enemy.PlayerDetected)
+            if (!Enemy.PlayerDetected)
                 return;
 
             Transform newTarget = Enemy.Sensor.GetPlayerTransform();
@@ -71,14 +61,16 @@ namespace StateMachine.States.EnemyStates
 
         private void UpdateBattleTimer()
         {
-            if(_battleTimer != null && !_battleTimer.IsCompleted)
+            if (_battleTimer != null && !_battleTimer.IsCompleted)
                 _battleTimer.Restart();
             else
                 _battleTimer = TimerManager.Instance.CreateTimer(Enemy.BattleTimeDuration, OnBattleTimeExpired);
         }
-        
+
         private void OnBattleTimeExpired() => StateMachine.ChangeState(Enemy.IdleState);
         private bool InAttackRange() => GetDistanceToPlayer() < Enemy.AttackDistance;
-        private float GetDistanceToPlayer() => !_player ? float.MaxValue : Vector3.Distance(Enemy.transform.position, _player.position);
+
+        private float GetDistanceToPlayer() =>
+            !_player ? float.MaxValue : Vector3.Distance(Enemy.transform.position, _player.position);
     }
 }

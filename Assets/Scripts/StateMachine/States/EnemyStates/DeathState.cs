@@ -1,3 +1,4 @@
+// Done
 using UnityEngine;
 
 namespace StateMachine.States.EnemyStates
@@ -13,7 +14,6 @@ namespace StateMachine.States.EnemyStates
             foreach (Collider2D collider in colliders)
                 collider.enabled = false;
             
-            //Enemy.GetComponent<Collider2D>().enabled = false;
             StateMachine.CanChangeState = false;
         }
 

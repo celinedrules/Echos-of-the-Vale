@@ -1,8 +1,10 @@
+// Done
 using System;
 using System.Collections.Generic;
 using Managers;
 using Player;
 using Sirenix.OdinInspector;
+using UI.Inventory;
 using UnityEngine;
 using Utilities.Enums;
 
@@ -33,7 +35,7 @@ namespace Data.InventoryData
 
         [Header("State")]
         [SerializeField] private bool hasValidData;
-        
+
         public int Gold
         {
             get => gold;
@@ -49,7 +51,7 @@ namespace Data.InventoryData
         public string[] QuickSlotItemIds => quickSlotItemIds;
         public List<InventoryItemEntry> StorageItems => storageItems;
         public List<InventoryItemEntry> StorageMaterials => storageMaterials;
-        
+
         public bool HasValidData
         {
             get => hasValidData;
@@ -72,7 +74,7 @@ namespace Data.InventoryData
         {
             hasValidData = true;
             InventoryItemEntry existing = items.Find(i => i.saveId == saveId);
-            
+
             if (existing != null)
                 existing.stackSize += amount;
             else
@@ -98,7 +100,7 @@ namespace Data.InventoryData
 
         public void EquipItem(string saveId, ItemType slotType)
         {
-            hasValidData =  true;
+            hasValidData = true;
             equippedItems.RemoveAll(e => e.slotType == slotType);
             equippedItems.Add(new EquippedItemEntry { saveId = saveId, slotType = slotType });
             OnDataChanged?.Invoke();
@@ -130,6 +132,7 @@ namespace Data.InventoryData
             {
                 storageItems.Add(new InventoryItemEntry { saveId = saveId, stackSize = amount });
             }
+
             OnDataChanged?.Invoke();
         }
 
@@ -144,6 +147,7 @@ namespace Data.InventoryData
             {
                 storageMaterials.Add(new InventoryItemEntry { saveId = saveId, stackSize = amount });
             }
+
             OnDataChanged?.Invoke();
         }
 
@@ -179,18 +183,18 @@ namespace Data.InventoryData
             }
 
             PlayerController player = GameManager.Instance?.Player;
-            
+
             if (!player)
             {
                 Debug.LogWarning("GameManager.Player not available.");
                 return;
             }
 
-            // player.Inventory?.SaveToRuntimeData();
-            //
-            // Storage storage = UiManager.Instance?.Storage;
-            // storage?.InventoryStorage?.SaveToRuntimeData();
-            
+            player.Inventory?.SaveToRuntimeData();
+
+            Storage storage = UiManager.Instance?.Storage;
+            storage?.InventoryStorage?.SaveToRuntimeData();
+
             Debug.Log("Runtime data saved.");
         }
 
@@ -203,22 +207,13 @@ namespace Data.InventoryData
         }
 
         // Reset runtime data when exiting play mode in editor
-        private void OnEnable()
-        {
-            UnityEditor.EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
-        }
-
-        private void OnDisable()
-        {
-            UnityEditor.EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
-        }
+        private void OnEnable() => UnityEditor.EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
+        private void OnDisable() => UnityEditor.EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
 
         private void OnPlayModeStateChanged(UnityEditor.PlayModeStateChange state)
         {
             if (state == UnityEditor.PlayModeStateChange.ExitingPlayMode)
-            {
                 ResetToDefaults();
-            }
         }
 #endif
     }
