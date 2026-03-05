@@ -4766,7 +4766,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Jornal
+  m_text: Journal
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 2e3da3be41e030023bedf28987d83961, type: 2}
   m_sharedMaterial: {fileID: -8980716626170679667, guid: 2e3da3be41e030023bedf28987d83961, type: 2}
@@ -14960,7 +14960,7 @@ RectTransform:
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 90}
   m_SizeDelta: {x: 0, y: 100}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &497586235
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16484,18 +16484,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Managers.UiManager
   isPersistent: 0
-  panelBackground: {fileID: 0}
-  hud: {fileID: 0}
-  menuButtons: {fileID: 0}
-  inventoryMenuButton: {fileID: 0}
+  panelBackground: {fileID: 914264897}
+  hud: {fileID: 1917921049}
+  menuButtons: {fileID: 497586236}
+  inventoryMenuButton: {fileID: 855530948}
   mainMenu: {fileID: 0}
-  gameOver: {fileID: 0}
-  save: {fileID: 0}
-  options: {fileID: 0}
-  inventory: {fileID: 0}
-  storage: {fileID: 0}
-  craft: {fileID: 0}
-  merchant: {fileID: 0}
+  gameOver: {fileID: 691711212}
+  save: {fileID: 412386557}
+  options: {fileID: 1428088642}
+  inventory: {fileID: 32314790}
+  storage: {fileID: 1361928688}
+  craft: {fileID: 1730626661}
+  merchant: {fileID: 424719237}
   quickItemSlotOptions: {fileID: 0}
 --- !u!1 &542089707
 GameObject:

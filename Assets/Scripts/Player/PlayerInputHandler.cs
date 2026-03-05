@@ -1,4 +1,4 @@
-using System;
+using Managers;
 using UnityEngine;
 
 namespace Player
@@ -8,6 +8,7 @@ namespace Player
         public Vector2 MoveInput { get; private set; }
 
         private PlayerInputSet _input;
+        private UiManager _uiManager;
         
         public PlayerInputSet.PlayerActions Player => _input.Player;
 
@@ -21,8 +22,22 @@ namespace Player
             _input.Enable();
             
             RegisterPlayerInputActions();
+            RegisterUiInputActions();
+            InitializeUiManager();
         }
 
+        private void InitializeUiManager()
+        {
+            _uiManager = UiManager.Instance;
+            _uiManager.OnUiOpened += DisablePlayerInput;
+            _uiManager.OnUiClosed += EnablePlayerInput;
+        }
+        
+        private void RegisterUiInputActions()
+        {
+            _input.UI.Cancel.performed += _ => UiManager.Instance.ToggleMenu();
+        }
+        
         private void RegisterPlayerInputActions()
         {
             _input.Player.Movement.performed += ctx => MoveInput = ctx.ReadValue<Vector2>();
