@@ -1,5 +1,6 @@
 using Core;
 using Core.Interfaces;
+using Data.DialogueData;
 using Data.EntityData;
 using InventorySystem;
 using Managers;
@@ -96,22 +97,22 @@ namespace Interactables
             Debug.Log("Interact");
             // QuestManager.Instance.AddProgress(data.QuestTargetId);
             //
-            // if (data.DialogueTable == null)
-            // {
-            //     Debug.LogWarning($"No DialogueTable assigned to {name}");
-            //     return;
-            // }
-            //
-            // DialogueRow startRow = data.DialogueTable.GetRowById(data.StartRowId);
-            // if (startRow == null)
-            // {
-            //     Debug.LogWarning($"Row ID {data.StartRowId} not found in {data.DialogueTable.name}");
-            //     return;
-            // }
-            //
-            // UiManager.OpenDialogue();
-            // UiManager.Dialogue.SetupNpcData(new DialogueNpcData(data.QuestTargetId, data.RewardType, data.Quests));
-            // UiManager.Dialogue.PlayDialogue(data.DialogueTable, data.StartRowId);
+            if (data.DialogueTable == null)
+            {
+                Debug.LogWarning($"No DialogueTable assigned to {name}");
+                return;
+            }
+            
+            DialogueRow startRow = data.DialogueTable.GetRowById(data.StartRowId);
+            if (startRow == null)
+            {
+                Debug.LogWarning($"Row ID {data.StartRowId} not found in {data.DialogueTable.name}");
+                return;
+            }
+            
+            UiManager.OpenDialogue();
+            UiManager.Dialogue.SetupNpcData(new DialogueNpcData(data.QuestTargetId, data.RewardType, data.Quests));
+            UiManager.Dialogue.PlayDialogue(data.DialogueTable, data.StartRowId);
         }
 
         private string DataLabel => RequiredDataType.Name.Replace("NpcData", "") is { Length: > 0 } label

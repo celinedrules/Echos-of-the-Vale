@@ -29741,7 +29741,7 @@ MonoBehaviour:
   quest: {fileID: 857790278}
   activeQuest: {fileID: 2057153910}
   quickItemSlotOptions: {fileID: 0}
-  dialogue: {fileID: 0}
+  dialogue: {fileID: 1533884101}
   itemTooltip: {fileID: 2097491245}
   statTooltip: {fileID: 428488244}
   notificationPopup: {fileID: 0}
@@ -37701,6 +37701,7 @@ GameObject:
   - component: {fileID: 672849529}
   - component: {fileID: 672849531}
   - component: {fileID: 672849530}
+  - component: {fileID: 672849532}
   m_Layer: 5
   m_Name: Choice (1)
   m_TagString: Untagged
@@ -37827,6 +37828,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 672849528}
   m_CullTransparentMesh: 1
+--- !u!114 &672849532
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 672849528}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d669ea84a19e4c0db0f2cbb6727c028a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UI.Dialogue.DialogueChoiceHandler
 --- !u!1 &673931065
 GameObject:
   m_ObjectHideFlags: 0
@@ -65498,6 +65511,7 @@ GameObject:
   - component: {fileID: 1135530450}
   - component: {fileID: 1135530452}
   - component: {fileID: 1135530451}
+  - component: {fileID: 1135530453}
   m_Layer: 5
   m_Name: Choice (2)
   m_TagString: Untagged
@@ -65624,6 +65638,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1135530449}
   m_CullTransparentMesh: 1
+--- !u!114 &1135530453
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1135530449}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d669ea84a19e4c0db0f2cbb6727c028a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UI.Dialogue.DialogueChoiceHandler
 --- !u!1 &1135781096
 GameObject:
   m_ObjectHideFlags: 0
@@ -86889,6 +86915,7 @@ GameObject:
   - component: {fileID: 1296643009}
   - component: {fileID: 1296643011}
   - component: {fileID: 1296643010}
+  - component: {fileID: 1296643012}
   m_Layer: 5
   m_Name: Choice
   m_TagString: Untagged
@@ -87015,6 +87042,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1296643008}
   m_CullTransparentMesh: 1
+--- !u!114 &1296643012
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1296643008}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d669ea84a19e4c0db0f2cbb6727c028a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UI.Dialogue.DialogueChoiceHandler
 --- !u!1 &1297063902
 GameObject:
   m_ObjectHideFlags: 0
@@ -126848,6 +126887,7 @@ GameObject:
   - component: {fileID: 2037614423}
   - component: {fileID: 2037614425}
   - component: {fileID: 2037614424}
+  - component: {fileID: 2037614426}
   m_Layer: 5
   m_Name: Choice (3)
   m_TagString: Untagged
@@ -126974,6 +127014,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2037614422}
   m_CullTransparentMesh: 1
+--- !u!114 &2037614426
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2037614422}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d669ea84a19e4c0db0f2cbb6727c028a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UI.Dialogue.DialogueChoiceHandler
 --- !u!1 &2041279706
 GameObject:
   m_ObjectHideFlags: 0

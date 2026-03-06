@@ -1,0 +1,90 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 060d06b2c67b42cb8abae29beba71e51, type: 3}
+  m_Name: MerchantBob
+  m_EditorClassIdentifier: Assembly-CSharp::Data.DialogueData.DialogueTable
+  tableName: 
+  rows:
+  - rowId: 1
+    speaker: {fileID: 11400000, guid: 4e5d83a1306f98a9cb2b27fde2681927, type: 2}
+    textLines:
+    - If this takes longer than a pint, I'm bust.
+    - Ah, good to see an old freind - thiugh yer barely outta diapers. What can I
+      get ye?
+    - Joe took me tools again. I swear, I'll bury that bastard...
+    - If ye break it, you but it. If I break it... well, that's a tradition.
+    portraitOverride: {fileID: 0}
+    actionType: 5
+    playerChoiceAnswer: 
+    choiceRowIds: 020000000300000006000000
+    audioClip: {fileID: 0}
+    audioStartTime: 0
+    dialogSkip: 0
+    leadsTo: -1
+  - rowId: 2
+    speaker: {fileID: 11400000, guid: 4e5d83a1306f98a9cb2b27fde2681927, type: 2}
+    textLines:
+    - Here check out my wares.
+    portraitOverride: {fileID: 0}
+    actionType: 2
+    playerChoiceAnswer: Do you have something to trade?
+    choiceRowIds: 
+    audioClip: {fileID: 0}
+    audioStartTime: 0
+    dialogSkip: 0
+    leadsTo: -1
+  - rowId: 3
+    speaker: {fileID: 11400000, guid: 4e5d83a1306f98a9cb2b27fde2681927, type: 2}
+    textLines:
+    - You came to the right place.
+    portraitOverride: {fileID: 0}
+    actionType: 5
+    playerChoiceAnswer: About the job...
+    choiceRowIds: 0400000005000000
+    audioClip: {fileID: 0}
+    audioStartTime: 0
+    dialogSkip: 0
+    leadsTo: -1
+  - rowId: 4
+    speaker: {fileID: 11400000, guid: 4e5d83a1306f98a9cb2b27fde2681927, type: 2}
+    textLines:
+    - Sure take a look!
+    portraitOverride: {fileID: 0}
+    actionType: 1
+    playerChoiceAnswer: Do you have a new job for me?
+    choiceRowIds: 
+    audioClip: {fileID: 0}
+    audioStartTime: 0
+    dialogSkip: 0
+    leadsTo: -1
+  - rowId: 5
+    speaker: {fileID: 11400000, guid: 4e5d83a1306f98a9cb2b27fde2681927, type: 2}
+    textLines: []
+    portraitOverride: {fileID: 0}
+    actionType: 4
+    playerChoiceAnswer: I want to get my reward.
+    choiceRowIds: 
+    audioClip: {fileID: 0}
+    audioStartTime: 0
+    dialogSkip: 0
+    leadsTo: -1
+  - rowId: 6
+    speaker: {fileID: 11400000, guid: 4e5d83a1306f98a9cb2b27fde2681927, type: 2}
+    textLines: []
+    portraitOverride: {fileID: 0}
+    actionType: 6
+    playerChoiceAnswer: I have to go.
+    choiceRowIds: 
+    audioClip: {fileID: 0}
+    audioStartTime: 0
+    dialogSkip: 0
+    leadsTo: -1

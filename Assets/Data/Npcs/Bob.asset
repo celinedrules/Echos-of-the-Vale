@@ -73,6 +73,8 @@ MonoBehaviour:
         baseValue: 0
         modifiers: []
   bio: 
+  dialogueTable: {fileID: 11400000, guid: 3692ba0079ec444d1872d47b2997888c, type: 2}
+  startRowId: 1
   shopInventory:
     size: 10
     slots:
