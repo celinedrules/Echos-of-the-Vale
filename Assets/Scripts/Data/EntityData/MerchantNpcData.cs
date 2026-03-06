@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace Data.EntityData
 {
+    [CreateAssetMenu(fileName = "Merchant Data - ", menuName = "Echos of the Vale/Npc Data/Merchant Data")]
     public class MerchantNpcData : NpcData
     {
         [TabGroup("Shop Inventory")]

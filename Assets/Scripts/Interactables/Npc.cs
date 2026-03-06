@@ -53,7 +53,6 @@ namespace Interactables
 
         protected virtual void Update()
         {
-            HandleNpcFlip();
             HandleTooltipFloat();
         }
 
@@ -63,26 +62,6 @@ namespace Interactables
             {
                 float yOffset = Mathf.Sin(Time.time * floatSpeed) * floatRange;
                 interactTooltip.transform.position = _startPosition + new Vector3(0, yOffset, 0);
-            }
-        }
-
-        private void HandleNpcFlip()
-        {
-            if (!Player)
-                return;
-
-            Direction previousDirection = _facingDirection;
-
-            if (Animator.transform.position.x > Player.position.x && _facingDirection == Direction.Right)
-                _facingDirection = Direction.Left;
-            else if (Animator.transform.position.x < Player.position.x && _facingDirection == Direction.Left)
-                _facingDirection = Direction.Right;
-
-            if (previousDirection != _facingDirection)
-            {
-                Vector3 scale = Animator.transform.localScale;
-                scale.x = Mathf.Abs(scale.x) * (int)_facingDirection;
-                Animator.transform.localScale = scale;
             }
         }
 
@@ -114,7 +93,7 @@ namespace Interactables
 
         public virtual void Interact()
         {
-            // Debug.Log("Interact");
+            Debug.Log("Interact");
             // QuestManager.Instance.AddProgress(data.QuestTargetId);
             //
             // if (data.DialogueTable == null)

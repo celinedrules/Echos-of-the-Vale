@@ -55,7 +55,7 @@ namespace Player
             _input.Player.Movement.canceled += _ => MoveInput = Vector2.zero;
             // _input.Player.Spell.performed += _ => SkillManager.Instance.Shard.TryUseSkill();
             // _input.Player.Spell.performed += _ => SkillManager.Instance.TimeEcho.TryUseSkill();
-            // _input.Player.Interact.performed += _ => GameManager.Instance.Player.TryInteract();
+            _input.Player.Interact.performed += _ => GameManager.Instance.Player.TryInteract();
             // _input.Player.QuickItemSlot1.performed += _ => GameManager.Instance.Player.Inventory.TryUseQuickItem(1);
             // _input.Player.QuickItemSlot2.performed += _ => GameManager.Instance.Player.Inventory.TryUseQuickItem(2);
         }

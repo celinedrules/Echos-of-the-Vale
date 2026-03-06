@@ -1,8 +1,8 @@
-using System;
 using System.Collections;
 using Core;
 using Data;
 using Data.InventoryData;
+using Data.QuestData;
 using Data.StatsData;
 using Data.WorldData;
 using Interactables;
@@ -27,7 +27,7 @@ namespace Managers
         [SerializeField] private InventoryRuntimeData inventoryRuntimeData;
         //[SerializeField] private SkillRuntimeData skillRuntimeData;
         [SerializeField] private StatsRuntimeData statsRuntimeData;
-        //[SerializeField] private QuestRuntimeData questRuntimeData;
+        [SerializeField] private QuestRuntimeData questRuntimeData;
         
         private float _sessionPlayTime;
         private string _pendingWaypointId;
@@ -43,7 +43,7 @@ namespace Managers
         public InventoryRuntimeData InventoryRuntimeData => inventoryRuntimeData;
         //public SkillRuntimeData SkillRuntimeData => skillRuntimeData;
         public StatsRuntimeData StatsRuntimeData => statsRuntimeData;
-        //public QuestRuntimeData QuestRuntimeData => questRuntimeData;
+        public QuestRuntimeData QuestRuntimeData => questRuntimeData;
 
         public Vector2? LastWaypointExitPosition { get; set; }
         public float LastWaypointExitTime { get; private set; }
@@ -218,8 +218,8 @@ namespace Managers
             if(Portal.Exists)
                 Portal.Instance?.SaveToRuntimeData();
             
-            // if(QuestManager.Exists)
-            //     QuestManager.Instance?.SaveToRuntimeData();
+            if(QuestManager.Exists)
+                QuestManager.Instance?.SaveToRuntimeData();
         }
         
         public void ClearAllRuntimeData()
@@ -228,7 +228,7 @@ namespace Managers
             inventoryRuntimeData?.ResetToDefaults();
             // skillRuntimeData?.ResetToDefaults();
             statsRuntimeData?.ResetToDefaults();
-            // questRuntimeData?.ResetToDefaults();
+            questRuntimeData?.ResetToDefaults();
         }
     }
 }

@@ -1,8 +1,10 @@
 using System;
 using UI;
 using UI.Common;
+using UI.Dialogue;
 using UI.Hud;
 using UI.Inventory;
+using UI.Quests;
 using UnityEngine;
 using Utilities;
 
@@ -30,10 +32,10 @@ namespace Managers
         [SerializeField] private Craft craft;
         [SerializeField] private Merchant merchant;
         // [SerializeField] private SkillTree skillTree;
-        // [SerializeField] private Quest quest;
-        // [SerializeField] private ActiveQuest activeQuest;
+        [SerializeField] private Quest quest;
+        [SerializeField] private ActiveQuest activeQuest;
         [SerializeField] private SimplePanel quickItemSlotOptions;
-        //[SerializeField] private Dialogue dialogue;
+        [SerializeField] private Dialogue dialogue;
         
         [Header("Tooltips")]
         // [SerializeField] private SkillTooltip skillTooltip;
@@ -61,9 +63,9 @@ namespace Managers
         // public SkillTooltip SkillTooltip => skillTooltip;
         public ItemTooltip ItemTooltip => itemTooltip;
         public StatTooltip StatTooltip => statTooltip;
-        // public Quest Quest => quest;
-        // public  ActiveQuest ActiveQuest => activeQuest;
-        // public Dialogue Dialogue => dialogue;
+        public Quest Quest => quest;
+        public  ActiveQuest ActiveQuest => activeQuest;
+        public Dialogue Dialogue => dialogue;
         
         public bool IsActivePanelOfType<T>() where T : IUiPanel => _activeUiPanel is T;
         
@@ -91,9 +93,9 @@ namespace Managers
         public void OpenCraft() => OpenPanel(craft);
         public void OpenMerchant() => OpenPanel(merchant);
         // public void OpenQuickItemSlotOptions() => OpenPanel(quickItemSlotOptions);
-        // public void OpenQuest() => OpenPanel(quest);
-        // public void OpenActiveQuest() => OpenPanel(activeQuest);
-        // public void OpenDialogue() => OpenPanel(dialogue);
+        public void OpenQuest() => OpenPanel(quest);
+        public void OpenActiveQuest() => OpenPanel(activeQuest);
+        public void OpenDialogue() => OpenPanel(dialogue);
         
         public void ToggleMenu()
         {

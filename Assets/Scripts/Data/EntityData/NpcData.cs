@@ -3,10 +3,11 @@ using UnityEngine;
 
 namespace Data.EntityData
 {
+    [CreateAssetMenu(fileName = "Npc Data - ", menuName = "Echos of the Vale/Npc Data/Npc Data")]
     public class NpcData : EntityData
     {
-        // [TabGroup("Identity")]
-        // [SerializeField, TextArea(10, 4)] private string bio;
+        [TabGroup("Identity")]
+        [SerializeField, TextArea(10, 4)] private string bio;
         //
         // [TabGroup("Dialogue")]
         // [SerializeField] private DialogueTable dialogueTable;

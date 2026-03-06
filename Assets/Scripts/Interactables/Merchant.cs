@@ -13,7 +13,7 @@ namespace Interactables
         protected override void Awake()
         {
             base.Awake();
-            Animator.SetBool(IsBlacksmith, false);
+            Animator?.SetBool(IsBlacksmith, false);
             _data = Data as MerchantNpcData;
             
             if(!_data)
