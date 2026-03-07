@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Data
 {
-    [CreateAssetMenu(fileName = "LocationDatabase", menuName = "Echos of the Vale/Location Database")]
+    [CreateAssetMenu(fileName = "LocationDatabase", menuName = "Echos of the Vale/Location Data/Location Database")]
     public class LocationDatabase : ScriptableObject
     {
         [SerializeField] private List<LocationEntry> locations = new();

@@ -6,7 +6,7 @@ using Utilities.Enums;
 
 namespace Data.SkillData
 {
-    [CreateAssetMenu(fileName = "Skill Runtime Data", menuName = "Echos of the Vale/Skills/Skill Runtime Data", order = 0)]
+    [CreateAssetMenu(fileName = "Skill Runtime Data", menuName = "Echos of the Vale/Skill Data/Skill Runtime Data", order = 0)]
     public class SkillRuntimeData : ScriptableObject
     {
         [Header("Skill Points")]

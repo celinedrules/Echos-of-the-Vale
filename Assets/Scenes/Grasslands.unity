@@ -69481,7 +69481,7 @@ MonoBehaviour:
   locationDatabase: {fileID: 11400000, guid: 2524a3c53a92b8fda84cf197f62d38e2, type: 2}
   worldRuntimeData: {fileID: 11400000, guid: c0f54129e2e38c1b09e7a2cf1d0787cd, type: 2}
   inventoryRuntimeData: {fileID: 11400000, guid: 31214fc7c40ba85a3a18a56f3462a228, type: 2}
-  skillRuntimeData: {fileID: 0}
+  skillRuntimeData: {fileID: 11400000, guid: 12b3dbdcb0644ad5fbe695f3e02c2d2c, type: 2}
   statsRuntimeData: {fileID: 11400000, guid: a22cb63b8f4b8894aabccdf4369335fb, type: 2}
   questRuntimeData: {fileID: 11400000, guid: f5a4785fc849f265fb7abaa9064da56d, type: 2}
 --- !u!1 &1135129416

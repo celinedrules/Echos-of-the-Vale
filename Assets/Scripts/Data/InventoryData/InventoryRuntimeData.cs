@@ -10,7 +10,7 @@ using Utilities.Enums;
 
 namespace Data.InventoryData
 {
-    [CreateAssetMenu(fileName = "Inventory Data", menuName = "Echos of the Vale/Inventory/Inventory Data")]
+    [CreateAssetMenu(fileName = "Inventory Data", menuName = "Echos of the Vale/Inventory Data/Inventory Data")]
     public class InventoryRuntimeData : ScriptableObject
     {
         public event Action OnDataChanged;

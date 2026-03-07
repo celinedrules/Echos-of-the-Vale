@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Data.StatsData
 {
-    [CreateAssetMenu(fileName = "Stats Runtime Data", menuName = "Echos of the Vale/Stats/Stats Runtime Data", order = 0)]
+    [CreateAssetMenu(fileName = "Stats Runtime Data", menuName = "Echos of the Vale/Stat Data/Stats Runtime Data", order = 0)]
     public class StatsRuntimeData : ScriptableObject
     {
         [SerializeField] private int currentHealth;

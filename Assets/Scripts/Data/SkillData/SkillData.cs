@@ -8,7 +8,7 @@ using Utilities.Enums;
 
 namespace Data.SkillData
 {
-    [CreateAssetMenu(fileName = "Skill Data", menuName = "Echos of the Vale/Skill Data", order = 0)]
+    [CreateAssetMenu(fileName = "Skill Data", menuName = "Echos of the Vale/Skill Data/Skills Data", order = 0)]
     public class SkillData : ScriptableObject
     {
         [BoxGroup("Skill Info")]

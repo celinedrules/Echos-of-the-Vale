@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Data.WorldData
 {
-    [CreateAssetMenu(fileName = "World Runtime Data", menuName = "Echos of the Vale/World/World Runtime Data", order = 0)]
+    [CreateAssetMenu(fileName = "World Runtime Data", menuName = "Echos of the Vale/World Data/World Runtime Data", order = 0)]
     public class WorldRuntimeData : ScriptableObject
     {
         [SerializeField] private List<string> collectedPickupIds = new();

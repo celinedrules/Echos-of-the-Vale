@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Data.PortalData
 {
-    [CreateAssetMenu(fileName = "Portal Runtime Data", menuName = "Echos of the Vale/Portal/Portal Runtime Data", order = 0)]
+    [CreateAssetMenu(fileName = "Portal Runtime Data", menuName = "Echos of the Vale/Portal Data/Portal Runtime Data", order = 0)]
     public class PortalRuntimeData : ScriptableObject
     {
         [Header("Portal State")]
