@@ -97,7 +97,7 @@ namespace Interactables
             return other.GetComponentInChildren<PlayerInteractionCollider>() != null;
         }
 
-        protected bool CachePlayerReferences(Collider2D other)
+        private bool CachePlayerReferences(Collider2D other)
         {
             InventoryPlayer inventory = other.GetComponentInParent<InventoryPlayer>();
 
