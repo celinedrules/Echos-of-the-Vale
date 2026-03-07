@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using Core;
 using Core.Interfaces;
 using Data.EntityData;
@@ -18,6 +19,7 @@ namespace Player
         
         private PlayerStateFactory _factory;
         private Coroutine _queuedAttackCo;
+        private readonly List<IInteractable> _availableInteractables = new();
         
         public InventoryPlayer Inventory { get; private set; }
         public PlayerInputHandler InputHandler { get; private set; }
@@ -214,33 +216,48 @@ namespace Player
             OnPlayerDeath?.Invoke();
             StateMachine.ChangeState(DeathState);
         }
+
+        public void RegisterInteractable(IInteractable interactable)
+        {
+            if (interactable == null || _availableInteractables.Contains(interactable))
+                return;
+
+            _availableInteractables.Add(interactable);
+        }
+
+        public void UnregisterInteractable(IInteractable interactable)
+        {
+            if (interactable == null)
+                return;
+
+            _availableInteractables.Remove(interactable);
+        }
         
         public void TryInteract()
         {
-            Transform closest = null;
+            IInteractable closestInteractable = null;
             float closestDistance = Mathf.Infinity;
-            Collider2D[] objectsAround = Physics2D.OverlapCircleAll(transform.position, 1.0f, LayerMask.GetMask("Npc"));
 
-            foreach (Collider2D objectAround in objectsAround)
+            for (int i = _availableInteractables.Count - 1; i >= 0; i--)
             {
-                IInteractable interactable = objectAround.GetComponent<IInteractable>();
+                IInteractable interactable = _availableInteractables[i];
 
-                if (interactable == null)
+                if (interactable is not MonoBehaviour interactableBehaviour || !interactableBehaviour)
+                {
+                    _availableInteractables.RemoveAt(i);
                     continue;
+                }
 
-                float distance = Vector2.Distance(transform.position, objectAround.transform.position);
+                float distance = Vector2.Distance(transform.position, interactableBehaviour.transform.position);
 
                 if (distance < closestDistance)
                 {
-                    closest = objectAround.transform;
                     closestDistance = distance;
+                    closestInteractable = interactable;
                 }
             }
 
-            if (!closest)
-                return;
-
-            closest.GetComponent<IInteractable>().Interact();
+            closestInteractable?.Interact();
         }
     }
 }

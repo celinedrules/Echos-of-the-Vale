@@ -4,6 +4,7 @@ using Data.DialogueData;
 using Data.EntityData;
 using InventorySystem;
 using Managers;
+using Player;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -33,14 +34,14 @@ namespace Interactables
 
         private Direction _facingDirection = Direction.Right;
         private Vector3 _startPosition;
+        private bool _playerInRange;
 
         public NpcData Data => data;
-
+        
         // public bool HasQuests => data.Quests != null && data.Quests.Length > 0;
         // public QuestData[] Quests => data.Quests;
 
         protected virtual System.Type RequiredDataType => typeof(NpcData);
-
 
         protected virtual void Awake()
         {
@@ -68,48 +69,86 @@ namespace Interactables
 
         protected virtual void OnTriggerEnter2D(Collider2D other)
         {
-            if (!other.CompareTag("Player"))
+            if (!IsValidInteractionCollider(other))
                 return;
 
-            if (other.gameObject.layer == LayerMask.NameToLayer("PlayerAttack"))
+            if (!CachePlayerReferences(other))
                 return;
 
-            Player = other.transform;
-            Inventory = Player.GetComponent<InventoryPlayer>();
-            Storage?.SetInventory(Inventory);
-            Merchant?.SetInventory(Inventory);
+            _playerInRange = true;
+            RegisterWithPlayer();
             interactTooltip.SetActive(true);
         }
 
         protected virtual void OnTriggerExit2D(Collider2D other)
         {
-            if (!other.CompareTag("Player"))
+            if (!IsValidInteractionCollider(other))
                 return;
 
-            if (other.gameObject.layer == LayerMask.NameToLayer("PlayerAttack"))
-                return;
-
+            UnregisterFromPlayer();
+            _playerInRange = false;
+            Player = null;
+            Inventory = null;
             interactTooltip.SetActive(false);
+        }
+
+        private bool IsValidInteractionCollider(Collider2D other)
+        {
+            return other.GetComponentInChildren<PlayerInteractionCollider>() != null;
+        }
+
+        protected bool CachePlayerReferences(Collider2D other)
+        {
+            InventoryPlayer inventory = other.GetComponentInParent<InventoryPlayer>();
+
+            if (!inventory)
+                return false;
+
+            Inventory = inventory;
+            Player = inventory.transform;
+            Storage?.SetInventory(Inventory);
+            Merchant?.SetInventory(Inventory);
+
+            return true;
+        }
+
+        private void RegisterWithPlayer()
+        {
+            PlayerController playerController = Player ? Player.GetComponent<PlayerController>() : null;
+            playerController?.RegisterInteractable(this);
+        }
+
+        private void UnregisterFromPlayer()
+        {
+            PlayerController playerController = Player ? Player.GetComponent<PlayerController>() : null;
+            playerController?.UnregisterInteractable(this);
+        }
+
+        protected bool CanInteract()
+        {
+            return _playerInRange && Player && Inventory;
         }
 
         public virtual void Interact()
         {
-            Debug.Log("Interact");
+            if (!CanInteract())
+                return;
+
             // QuestManager.Instance.AddProgress(data.QuestTargetId);
-            //
+            
             if (data.DialogueTable == null)
             {
                 Debug.LogWarning($"No DialogueTable assigned to {name}");
                 return;
             }
-            
+
             DialogueRow startRow = data.DialogueTable.GetRowById(data.StartRowId);
             if (startRow == null)
             {
                 Debug.LogWarning($"Row ID {data.StartRowId} not found in {data.DialogueTable.name}");
                 return;
             }
-            
+
             UiManager.OpenDialogue();
             UiManager.Dialogue.SetupNpcData(new DialogueNpcData(data.QuestTargetId, data.RewardType, data.Quests));
             UiManager.Dialogue.PlayDialogue(data.DialogueTable, data.StartRowId);

@@ -32,6 +32,9 @@ namespace Interactables
 
         public override void Interact()
         {
+            if(!CanInteract())
+                return;
+            
             base.Interact();
             UiManager.Merchant.SetupMerchantUi(Merchant, Inventory);
         }
