@@ -5,6 +5,8 @@ using UI.Dialogue;
 using UI.Hud;
 using UI.Inventory;
 using UI.Quests;
+using UI.SkillTree.Core;
+using UI.SkillTree.Tooltips;
 using UnityEngine;
 using Utilities;
 
@@ -31,14 +33,14 @@ namespace Managers
         [SerializeField] private Storage storage;
         [SerializeField] private Craft craft;
         [SerializeField] private Merchant merchant;
-        // [SerializeField] private SkillTree skillTree;
+        [SerializeField] private SkillTree skillTree;
         [SerializeField] private Quest quest;
         [SerializeField] private ActiveQuest activeQuest;
         [SerializeField] private SimplePanel quickItemSlotOptions;
         [SerializeField] private Dialogue dialogue;
         
         [Header("Tooltips")]
-        // [SerializeField] private SkillTooltip skillTooltip;
+        [SerializeField] private SkillTooltip skillTooltip;
         [SerializeField] private ItemTooltip itemTooltip;
         [SerializeField] private StatTooltip statTooltip;
         
@@ -59,8 +61,8 @@ namespace Managers
         public Merchant Merchant => merchant;
         public Craft Craft => craft;
         public Storage Storage => storage;
-        // public SkillTree SkillTree => skillTree;
-        // public SkillTooltip SkillTooltip => skillTooltip;
+        public SkillTree SkillTree => skillTree;
+        public SkillTooltip SkillTooltip => skillTooltip;
         public ItemTooltip ItemTooltip => itemTooltip;
         public StatTooltip StatTooltip => statTooltip;
         public Quest Quest => quest;
@@ -87,12 +89,12 @@ namespace Managers
         public void OpenMainMenu() => OpenPanel(mainMenu);
         public void OpenGameOver() => OpenPanel(gameOver);
         public void OpenOptions() => OpenPanel(options);
-        //public void OpenSkillTree() => OpenPanel(skillTree);
+        public void OpenSkillTree() => OpenPanel(skillTree);
         public void OpenInventory() => OpenPanel(inventory);
         public void OpenStorage() => OpenPanel(storage);
         public void OpenCraft() => OpenPanel(craft);
         public void OpenMerchant() => OpenPanel(merchant);
-        // public void OpenQuickItemSlotOptions() => OpenPanel(quickItemSlotOptions);
+        public void OpenQuickItemSlotOptions() => OpenPanel(quickItemSlotOptions);
         public void OpenQuest() => OpenPanel(quest);
         public void OpenActiveQuest() => OpenPanel(activeQuest);
         public void OpenDialogue() => OpenPanel(dialogue);
@@ -175,7 +177,7 @@ namespace Managers
         {
             if(_activePanelHasTooltips)
             {
-                // HideTooltip(skillTooltip.CanvasGroup);
+                HideTooltip(skillTooltip.CanvasGroup);
                 HideTooltip(statTooltip.CanvasGroup);
                 HideTooltip(itemTooltip.CanvasGroup);
             }

@@ -1,3 +1,4 @@
+// Done
 using System.Collections.Generic;
 using InventorySystem;
 using Managers;
@@ -24,7 +25,7 @@ namespace UI.Hud
         private int _initialMaxHealth;
         private PlayerController _player;
         private InventoryPlayer _inventory;
-        // private SkillSlot[] _skillSlots;
+        private SkillSlot[] _skillSlots;
         private QuickItemSlotOption[] _quickItemOptions;
         private QuickItemSlot[] _quickItemSlots;
         
@@ -38,7 +39,7 @@ namespace UI.Hud
 
             UpdateHealthBar();
             
-            //_skillSlots = GetComponentsInChildren<SkillSlot>(true);
+            _skillSlots = GetComponentsInChildren<SkillSlot>(true);
             
             _inventory = _player.Inventory;
             _inventory.OnInventoryChanged += UpdateQuickSlots;
@@ -80,27 +81,27 @@ namespace UI.Hud
             }
             
             quickItemOptionsParent.position = targetRect.position + Vector3.up * yOffsetQuickItemParent;
-            //UiManager.Instance.OpenQuickItemSlotOptions();
+            UiManager.Instance.OpenQuickItemSlotOptions();
         }
 
         
         public void HideQuickItemOptions() => UiManager.Instance.TryCloseActiveUi();
 
-        // public SkillSlot GetSkillSlot(SkillType skillType)
-        // {
-        //     _skillSlots ??= GetComponentsInChildren<SkillSlot>(true);
-        //
-        //     foreach (SkillSlot slot in _skillSlots)
-        //     {
-        //         if (slot.SkillType == skillType)
-        //         {
-        //             slot.gameObject.SetActive(true);
-        //             return slot;
-        //         }
-        //     }
-        //
-        //     return null;
-        // }
+        public SkillSlot GetSkillSlot(SkillType skillType)
+        {
+            _skillSlots ??= GetComponentsInChildren<SkillSlot>(true);
+        
+            foreach (SkillSlot slot in _skillSlots)
+            {
+                if (slot.SkillType == skillType)
+                {
+                    slot.gameObject.SetActive(true);
+                    return slot;
+                }
+            }
+        
+            return null;
+        }
         
         public void UpdateHealthBar()
         {

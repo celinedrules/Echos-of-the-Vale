@@ -3,6 +3,7 @@ using Core;
 using Data;
 using Data.InventoryData;
 using Data.QuestData;
+using Data.SkillData;
 using Data.StatsData;
 using Data.WorldData;
 using Interactables;
@@ -25,7 +26,7 @@ namespace Managers
         [SerializeField] private LocationDatabase locationDatabase;
         [SerializeField] private WorldRuntimeData worldRuntimeData;
         [SerializeField] private InventoryRuntimeData inventoryRuntimeData;
-        //[SerializeField] private SkillRuntimeData skillRuntimeData;
+        [SerializeField] private SkillRuntimeData skillRuntimeData;
         [SerializeField] private StatsRuntimeData statsRuntimeData;
         [SerializeField] private QuestRuntimeData questRuntimeData;
         
@@ -41,7 +42,7 @@ namespace Managers
         public float SessionPlayTime => _sessionPlayTime;
         public WorldRuntimeData WorldRuntimeData => worldRuntimeData;
         public InventoryRuntimeData InventoryRuntimeData => inventoryRuntimeData;
-        //public SkillRuntimeData SkillRuntimeData => skillRuntimeData;
+        public SkillRuntimeData SkillRuntimeData => skillRuntimeData;
         public StatsRuntimeData StatsRuntimeData => statsRuntimeData;
         public QuestRuntimeData QuestRuntimeData => questRuntimeData;
 
@@ -212,8 +213,8 @@ namespace Managers
             ((PlayerStats)Player?.Stats)?.SaveToRuntimeData();
             UiManager.Instance.Storage?.InventoryStorage?.SaveToRuntimeData();
             
-            // if (SkillManager.Exists)
-            //     SkillManager.Instance.SkillTree?.SaveToRuntimeData();
+            if (SkillManager.Exists)
+                SkillManager.Instance.SkillTree?.SaveToRuntimeData();
             
             if(Portal.Exists)
                 Portal.Instance?.SaveToRuntimeData();
@@ -226,7 +227,7 @@ namespace Managers
         {
             worldRuntimeData?.ResetToDefaults();
             inventoryRuntimeData?.ResetToDefaults();
-            // skillRuntimeData?.ResetToDefaults();
+            skillRuntimeData?.ResetToDefaults();
             statsRuntimeData?.ResetToDefaults();
             questRuntimeData?.ResetToDefaults();
         }
