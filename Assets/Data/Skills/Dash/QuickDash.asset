@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0de3a38e52e240988e4952e45920d9f2, type: 3}
+  m_Name: QuickDash
+  m_EditorClassIdentifier: Assembly-CSharp::Data.SkillData.SkillData
+  skillType: 0
+  displayName: Quick Dash
+  description: 'Dash to avoid attacks.
+
+    You cannot take damage while attacking.'
+  icon: {fileID: 21300000, guid: 8df225d5dcd64b95587314eedc16f7f3, type: 3}
+  unlockedByDefault: 1
+  cost: 0
+  upgradeData:
+    upgradeType: 1
+    cooldown: 3
+    damageScaleData:
+      <Physical>k__BackingField: 1
+      <Elemental>k__BackingField: 1
+      <ChillDuration>k__BackingField: 3
+      <ChillSlowMultiplier>k__BackingField: 0.2
+      <BurnDuration>k__BackingField: 3
+      <BurnDamageScale>k__BackingField: 1
+      <ShockDuration>k__BackingField: 3
+      <ShockDamageScale>k__BackingField: 1
+      <ShockCharge>k__BackingField: 0.4

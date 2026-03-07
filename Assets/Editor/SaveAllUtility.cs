@@ -13,6 +13,6 @@ public static class SaveAllUtility
         AssetDatabase.SaveAssets();
 
         // Optional feedback
-        Debug.Log("All open scenes and assets saved!");
+        Debug.Log("✅ All scenes and assets saved.");
     }
 }

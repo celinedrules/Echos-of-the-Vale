@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 using SkillSystem.Core;
+using SkillSystem.Skills.Movement;
 using UI.SkillTree.Core;
 using UnityEngine;
 using Utilities;
@@ -25,7 +26,7 @@ namespace Managers
 
         public SkillBase[] AllSkills { get; private set; }
         public SkillTree SkillTree => skillTree;
-        // public SkillDash Dash { get; private set; }
+        public SkillDash Dash { get; private set; }
         // public SkillShard Shard { get; private set; }
         // public SkillSwordThrow SwordThrow { get; private set; }
         // public SkillTimeEcho TimeEcho { get; private set; }
@@ -37,7 +38,7 @@ namespace Managers
 
             AllSkills = skills.GetComponents<SkillBase>();
 
-            // Dash = GetSkill<SkillDash>();
+            Dash = GetSkill<SkillDash>();
             // Shard = GetSkill<SkillShard>();
             // SwordThrow = GetSkill<SkillSwordThrow>();
             // TimeEcho = GetSkill<SkillTimeEcho>();
@@ -48,8 +49,8 @@ namespace Managers
         {
             switch (type)
             {
-                // case SkillType.Dash:
-                //     return Dash;
+                case SkillType.Dash:
+                    return Dash;
                 // case SkillType.TimeEcho:
                 //     return TimeEcho;
                 // case SkillType.TimeShard:

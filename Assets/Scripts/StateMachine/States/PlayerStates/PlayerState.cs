@@ -1,5 +1,6 @@
 // Done
 using Core;
+using Managers;
 using Player;
 using UnityEngine;
 
@@ -32,6 +33,12 @@ namespace StateMachine.States.PlayerStates
             
             if(Input.Player.CounterAttack.WasPressedThisFrame() && StateMachine.CurrentState != Player.CounterAttackState)
                 StateMachine.ChangeState(Player.CounterAttackState);
+
+            if (Input.Player.Dash.WasPressedThisFrame() && CanDash())
+            {
+                SkillManager.Instance.Dash.SetSkillOnCooldown();
+                StateMachine.ChangeState(Player.DashState);
+            }
         }
 
         private void SetFacingFloats(float x, float y)
@@ -63,6 +70,22 @@ namespace StateMachine.States.PlayerStates
         {
             base.UpdateAnimationParams();
             SetFacingFloatsFromDirection();
+        }
+        
+        private bool CanDash()
+        {
+            if (!SkillManager.Instance.Dash.CanUseSkill())
+            {
+                Debug.Log("Can't use skill");
+                return false;
+            }
+
+            // if (Player.HitWall)
+            //     return false;
+
+            return StateMachine.CurrentState != Player.DashState;
+            // return StateMachine.CurrentState != Player.DashState &&
+            //        StateMachine.CurrentState != Player.DomainExpansionState;
         }
     }
 }

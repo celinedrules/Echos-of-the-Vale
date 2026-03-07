@@ -7,6 +7,7 @@ using Data.EntityData;
 using Data.InventoryData;
 using Data.WeaponData;
 using InventorySystem;
+using SkillSystem.Skills.Movement;
 using StateMachine.States.PlayerStates;
 using Stats;
 using UnityEngine;
@@ -27,14 +28,14 @@ namespace Player
         
         public IdleState IdleState { get; private set; }
         public MoveState MoveState { get; private set; }
-        //public DashState DashState { get; private set; }
+        public DashState DashState { get; private set; }
         public BasicAttackState BasicAttackState { get; private set; }
         public CounterAttackState CounterAttackState { get; private set; }
         // public SwordThrowState SwordThrowState { get; private set; }
         public DeathState DeathState { get; private set; }
         
-        // [field: SerializeField, Header("Skills")]
-        // public SkillDash Dash { get; private set; }
+        [field: SerializeField, Header("Skills")]
+        public SkillDash Dash { get; private set; }
         
         [field: SerializeField, Header("Movement Settings")]
         public float MoveSpeed { get; set; } = 5.0f;
@@ -76,14 +77,14 @@ namespace Player
             
             IdleState = _factory.Create<IdleState>("Idle");
             MoveState = _factory.Create<MoveState>("Move");
-            //DashState = _factory.Create<DashState>("Dash");
+            DashState = _factory.Create<DashState>("Dash");
             BasicAttackState = _factory.Create<BasicAttackState>("BasicAttack");
             CounterAttackState = _factory.Create<CounterAttackState>("CounterAttack");
             //SwordThrowState = _factory.Create<SwordThrowState>("SwordThrow");
             DeathState = _factory.Create<DeathState>("Death");
             
-            // if (!Dash)
-            //     Dash = GetComponentInChildren<SkillDash>();
+            if (!Dash)
+                Dash = GetComponentInChildren<SkillDash>();
         }
 
         protected override void Start()
@@ -160,8 +161,7 @@ namespace Player
             if (IsKnockedBack)
                 return;
 
-            Rigidbody.linearVelocity = new Vector2(velocityX, velocityY);
-            //HandleFlip(velocityX);
+            SetVelocity(new Vector2(velocityX, velocityY));
         }
         
         public void EnterAttackStateWithDelay()
