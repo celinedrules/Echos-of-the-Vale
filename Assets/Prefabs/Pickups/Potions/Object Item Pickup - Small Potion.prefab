@@ -173,7 +173,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 999a37c7b1064d4caf3ecd0dd32b3c9e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Interactables.ItemPickup
-  pickupId: e2ec2868-601a-4681-8004-ecfa6f2149cd
+  pickupId: 6e6d21d1-4ae1-4a3f-ac20-a2b4416ae431
   dropForce: {x: 3, y: 10}
   itemData: {fileID: 11400000, guid: d8e4f01ae1ebae719aa3ac8cbd9c2573, type: 2}
-  lastKnownInstanceId: -122614
+  lastKnownInstanceId: -153082
