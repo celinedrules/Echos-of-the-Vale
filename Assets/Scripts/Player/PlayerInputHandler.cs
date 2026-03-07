@@ -1,4 +1,5 @@
 using Managers;
+using UI.Dialogue;
 using UnityEngine;
 
 namespace Player
@@ -34,18 +35,18 @@ namespace Player
         private void RegisterUiInputActions()
         {
             _input.UI.Cancel.performed += _ => UiManager.Instance.ToggleMenu();
-            // _input.UI.DialogueInteraction.performed += _ =>
-            // {
-            //     if(UiManager.Instance.IsActivePanelOfType<Dialogue>())
-            //         UiManager.Instance.Dialogue.DialogueInteraction();
-            // };
-            // _input.UI.DialogueNavigation.performed += ctx =>
-            // {
-            //     int direction = Mathf.RoundToInt(ctx.ReadValue<float>());
-            //
-            //     if (UiManager.Instance.IsActivePanelOfType<Dialogue>())
-            //         UiManager.Instance.Dialogue.NavigateChoices(direction);
-            // };
+            _input.UI.DialogueInteraction.performed += _ =>
+            {
+                if(UiManager.Instance.IsActivePanelOfType<Dialogue>())
+                    UiManager.Instance.Dialogue.DialogueInteraction();
+            };
+            _input.UI.DialogueNavigation.performed += ctx =>
+            {
+                int direction = Mathf.RoundToInt(ctx.ReadValue<float>());
+            
+                if (UiManager.Instance.IsActivePanelOfType<Dialogue>())
+                    UiManager.Instance.Dialogue.NavigateChoices(direction);
+            };
         }
         
         private void RegisterPlayerInputActions()
