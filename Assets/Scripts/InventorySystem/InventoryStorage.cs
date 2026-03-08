@@ -1,8 +1,10 @@
+// Done
 using System.Collections.Generic;
 using System.Linq;
 using Data.InventoryData;
 using Data.ItemData;
 using Managers;
+using SaveSystem;
 using UnityEngine;
 
 namespace InventorySystem
@@ -44,8 +46,8 @@ namespace InventorySystem
                     _playerInventory.RemoveOneItem(item);
                     AddItem(itemToAdd);
 
-                    // if (QuestManager.Exists)
-                    //     QuestManager.Instance.ReduceProgress(item.ItemData.SaveId);
+                    if (QuestManager.Exists)
+                        QuestManager.Instance.ReduceProgress(item.ItemData.SaveId);
                 }
             }
 
@@ -64,8 +66,8 @@ namespace InventorySystem
                     RemoveOneItem(item);
                     _playerInventory.AddItem(itemToAdd);
 
-                    // if (QuestManager.Exists)
-                    //     QuestManager.Instance.AddProgress(item.ItemData.SaveId);
+                    if (QuestManager.Exists)
+                        QuestManager.Instance.AddProgress(item.ItemData.SaveId);
                 }
             }
 
@@ -145,8 +147,8 @@ namespace InventorySystem
                 if (amountToConsume > 0)
                     amountToConsume -= ConsumedItemsAmount(MaterialStash, requiredItem);
 
-                // if (QuestManager.Exists)
-                //     QuestManager.Instance.ReduceProgress(requiredItem.ItemData.SaveId, requiredItem.StackSize);
+                if (QuestManager.Exists)
+                    QuestManager.Instance.ReduceProgress(requiredItem.ItemData.SaveId, requiredItem.StackSize);
             }
         }
 
@@ -214,79 +216,79 @@ namespace InventorySystem
             return amount;
         }
 
-        // public override void SaveData(ref GameData gameData)
-        // {
-        //     SaveToRuntimeData();
-        //
-        //     base.SaveData(ref gameData);
-        //
-        //     gameData.storageItems.Clear();
-        //     gameData.storageMaterials.Clear();
-        //
-        //     foreach (InventoryItem item in ItemList)
-        //     {
-        //         if (item == null || !item.ItemData)
-        //             continue;
-        //
-        //         string saveId = item.ItemData.SaveId;
-        //
-        //         gameData.storageItems.TryAdd(saveId, 0);
-        //         gameData.storageItems[saveId] += item.StackSize;
-        //     }
-        //
-        //     foreach (InventoryItem item in MaterialStash)
-        //     {
-        //         if (item == null || !item.ItemData)
-        //             continue;
-        //
-        //         string saveId = item.ItemData.SaveId;
-        //
-        //         gameData.storageMaterials.TryAdd(saveId, 0);
-        //         gameData.storageMaterials[saveId] += item.StackSize;
-        //     }
-        // }
+        public override void SaveData(ref GameData gameData)
+        {
+            SaveToRuntimeData();
+        
+            base.SaveData(ref gameData);
+        
+            gameData.storageItems.Clear();
+            gameData.storageMaterials.Clear();
+        
+            foreach (InventoryItem item in ItemList)
+            {
+                if (item == null || !item.ItemData)
+                    continue;
+        
+                string saveId = item.ItemData.SaveId;
+        
+                gameData.storageItems.TryAdd(saveId, 0);
+                gameData.storageItems[saveId] += item.StackSize;
+            }
+        
+            foreach (InventoryItem item in MaterialStash)
+            {
+                if (item == null || !item.ItemData)
+                    continue;
+        
+                string saveId = item.ItemData.SaveId;
+        
+                gameData.storageMaterials.TryAdd(saveId, 0);
+                gameData.storageMaterials[saveId] += item.StackSize;
+            }
+        }
 
-        // public override void LoadData(GameData gameData)
-        // {
-        //     ItemList.Clear();
-        //     MaterialStash.Clear();
-        //
-        //     foreach ((string saveId, int stackSize) in gameData.storageItems)
-        //     {
-        //         ItemData itemData = itemDatabase.GetItemData(saveId);
-        //
-        //         if (!itemData)
-        //         {
-        //             Debug.LogWarning($"Can't find save data for item {saveId}!");
-        //             continue;
-        //         }
-        //
-        //         for (int i = 0; i < stackSize; i++)
-        //         {
-        //             InventoryItem inventoryItem = new(itemData);
-        //             AddItem(inventoryItem);
-        //         }
-        //     }
-        //
-        //     foreach ((string saveId, int stackSize) in gameData.storageMaterials)
-        //     {
-        //         ItemData itemData = itemDatabase.GetItemData(saveId);
-        //
-        //         if (!itemData)
-        //         {
-        //             Debug.LogWarning($"Can't find save data for item {saveId}!");
-        //             continue;
-        //         }
-        //
-        //         for (int i = 0; i < stackSize; i++)
-        //         {
-        //             InventoryItem inventoryItem = new(itemData);
-        //             AddMaterialToStash(inventoryItem);
-        //         }
-        //     }
-        //
-        //     SaveToRuntimeData();
-        // }
+        public override void LoadData(GameData gameData)
+        {
+            ItemList.Clear();
+            MaterialStash.Clear();
+        
+            foreach ((string saveId, int stackSize) in gameData.storageItems)
+            {
+                ItemData itemData = itemDatabase.GetItemData(saveId);
+        
+                if (!itemData)
+                {
+                    Debug.LogWarning($"Can't find save data for item {saveId}!");
+                    continue;
+                }
+        
+                for (int i = 0; i < stackSize; i++)
+                {
+                    InventoryItem inventoryItem = new(itemData);
+                    AddItem(inventoryItem);
+                }
+            }
+        
+            foreach ((string saveId, int stackSize) in gameData.storageMaterials)
+            {
+                ItemData itemData = itemDatabase.GetItemData(saveId);
+        
+                if (!itemData)
+                {
+                    Debug.LogWarning($"Can't find save data for item {saveId}!");
+                    continue;
+                }
+        
+                for (int i = 0; i < stackSize; i++)
+                {
+                    InventoryItem inventoryItem = new(itemData);
+                    AddMaterialToStash(inventoryItem);
+                }
+            }
+        
+            SaveToRuntimeData();
+        }
 
         public void SaveToRuntimeData()
         {

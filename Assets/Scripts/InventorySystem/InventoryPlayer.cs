@@ -1,3 +1,4 @@
+// Done
 using System;
 using System.Collections.Generic;
 using Data.InventoryData;
@@ -260,78 +261,78 @@ namespace InventorySystem
         {
             SaveToRuntimeData();
             
-            // gameData.gold = Gold;
-            // gameData.inventory.Clear();
-            // gameData.equipedItems.Clear();
-            //
-            // foreach (InventoryItem item in ItemList)
-            // {
-            //     if (item == null || !item.ItemData) 
-            //         continue;
-            //     
-            //     string saveId = item.ItemData.SaveId;
-            //
-            //     gameData.inventory.TryAdd(saveId, 0);
-            //     gameData.inventory[saveId] += item.StackSize;
-            // }
-            //
-            // foreach (InventoryEquipmentSlot slot in equipList)
-            // {
-            //     if (slot.HasItem)
-            //         gameData.equipedItems[slot.EquippedItem.ItemData.saveId] = slot.SlotType;
-            // }
+            gameData.gold = Gold;
+            gameData.inventory.Clear();
+            gameData.equipedItems.Clear();
+            
+            foreach (InventoryItem item in ItemList)
+            {
+                if (item == null || !item.ItemData) 
+                    continue;
+                
+                string saveId = item.ItemData.SaveId;
+            
+                gameData.inventory.TryAdd(saveId, 0);
+                gameData.inventory[saveId] += item.StackSize;
+            }
+            
+            foreach (InventoryEquipmentSlot slot in equipList)
+            {
+                if (slot.HasItem)
+                    gameData.equipedItems[slot.EquippedItem.ItemData.saveId] = slot.SlotType;
+            }
         }
 
         public override void LoadData(GameData gameData)
         {
-            // Gold = gameData.gold;
-            //
-            // ItemList.Clear();
-            //
-            // foreach (InventoryEquipmentSlot slot in equipList)
-            // {
-            //     if (slot.HasItem)
-            //     {
-            //         slot.EquippedItem.RemoveModifiers(Player.Stats);
-            //         slot.EquippedItem.RemoveItemEffect();
-            //         slot.EquippedItem = null;
-            //     }
-            // }
-            //
-            // foreach ((string saveId, int stackSize) in gameData.inventory)
-            // {
-            //     ItemData itemData = itemDatabase.GetItemData(saveId);
-            //     
-            //     if (!itemData)
-            //     {
-            //         Debug.LogWarning($"Can't find save data for item {saveId}!");
-            //         continue;
-            //     }
-            //     
-            //     for(int i = 0; i < stackSize; i++)
-            //     {
-            //         InventoryItem inventoryItem = new(itemData);
-            //         AddItem(inventoryItem);
-            //     }
-            // }
-            //
-            // foreach ((string saveId, ItemType itemType) in gameData.equipedItems)
-            // {
-            //     ItemData itemData = itemDatabase.GetItemData(saveId);
-            //     InventoryItem inventoryItem = new(itemData);
-            //     
-            //     InventoryEquipmentSlot slot = equipList.Find(slot => slot.SlotType == itemType && !slot.HasItem);
-            //
-            //     if (slot == null)
-            //         continue;
-            //     
-            //     slot.EquippedItem = inventoryItem;
-            //     inventoryItem.AddModifiers(Player.Stats);
-            //     inventoryItem.AddItemEffect(Player);
-            // }
-            //
-            // TriggerUpdateUi();
-            // SaveToRuntimeData();
+            Gold = gameData.gold;
+            
+            ItemList.Clear();
+            
+            foreach (InventoryEquipmentSlot slot in equipList)
+            {
+                if (slot.HasItem)
+                {
+                    slot.EquippedItem.RemoveModifiers(Player.Stats);
+                    slot.EquippedItem.RemoveItemEffect();
+                    slot.EquippedItem = null;
+                }
+            }
+            
+            foreach ((string saveId, int stackSize) in gameData.inventory)
+            {
+                ItemData itemData = itemDatabase.GetItemData(saveId);
+                
+                if (!itemData)
+                {
+                    Debug.LogWarning($"Can't find save data for item {saveId}!");
+                    continue;
+                }
+                
+                for(int i = 0; i < stackSize; i++)
+                {
+                    InventoryItem inventoryItem = new(itemData);
+                    AddItem(inventoryItem);
+                }
+            }
+            
+            foreach ((string saveId, ItemType itemType) in gameData.equipedItems)
+            {
+                ItemData itemData = itemDatabase.GetItemData(saveId);
+                InventoryItem inventoryItem = new(itemData);
+                
+                InventoryEquipmentSlot slot = equipList.Find(slot => slot.SlotType == itemType && !slot.HasItem);
+            
+                if (slot == null)
+                    continue;
+                
+                slot.EquippedItem = inventoryItem;
+                inventoryItem.AddModifiers(Player.Stats);
+                inventoryItem.AddItemEffect(Player);
+            }
+            
+            TriggerUpdateUi();
+            SaveToRuntimeData();
         }
     }
 }

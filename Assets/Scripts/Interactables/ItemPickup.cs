@@ -1,3 +1,4 @@
+// Done
 using Core.Interfaces;
 using Data.ItemData;
 using InventorySystem;
@@ -15,7 +16,6 @@ namespace Interactables
         [SerializeField, HideInInspector] private int lastKnownInstanceId;
         
         private SpriteRenderer _spriteRenderer;
-        //private Rigidbody2D _rigidbody;
         private Collider2D _collider;
         private bool _isCollected;
         
@@ -24,7 +24,6 @@ namespace Interactables
         private void Awake()
         {
             _spriteRenderer = GetComponentInChildren<SpriteRenderer>();
-            //_rigidbody = GetComponent<Rigidbody2D>();
             _collider = GetComponent<Collider2D>();
         }
 
@@ -70,7 +69,6 @@ namespace Interactables
                 Physics2D.IgnoreCollision(_collider, playerCollider);
 
             float dropForceX = Random.Range(-dropForce.x, dropForce.x);
-            //_rigidbody.linearVelocity = new Vector2(dropForceX, dropForce.y);
             _collider.isTrigger = false;
 
             pickupId = "";
@@ -100,10 +98,10 @@ namespace Interactables
             inventory.AddItem(itemToAdd);
             _isCollected = true;
             
-            //QuestManager.Instance.CheckImmediateDeliverQuests();
+            QuestManager.Instance.CheckImmediateDeliverQuests();
             
             // Mark as collected in runtime data immediately
-            //GameManager.Instance.WorldRuntimeData.MarkPickupCollected(pickupId);
+            GameManager.Instance.WorldRuntimeData.MarkPickupCollected(pickupId);
             
             Destroy(gameObject);
         }
@@ -113,8 +111,8 @@ namespace Interactables
             if (string.IsNullOrEmpty(pickupId))
                 return;
         
-            // if (_isCollected && !gameData.collectedPickups.ContainsKey(pickupId))
-            //     gameData.collectedPickups.Add(pickupId, true);
+            if (_isCollected && !gameData.collectedPickups.ContainsKey(pickupId))
+                gameData.collectedPickups.Add(pickupId, true);
         }
         
         public void LoadData(GameData gameData)
@@ -122,8 +120,8 @@ namespace Interactables
             if (string.IsNullOrEmpty(pickupId))
                 return;
         
-            // if (gameData.collectedPickups.ContainsKey(pickupId))
-            //     Destroy(gameObject);
+            if (gameData.collectedPickups.ContainsKey(pickupId))
+                Destroy(gameObject);
         }
     }
 }

@@ -1,4 +1,6 @@
+// Done
 using Managers;
+using UI.SkillTree.Core;
 using UnityEngine;
 
 namespace Data.ItemEffects
@@ -8,8 +10,8 @@ namespace Data.ItemEffects
     {
         public override void ExecuteEffect()
         {
-            // SkillTree skillTree = UiManager.Instance.SkillTree;
-            // skillTree.RefundAllSkills();
+            SkillTree skillTree = UiManager.Instance.SkillTree;
+            skillTree.RefundAllSkills();
         }
     }
 }

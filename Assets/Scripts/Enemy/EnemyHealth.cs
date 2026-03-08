@@ -1,4 +1,6 @@
+// Done
 using Core;
+using Managers;
 using Player;
 using Utilities.Enums;
 
@@ -33,7 +35,7 @@ namespace Enemy
         protected override void Die()
         {
             base.Die();
-            //QuestManager.Instance.AddProgress(_enemy.QuestTargetId);
+            QuestManager.Instance.AddProgress(_enemy.QuestTargetId);
         }
     }
 }

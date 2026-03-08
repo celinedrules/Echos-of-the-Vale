@@ -1,7 +1,9 @@
+// Done
 using Core;
 using Core.Interfaces;
 using Data.DialogueData;
 using Data.EntityData;
+using Data.QuestData;
 using InventorySystem;
 using Managers;
 using Player;
@@ -38,8 +40,8 @@ namespace Interactables
 
         public NpcData Data => data;
         
-        // public bool HasQuests => data.Quests != null && data.Quests.Length > 0;
-        // public QuestData[] Quests => data.Quests;
+        public bool HasQuests => data.Quests != null && data.Quests.Length > 0;
+        public QuestData[] Quests => data.Quests;
 
         protected virtual System.Type RequiredDataType => typeof(NpcData);
 
@@ -134,7 +136,7 @@ namespace Interactables
             if (!CanInteract())
                 return;
 
-            // QuestManager.Instance.AddProgress(data.QuestTargetId);
+            QuestManager.Instance.AddProgress(data.QuestTargetId);
             
             if (data.DialogueTable == null)
             {

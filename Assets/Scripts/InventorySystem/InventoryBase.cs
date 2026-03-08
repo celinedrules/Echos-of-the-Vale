@@ -1,3 +1,4 @@
+// Done
 using System;
 using System.Collections.Generic;
 using Core.Interfaces;
@@ -62,8 +63,8 @@ namespace InventorySystem
             else
                 itemList.Add(item);
             
-            // if (QuestManager.Exists)
-            //     QuestManager.Instance.ReduceProgress(item.ItemData.SaveId);
+            if (QuestManager.Exists)
+                QuestManager.Instance.ReduceProgress(item.ItemData.SaveId);
 
             OnInventoryChanged?.Invoke();
         }

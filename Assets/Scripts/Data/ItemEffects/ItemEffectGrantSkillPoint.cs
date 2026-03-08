@@ -1,3 +1,5 @@
+// Done
+using Managers;
 using UnityEngine;
 
 namespace Data.ItemEffects
@@ -9,7 +11,7 @@ namespace Data.ItemEffects
 
         public override void ExecuteEffect()
         {
-            //SkillManager.Instance.AddSkillPoints(pointsToAdd);
+            SkillManager.Instance.AddSkillPoints(pointsToAdd);
         }
     }
 }

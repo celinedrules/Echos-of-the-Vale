@@ -1,6 +1,8 @@
+// Done
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Audio;
 using Core.Interfaces;
 using SaveSystem;
 using Sirenix.OdinInspector;
@@ -138,9 +140,9 @@ namespace Managers
             }
             
             // Apply audio settings
-            // FusionAudioManager.Instance.SetTrackVolume(AudioTrackType.Background, _gameData.bgmVolume);
-            // FusionAudioManager.Instance.SetTrackVolume(AudioTrackType.PlayerFX, _gameData.sfxVolume);
-            // FusionAudioManager.Instance.SetSpatialAudioVolume(_gameData.sfxVolume);
+            FusionAudioManager.Instance.SetTrackVolume(AudioTrackType.Background, _gameData.bgmVolume);
+            FusionAudioManager.Instance.SetTrackVolume(AudioTrackType.PlayerFX, _gameData.sfxVolume);
+            FusionAudioManager.Instance.SetSpatialAudioVolume(_gameData.sfxVolume);
 
             
             foreach (ISavable savable in _savables)

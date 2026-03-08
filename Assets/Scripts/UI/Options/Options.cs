@@ -1,3 +1,5 @@
+// Done
+using Audio;
 using Managers;
 using Player;
 using UI.Common;
@@ -34,13 +36,13 @@ namespace UI
 
         private void SfxSliderValue(float value)
         {
-            // FusionAudioManager.Instance.SetTrackVolume(AudioTrackType.PlayerFX, value);
-            // FusionAudioManager.Instance.SetSpatialAudioVolume(value);
+            FusionAudioManager.Instance.SetTrackVolume(AudioTrackType.PlayerFX, value);
+            FusionAudioManager.Instance.SetSpatialAudioVolume(value);
         }
 
         private void BgmSliderValue(float value)
         {
-            //FusionAudioManager.Instance.SetTrackVolume(AudioTrackType.Background, value);
+            FusionAudioManager.Instance.SetTrackVolume(AudioTrackType.Background, value);
         }
         
         private void OnHealthBarToggleChanged(bool value)
@@ -52,15 +54,15 @@ namespace UI
         {
             // Sync sliders with current audio values (without triggering callbacks)
             bgmSlider.onValueChanged.RemoveListener(BgmSliderValue);
-            //bgmSlider.value = FusionAudioManager.Instance.GetTrackTargetVolume(AudioTrackType.Background);
+            bgmSlider.value = FusionAudioManager.Instance.GetTrackTargetVolume(AudioTrackType.Background);
             bgmSlider.onValueChanged.AddListener(BgmSliderValue);
 
             sfxSlider.onValueChanged.RemoveListener(SfxSliderValue);
-            //sfxSlider.value = FusionAudioManager.Instance.GetTrackTargetVolume(AudioTrackType.PlayerFX);
+            sfxSlider.value = FusionAudioManager.Instance.GetTrackTargetVolume(AudioTrackType.PlayerFX);
             sfxSlider.onValueChanged.AddListener(SfxSliderValue);
             
             // Sync health bar toggle (if player exists)
-            if (_player != null && _player.Health != null)
+            if (_player && _player.Health)
             {
                 healthBarToggle.onValueChanged.RemoveListener(OnHealthBarToggleChanged);
                 healthBarToggle.isOn = false; // _player.Health.MiniHealthBarActive;

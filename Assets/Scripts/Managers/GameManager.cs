@@ -1,4 +1,6 @@
+// Done
 using System.Collections;
+using Audio;
 using Core;
 using Data;
 using Data.InventoryData;
@@ -119,8 +121,8 @@ namespace Managers
             if (sceneName == "DefaultScene")
                 sceneName = defaultScene.name;
             
-            // if(!_keepBackgroundMusic)
-            //     FusionAudioManager.Instance.StopTrack(AudioTrackType.Background, ScreenFader.Instance.FadeDuration);
+            if(!_keepBackgroundMusic)
+                FusionAudioManager.Instance.StopTrack(AudioTrackType.Background, ScreenFader.Instance.FadeDuration);
             
             StartCoroutine(LoadSceneRoutine(sceneName, targetWaypointId));
         }

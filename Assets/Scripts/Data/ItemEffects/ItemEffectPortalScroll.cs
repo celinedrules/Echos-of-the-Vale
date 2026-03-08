@@ -1,3 +1,4 @@
+using Interactables;
 using Managers;
 using UnityEngine;
 
@@ -11,7 +12,7 @@ namespace Data.ItemEffects
             Player = GameManager.Instance.Player;
             Vector3 portalPosition = Player.transform.position + new Vector3((int)Player.FacingDirection * 1.5f, 0);
             
-            // Portal.Instance.ActivatePortal(portalPosition, Player.FacingDirection);
+            Portal.Instance.ActivatePortal(portalPosition, Player.FacingDirection);
         }
     }
 }

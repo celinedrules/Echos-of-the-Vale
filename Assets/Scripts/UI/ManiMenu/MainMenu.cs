@@ -1,3 +1,5 @@
+// Done
+using Audio;
 using Managers;
 using UI.Common;
 using UnityEngine;
@@ -13,12 +15,12 @@ namespace UI
         {
             _canvasGroup = GetComponent<CanvasGroup>();
             UiManager.Instance.OpenMainMenu();
-            //FusionAudioManager.Instance.PlayAudio(BackgroundAudioId.MainMenu);
+            FusionAudioManager.Instance.PlayAudio(BackgroundAudioId.MainMenu);
         }
 
         public void Play()
         {
-            //FusionAudioManager.Instance.PlayAudio(UiAudioId.ButtonClicked);
+            FusionAudioManager.Instance.PlayAudio(UiAudioId.ButtonClicked);
             GameManager.Instance.LoadScene(DefaultScene);
         }
 

@@ -1,3 +1,4 @@
+// Done
 using Core;
 using Core.Interfaces;
 using Managers;
@@ -30,14 +31,14 @@ namespace Interactables
             _dropManager = GetComponent<EntityDropManager>();
         }
 
-        // private void Start()
-        // {
-        //     // Check if already opened in runtime data
-        //     if (GameManager.Instance.WorldRuntimeData.IsChestOpened(chestId))
-        //     {
-        //         OpenChest(false);
-        //     }
-        // }
+        private void Start()
+        {
+            // Check if already opened in runtime data
+            if (GameManager.Instance.WorldRuntimeData.IsChestOpened(chestId))
+            {
+                OpenChest(false);
+            }
+        }
 
         private void OnValidate()
         {
@@ -53,7 +54,7 @@ namespace Interactables
             OpenChest(true);
             
             // Mark as opened in runtime data immediately
-            //GameManager.Instance.WorldRuntimeData.MarkChestOpened(chestId);
+            GameManager.Instance.WorldRuntimeData.MarkChestOpened(chestId);
             
             return true;
         }
@@ -81,10 +82,10 @@ namespace Interactables
             if (string.IsNullOrEmpty(chestId))
                 return;
 
-            // gameData.openedChests ??= new SerializableDictionary<string, bool>();
-            //
-            // if (_isOpened && !gameData.openedChests.ContainsKey(chestId))
-            //     gameData.openedChests.Add(chestId, true);
+            gameData.openedChests ??= new SerializableDictionary<string, bool>();
+            
+            if (_isOpened && !gameData.openedChests.ContainsKey(chestId))
+                gameData.openedChests.Add(chestId, true);
         }
 
         public void LoadData(GameData gameData)
@@ -92,10 +93,10 @@ namespace Interactables
             if (string.IsNullOrEmpty(chestId))
                 return;
 
-            // gameData.openedChests ??= new SerializableDictionary<string, bool>();
-            //
-            // if (gameData.openedChests.ContainsKey(chestId))
-            //     OpenChest(false);
+            gameData.openedChests ??= new SerializableDictionary<string, bool>();
+            
+            if (gameData.openedChests.ContainsKey(chestId))
+                OpenChest(false);
         }
     }
 }
