@@ -1,7 +1,6 @@
-// Done
 using System.Collections.Generic;
+using Sirenix.OdinInspector;
 using UnityEngine;
-using Utilities.Enums;
 
 namespace Data.DialogueData
 {
@@ -9,10 +8,39 @@ namespace Data.DialogueData
     public class DialogueTable : ScriptableObject
     {
         [SerializeField] private string tableName;
+
+        [TitleGroup("Tools")]
+        [InfoBox("Renumber IDs + Remap References is disabled while duplicate Row IDs exist. Fix duplicates first.", InfoMessageType.Warning, nameof(HasDuplicateRowIds))]
+        [HorizontalGroup("Tools/Buttons")]
+        [Button("Auto Organize", ButtonSizes.Medium), GUIColor(0.35f, 0.85f, 1f)]
+        private void AutoOrganizeRows() => DialogueTableUtility.AutoOrganize(rows);
+
+        [HorizontalGroup("Tools/Buttons")]
+        [Button("Sort By Row Id", ButtonSizes.Medium), GUIColor(0.4f, 0.8f, 1f)]
+        private void SortRowsByRowId() => DialogueTableUtility.SortRowsByRowId(rows);
+
+        [HorizontalGroup("Tools/Buttons")]
+        [EnableIf(nameof(CanRenumberSafely))]
+        [Button("Renumber IDs + Remap References", ButtonSizes.Medium), GUIColor(0.6f, 1f, 0.6f)]
+        private void RenumberRowsSequentiallyAndRemapReferences()
+        {
+            if (DialogueTableUtility.RenumberRowsSequentiallyAndRemapReferences(rows))
+                return;
+
+            Debug.LogWarning($"Cannot safely renumber dialogue table '{tableName}' while duplicate Row IDs exist. Fix duplicates first.");
+        }
+
+        [HorizontalGroup("Tools/Buttons")]
+        [Button("Fix Duplicate IDs", ButtonSizes.Medium), GUIColor(1f, 0.85f, 0.4f)]
+        private void FixDuplicateRowIds() => DialogueTableUtility.FixDuplicateRowIds(rows);
+
+        [ListDrawerSettings(Expanded = true)]
         [SerializeField] private List<DialogueRow> rows = new();
 
         public string TableName => tableName;
         public IReadOnlyList<DialogueRow> Rows => rows;
+        public DialogueRow FirstRow => rows.Count > 0 ? rows[0] : null;
+        public int RowCount => rows.Count;
 
         public DialogueRow GetRow(int index)
         {
@@ -21,7 +49,7 @@ namespace Data.DialogueData
 
             return rows[index];
         }
-        
+
         public DialogueRow GetRowById(int rowId)
         {
             for (int i = 0; i < rows.Count; i++)
@@ -33,62 +61,11 @@ namespace Data.DialogueData
             return null;
         }
 
-        public DialogueRow FirstRow => rows.Count > 0 ? rows[0] : null;
-        public int RowCount => rows.Count;
-    }
+        public bool HasRowId(int rowId) => GetRowById(rowId) != null;
 
-    [System.Serializable]
-    public class DialogueRow
-    {
-        [SerializeField] private int rowId;
-        [SerializeField] private DialogueSpeakerData speaker;
+        public List<string> GetValidationMessages() => DialogueTableValidator.GetValidationMessages(this);
 
-        [TextArea]
-        [SerializeField] private string[] textLines;
-
-        [SerializeField] private Sprite portraitOverride;
-        [SerializeField] private DialogueActionType actionType;
-
-        [Header("Choice Settings")]
-        [SerializeField] private string playerChoiceAnswer;
-        [SerializeField] private int[] choiceRowIds;
-
-        [Header("Audio")]
-        [SerializeField] private AudioClip audioClip;
-        [SerializeField] private float audioStartTime;
-
-        [Header("Flags")]
-        [SerializeField] private bool dialogSkip;
-        
-        [Header("Flow")]
-        [SerializeField] private int leadsTo = -1;
-
-        public int RowId => rowId;
-        public DialogueSpeakerData Speaker => speaker;
-        public string[] TextLines => textLines;
-        public Sprite PortraitOverride => portraitOverride;
-        public DialogueActionType ActionType => actionType;
-        public string PlayerChoiceAnswer => playerChoiceAnswer;
-        public int[] ChoiceRowIds => choiceRowIds;
-        public AudioClip AudioClip => audioClip;
-        public float AudioStartTime => audioStartTime;
-        public bool DialogSkip => dialogSkip;
-        public int LeadsTo => leadsTo;
-
-        /// <summary>
-        /// Returns the portrait to display. Uses the override if set, otherwise falls back to the speaker's portrait.
-        /// </summary>
-        public Sprite GetPortrait()
-        {
-            if (portraitOverride != null)
-                return portraitOverride;
-
-            return speaker != null ? speaker.SpeakerPortrait : null;
-        }
-
-        public string GetFirstLine() => textLines is { Length: > 0 } ? textLines[0] : string.Empty;
-
-        public string GetRandomLine() =>
-            textLines is { Length: > 0 } ? textLines[Random.Range(0, textLines.Length)] : string.Empty;
+        private bool CanRenumberSafely() => DialogueTableUtility.CanRenumberSafely(rows);
+        private bool HasDuplicateRowIds() => DialogueTableValidator.HasDuplicateRowIds(this);
     }
 }

@@ -1,4 +1,3 @@
-// Done
 using System;
 using System.Collections;
 using Data.DialogueData;
@@ -13,15 +12,9 @@ namespace UI.Dialogue
 {
     public class Dialogue : MonoBehaviour, IUiPanel
     {
-        [SerializeField] private Image speakerPortrait;
-        [SerializeField] private TextMeshProUGUI speakerName;
-        [SerializeField] private TextMeshProUGUI dialogueText;
-        [SerializeField] private TextMeshProUGUI[] dialogueChoicesText;
-        [SerializeField] private float textSpeed = 0.1f;
+        [SerializeField] private DialogueView view;
+        [SerializeField] private DialogueTypewriter typewriter;
         [SerializeField] private float choiceDelay = 0.5f;
-
-        private Coroutine _typingRoutine;
-        private string _fullTextToShow;
 
         private DialogueTable _table;
         private DialogueRow _currentRow;
@@ -30,6 +23,7 @@ namespace UI.Dialogue
         private int _selectedChoiceIndex;
         private bool _waitingToConfirm;
         private int _startedTypingFrame;
+        private string _currentRowText;
         private DialogueNpcData _npcData;
         private CanvasGroup _canvasGroup;
 
@@ -42,15 +36,7 @@ namespace UI.Dialogue
         private void Awake()
         {
             _canvasGroup = GetComponent<CanvasGroup>();
-
-            for (int i = 0; i < dialogueChoicesText.Length; i++)
-            {
-                DialogueChoiceHandler handler = dialogueChoicesText[i].GetComponent<DialogueChoiceHandler>();
-
-                handler.Setup(i);
-                handler.OnHover += SelectChoice;
-                handler.OnClick += ConfirmChoice;
-            }
+            SetupChoiceHandlers();
         }
 
         public void SetupNpcData(DialogueNpcData npcData) => _npcData = npcData;
@@ -72,105 +58,14 @@ namespace UI.Dialogue
             PlayRow(row);
         }
 
-        private void PlayRow(DialogueRow row)
-        {
-            _currentRow = row;
-
-            // Resolve choice rows from IDs
-            int[] choiceIds = row.ChoiceRowIds;
-            if (choiceIds != null && choiceIds.Length > 0)
-            {
-                _currentChoices = new DialogueRow[choiceIds.Length];
-                for (int i = 0; i < choiceIds.Length; i++)
-                    _currentChoices[i] = _table.GetRowById(choiceIds[i]);
-            }
-            else
-            {
-                _currentChoices = null;
-            }
-
-            _fullTextToShow = row.GetRandomLine();
-            _waitingToConfirm = false;
-            _selectedChoice = null;
-
-            HideAllChoices();
-
-            Sprite portrait = row.GetPortrait();
-            if (portrait != null)
-                speakerPortrait.sprite = portrait;
-
-            speakerName.text = row.Speaker != null ? row.Speaker.SpeakerName : "";
-
-            if (_typingRoutine != null)
-                StopCoroutine(_typingRoutine);
-
-            _startedTypingFrame = Time.frameCount;
-            _typingRoutine = StartCoroutine(TypeText(_fullTextToShow));
-        }
-
-        private void HandleNextAction()
-        {
-            switch (_currentRow.ActionType)
-            {
-                case DialogueActionType.None:
-                    if (_currentRow.LeadsTo >= 0)
-                    {
-                        DialogueRow nextRow = _table.GetRowById(_currentRow.LeadsTo);
-                        if (nextRow != null)
-                        {
-                            PlayRow(nextRow);
-                            return;
-                        }
-
-                        Debug.LogWarning($"LeadsTo row ID {_currentRow.LeadsTo} not found in table {_table.TableName}");
-                    }
-                    break;
-                case DialogueActionType.OpenQuest:
-                    UiManager.Instance.Quest.SetupQuests(_npcData.Quests);
-                    UiManager.Instance.OpenQuest();
-                    break;
-                case DialogueActionType.OpenShop:
-                    UiManager.Instance.OpenMerchant();
-                    break;
-                case DialogueActionType.OpenStorage:
-                    UiManager.Instance.OpenStorage();
-                    break;
-                case DialogueActionType.OpenCraft:
-                    UiManager.Instance.OpenCraft();
-                    break;
-                case DialogueActionType.GetQuestReward:
-                    QuestManager.Instance.TryGetQuestReward(_npcData.QuestTargetId);
-                    UiManager.Instance.TryCloseActiveUi();
-                    break;
-                case DialogueActionType.PlayerChoice:
-                    if (_selectedChoice == null)
-                    {
-                        _selectedChoiceIndex = 0;
-                        StartCoroutine(ShowChoicesDelayed());
-                    }
-                    else
-                    {
-                        DialogueRow selectedChoice = _currentChoices[_selectedChoiceIndex];
-                        _selectedChoice = null;
-                        PlayRow(selectedChoice);
-                    }
-                    break;
-                case DialogueActionType.CloseDialogue:
-                    UiManager.Instance.TryCloseActiveUi();
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-        }
-
         public void DialogueInteraction()
         {
             if (_startedTypingFrame == Time.frameCount)
                 return;
 
-            if (_typingRoutine != null)
+            if (typewriter.IsTyping)
             {
-                CompleteTyping();
+                typewriter.CompleteInstantly();
                 return;
             }
 
@@ -178,23 +73,124 @@ namespace UI.Dialogue
             {
                 _waitingToConfirm = false;
                 HandleNextAction();
-                return;
             }
         }
 
-        private void CompleteTyping()
+        public void NavigateChoices(int direction)
         {
-            if (_typingRoutine != null)
-                StopCoroutine(_typingRoutine);
+            if (_currentChoices == null || _currentChoices.Length <= 1)
+                return;
 
-            _typingRoutine = null;
-            dialogueText.text = _fullTextToShow;
-            OnTypingComplete();
+            _selectedChoiceIndex += direction;
+            _selectedChoiceIndex = Mathf.Clamp(_selectedChoiceIndex, 0, _currentChoices.Length - 1);
+            ShowChoices();
         }
 
+        public void OnOpened()
+        {
+        }
+
+        private void SetupChoiceHandlers()
+        {
+            TextMeshProUGUI[] choiceTexts = view.DialogueChoicesText;
+
+            for (int i = 0; i < choiceTexts.Length; i++)
+            {
+                DialogueChoiceHandler handler = choiceTexts[i].GetComponent<DialogueChoiceHandler>();
+
+                handler.Setup(i);
+                handler.OnHover += SelectChoice;
+                handler.OnClick += ConfirmChoice;
+            }
+        }
+
+        private void PlayRow(DialogueRow row)
+        {
+            SetCurrentRow(row);
+            ResolveCurrentChoices(row);
+            view.HideAllChoices();
+            view.SetSpeaker(row);
+            StartTypingCurrentRow();
+        }
+
+        private void SetCurrentRow(DialogueRow row)
+        {
+            _currentRow = row;
+            _currentRowText = row.GetRandomLine();
+            _waitingToConfirm = false;
+            _selectedChoice = null;
+        }
+
+        private void ResolveCurrentChoices(DialogueRow row)
+        {
+            int[] choiceIds = row.ChoiceRowIds;
+
+            if (row.RowKind != DialogueRowKind.ChoicePrompt || choiceIds == null || choiceIds.Length == 0)
+            {
+                _currentChoices = null;
+                return;
+            }
+
+            _currentChoices = new DialogueRow[choiceIds.Length];
+            for (int i = 0; i < choiceIds.Length; i++)
+                _currentChoices[i] = _table.GetRowById(choiceIds[i]);
+        }
+
+        private void StartTypingCurrentRow()
+        {
+            _startedTypingFrame = Time.frameCount;
+            typewriter.StartTyping(_currentRowText, OnTypingComplete);
+        }
+
+        private void HandleNextAction()
+        {
+            if (_currentRow.RowKind == DialogueRowKind.ChoicePrompt)
+            {
+                HandleChoicePromptRow();
+                return;
+            }
+
+            ExecuteCurrentRowAction();
+            TryAdvanceToNextRow();
+        }
+
+        private void HandleChoicePromptRow()
+        {
+            if (_selectedChoice == null)
+            {
+                _selectedChoiceIndex = 0;
+                StartCoroutine(ShowChoicesDelayed());
+                return;
+            }
+
+            DialogueRow selectedChoice = _currentChoices[_selectedChoiceIndex];
+            _selectedChoice = null;
+            PlayRow(selectedChoice);
+        }
+
+        private void ExecuteCurrentRowAction() => DialogueActionExecutor.Execute(_currentRow.RowAction, _npcData);
+
+        private void TryAdvanceToNextRow()
+        {
+            if (_currentRow.RowAction == DialogueRowAction.CloseDialogue)
+                return;
+
+            if (_currentRow.LeadsTo < 0)
+                return;
+
+            DialogueRow nextRow = _table.GetRowById(_currentRow.LeadsTo);
+            if (nextRow != null)
+            {
+                PlayRow(nextRow);
+                return;
+            }
+
+            Debug.LogWarning($"LeadsTo row ID {_currentRow.LeadsTo} not found in table {_table.TableName}");
+        }
+        
         private void OnTypingComplete()
         {
-            if (_currentRow.ActionType == DialogueActionType.PlayerChoice)
+            if (_currentRow.RowKind == DialogueRowKind.ChoicePrompt)
             {
                 HandleNextAction();
                 return;
@@ -212,34 +208,12 @@ namespace UI.Dialogue
 
         private void ShowChoices()
         {
-            if (_currentChoices == null) return;
-
-            for (int i = 0; i < dialogueChoicesText.Length; i++)
-            {
-                if (i < _currentChoices.Length && _currentChoices[i] != null)
-                {
-                    DialogueRow choice = _currentChoices[i];
-                    string choiceText = choice.PlayerChoiceAnswer;
-
-                    dialogueChoicesText[i].gameObject.SetActive(true);
-                    dialogueChoicesText[i].text = _selectedChoiceIndex == i
-                        ? $"<color=green>{i + 1}) {choiceText}</color>"
-                        : $"{i + 1}) {choiceText}";
-
-                    if (choice.ActionType == DialogueActionType.GetQuestReward
-                        && !QuestManager.Instance.CanTurnInAnyQuest(_npcData.QuestTargetId))
-                        dialogueChoicesText[i].gameObject.SetActive(false);
-                }
-                else
-                {
-                    dialogueChoicesText[i].gameObject.SetActive(false);
-                }
-            }
+            view.ShowChoices(_currentChoices, _selectedChoiceIndex, _npcData);
 
             if (_currentChoices.Length > 0 && _currentChoices[_selectedChoiceIndex] != null)
                 _selectedChoice = _currentChoices[_selectedChoiceIndex];
         }
-
+        
         private void SelectChoice(int index)
         {
             _selectedChoiceIndex = index;
@@ -250,40 +224,6 @@ namespace UI.Dialogue
         {
             SelectChoice(index);
             DialogueInteraction();
-        }
-
-        private void HideAllChoices()
-        {
-            foreach (TextMeshProUGUI choice in dialogueChoicesText)
-                choice.gameObject.SetActive(false);
-        }
-
-        public void NavigateChoices(int direction)
-        {
-            if (_currentChoices == null || _currentChoices.Length <= 1)
-                return;
-
-            _selectedChoiceIndex += direction;
-            _selectedChoiceIndex = Mathf.Clamp(_selectedChoiceIndex, 0, _currentChoices.Length - 1);
-            ShowChoices();
-        }
-
-        private IEnumerator TypeText(string text)
-        {
-            dialogueText.text = "";
-
-            foreach (char letter in text)
-            {
-                dialogueText.text += letter;
-                yield return new WaitForSecondsRealtime(textSpeed);
-            }
-
-            _typingRoutine = null;
-            OnTypingComplete();
-        }
-
-        public void OnOpened()
-        {
         }
     }
 }

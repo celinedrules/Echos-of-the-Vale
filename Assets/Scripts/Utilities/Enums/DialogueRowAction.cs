@@ -1,14 +1,13 @@
 // Done
 namespace Utilities.Enums
 {
-    public enum DialogueActionType
+    public enum DialogueRowAction
     {
         None,
         OpenQuest,
         OpenShop,
         OpenCraft,
         GetQuestReward,
-        PlayerChoice,
         CloseDialogue,
         OpenStorage
     }
