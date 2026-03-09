@@ -1,4 +1,5 @@
 // Done
+
 using System.Collections;
 using System.Linq;
 using UnityEngine;
@@ -34,11 +35,11 @@ namespace Audio
             _audioTable = new Hashtable();
             _jobTable = new Hashtable();
             _trackTargetVolumes = new float[tracks.Length];
-            
+
             // Initialize target volumes from track defaults
             for (int i = 0; i < tracks.Length; i++)
                 _trackTargetVolumes[i] = tracks[i].volume;
-            
+
             GenerateAudioTable();
             ApplyAllVolumes();
         }
@@ -100,12 +101,17 @@ namespace Audio
             string lookupKey = $"{job.TrackType}_{job.AudioId}";
             AudioTrack track = (AudioTrack)_audioTable[lookupKey];
 
-            // Use override source if provided, otherwise use track's source
+            if (track == null)
+            {
+                LogWarning($"Audio job failed. No track registered for key [{lookupKey}].");
+                yield break;
+            }
+
             AudioSource source = job.SourceOverride != null ? job.SourceOverride : track.Source;
 
             if (source == null)
             {
-                LogWarning($"No AudioSource available for job [{job.Key}]");
+                LogWarning($"No AudioSource available for job [{job.Key}].");
                 yield break;
             }
 
@@ -279,12 +285,12 @@ namespace Audio
         public bool IsTrackPlaying(AudioTrackType trackType)
         {
             int index = (int)trackType;
-            
+
             if (index < 0 || index >= tracks.Length)
                 return false;
 
             AudioSource source = tracks[index].Source;
-            
+
             return source != null && source.isPlaying;
         }
 
@@ -310,16 +316,16 @@ namespace Audio
                 tracks[index].ApplyVolume();
             }
         }
-        
+
         public float GetTrackTargetVolume(AudioTrackType trackType)
         {
             int index = (int)trackType;
-            
+
             if (index >= 0 && index < _trackTargetVolumes.Length)
                 return _trackTargetVolumes[index];
             return 1f;
         }
-        
+
         public void SetSpatialAudioVolume(float volume)
         {
             SpatialAudioEmitter.GlobalVolume = volume;

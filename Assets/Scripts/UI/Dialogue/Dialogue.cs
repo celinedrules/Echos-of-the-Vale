@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using Data.DialogueData;
 using Managers;
 using TMPro;
@@ -36,7 +37,6 @@ namespace UI.Dialogue
         private void Awake()
         {
             _canvasGroup = GetComponent<CanvasGroup>();
-            SetupChoiceHandlers();
         }
 
         public void SetupNpcData(DialogueNpcData npcData) => _npcData = npcData;
@@ -92,14 +92,18 @@ namespace UI.Dialogue
 
         private void SetupChoiceHandlers()
         {
-            TextMeshProUGUI[] choiceTexts = view.DialogueChoicesText;
+            IReadOnlyList<DialogueView.ChoiceInstance> choiceInstances = view.ChoiceInstances;
 
-            for (int i = 0; i < choiceTexts.Length; i++)
+            for (int i = 0; i < choiceInstances.Count; i++)
             {
-                DialogueChoiceHandler handler = choiceTexts[i].GetComponent<DialogueChoiceHandler>();
+                DialogueChoiceHandler handler = choiceInstances[i].Handler;
+                if (handler == null)
+                    continue;
 
                 handler.Setup(i);
+                handler.OnHover -= SelectChoice;
                 handler.OnHover += SelectChoice;
+                handler.OnClick -= ConfirmChoice;
                 handler.OnClick += ConfirmChoice;
             }
         }
@@ -108,7 +112,7 @@ namespace UI.Dialogue
         {
             SetCurrentRow(row);
             ResolveCurrentChoices(row);
-            view.HideAllChoices();
+            view.ClearChoiceInstances();
             view.SetSpeaker(row);
             StartTypingCurrentRow();
         }
@@ -167,6 +171,7 @@ namespace UI.Dialogue
             _selectedChoice = null;
             PlayRow(selectedChoice);
         }
+        
 
         private void ExecuteCurrentRowAction() => DialogueActionExecutor.Execute(_currentRow.RowAction, _npcData);
 
@@ -187,7 +192,7 @@ namespace UI.Dialogue
 
             Debug.LogWarning($"LeadsTo row ID {_currentRow.LeadsTo} not found in table {_table.TableName}");
         }
-        
+
         private void OnTypingComplete()
         {
             if (_currentRow.RowKind == DialogueRowKind.ChoicePrompt)
@@ -202,18 +207,26 @@ namespace UI.Dialogue
         private IEnumerator ShowChoicesDelayed()
         {
             yield return new WaitForSecondsRealtime(choiceDelay);
-            ShowChoices();
+            ShowChoices(true);
             _waitingToConfirm = true;
         }
 
-        private void ShowChoices()
+        private void ShowChoices(bool rebuild = false)
         {
-            view.ShowChoices(_currentChoices, _selectedChoiceIndex, _npcData);
+            if (rebuild)
+            {
+                view.RebuildChoices(_currentChoices, _selectedChoiceIndex, _npcData);
+                SetupChoiceHandlers();
+            }
+            else
+            {
+                view.RefreshChoiceVisuals(_currentChoices, _selectedChoiceIndex, _npcData);
+            }
 
             if (_currentChoices.Length > 0 && _currentChoices[_selectedChoiceIndex] != null)
                 _selectedChoice = _currentChoices[_selectedChoiceIndex];
         }
-        
+
         private void SelectChoice(int index)
         {
             _selectedChoiceIndex = index;

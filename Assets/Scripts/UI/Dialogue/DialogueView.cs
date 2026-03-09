@@ -9,31 +9,23 @@ namespace UI.Dialogue
 {
     public class DialogueView : MonoBehaviour
     {
+        [System.Serializable]
+        public class ChoiceInstance
+        {
+            public GameObject Root;
+            public DialogueChoiceHandler Handler;
+            public TextMeshProUGUI Text;
+        }
+
         [SerializeField] private Image speakerPortrait;
         [SerializeField] private TextMeshProUGUI speakerName;
         [SerializeField] private TextMeshProUGUI dialogueText;
         [SerializeField] private Transform choicesRoot;
+        [SerializeField] private GameObject choicePrefab;
 
-        private TextMeshProUGUI[] _dialogueChoicesText;
+        private readonly List<ChoiceInstance> _choiceInstances = new();
 
-        public TextMeshProUGUI[] DialogueChoicesText
-        {
-            get
-            {
-                CacheChoiceTextsIfNeeded();
-                return _dialogueChoicesText;
-            }
-        }
-
-        private void Awake()
-        {
-            CacheChoiceTextsIfNeeded();
-        }
-
-        private void OnValidate()
-        {
-            CacheChoiceTextsIfNeeded();
-        }
+        public IReadOnlyList<ChoiceInstance> ChoiceInstances => _choiceInstances;
 
         public void SetSpeaker(DialogueRow row)
         {
@@ -54,70 +46,111 @@ namespace UI.Dialogue
             dialogueText.text = "";
         }
 
-        public void HideAllChoices()
+        public void RebuildChoices(DialogueRow[] currentChoices, int selectedChoiceIndex, DialogueNpcData npcData)
         {
-            TextMeshProUGUI[] choiceTexts = DialogueChoicesText;
+            ClearChoiceInstances();
 
-            foreach (TextMeshProUGUI choice in choiceTexts)
-                choice.gameObject.SetActive(false);
-        }
-
-        public void ShowChoices(DialogueRow[] currentChoices, int selectedChoiceIndex, DialogueNpcData npcData)
-        {
-            TextMeshProUGUI[] choiceTexts = DialogueChoicesText;
-
-            if (currentChoices == null)
-            {
-                HideAllChoices();
+            if (currentChoices == null || currentChoices.Length == 0 || choicesRoot == null || choicePrefab == null)
                 return;
-            }
 
-            for (int i = 0; i < choiceTexts.Length; i++)
+            for (int i = 0; i < currentChoices.Length; i++)
             {
-                if (i >= currentChoices.Length || currentChoices[i] == null)
+                DialogueRow choice = currentChoices[i];
+                if (choice == null)
+                    continue;
+
+                GameObject choiceInstance = Instantiate(choicePrefab, choicesRoot);
+                TextMeshProUGUI choiceTextUi = choiceInstance.GetComponentInChildren<TextMeshProUGUI>();
+                DialogueChoiceHandler handler = choiceInstance.GetComponentInChildren<DialogueChoiceHandler>();
+
+                if (choiceTextUi == null)
                 {
-                    choiceTexts[i].gameObject.SetActive(false);
+                    Debug.LogWarning("Dialogue choice prefab is missing a TextMeshProUGUI component.");
+                    Destroy(choiceInstance);
                     continue;
                 }
 
-                DialogueRow choice = currentChoices[i];
-                TextMeshProUGUI choiceTextUi = choiceTexts[i];
+                if (handler == null)
+                {
+                    Debug.LogWarning("Dialogue choice prefab is missing a DialogueChoiceHandler component.");
+                    Destroy(choiceInstance);
+                    continue;
+                }
+
+                choiceInstance.SetActive(true);
 
                 if (choice.RowAction == DialogueRowAction.GetQuestReward &&
                     !Managers.QuestManager.Instance.CanTurnInAnyQuest(npcData.QuestTargetId))
                 {
-                    choiceTextUi.gameObject.SetActive(false);
+                    choiceInstance.SetActive(false);
+                    _choiceInstances.Add(new ChoiceInstance
+                    {
+                        Root = choiceInstance,
+                        Handler = handler,
+                        Text = choiceTextUi
+                    });
                     continue;
                 }
 
                 string choiceText = choice.PlayerChoiceAnswer;
-                choiceTextUi.gameObject.SetActive(true);
                 choiceTextUi.text = selectedChoiceIndex == i
+                    ? $"<color=green>{i + 1}) {choiceText}</color>"
+                    : $"{i + 1}) {choiceText}";
+
+                _choiceInstances.Add(new ChoiceInstance
+                {
+                    Root = choiceInstance,
+                    Handler = handler,
+                    Text = choiceTextUi
+                });
+            }
+        }
+
+        public void RefreshChoiceVisuals(DialogueRow[] currentChoices, int selectedChoiceIndex, DialogueNpcData npcData)
+        {
+            if (currentChoices == null)
+                return;
+
+            for (int i = 0; i < _choiceInstances.Count; i++)
+            {
+                ChoiceInstance choiceInstance = _choiceInstances[i];
+
+                if (choiceInstance == null || choiceInstance.Text == null || choiceInstance.Root == null)
+                    continue;
+
+                if (i >= currentChoices.Length || currentChoices[i] == null)
+                {
+                    choiceInstance.Root.SetActive(false);
+                    continue;
+                }
+
+                DialogueRow choice = currentChoices[i];
+
+                if (choice.RowAction == DialogueRowAction.GetQuestReward &&
+                    !Managers.QuestManager.Instance.CanTurnInAnyQuest(npcData.QuestTargetId))
+                {
+                    choiceInstance.Root.SetActive(false);
+                    continue;
+                }
+
+                choiceInstance.Root.SetActive(true);
+
+                string choiceText = choice.PlayerChoiceAnswer;
+                choiceInstance.Text.text = selectedChoiceIndex == i
                     ? $"<color=green>{i + 1}) {choiceText}</color>"
                     : $"{i + 1}) {choiceText}";
             }
         }
-
-        private void CacheChoiceTextsIfNeeded()
+        
+        public void ClearChoiceInstances()
         {
-            if (choicesRoot == null)
+            for (int i = 0; i < _choiceInstances.Count; i++)
             {
-                _dialogueChoicesText = System.Array.Empty<TextMeshProUGUI>();
-                return;
+                if (_choiceInstances[i].Root != null)
+                    Destroy(_choiceInstances[i].Root);
             }
 
-            List<TextMeshProUGUI> choiceTexts = new();
-
-            for (int i = 0; i < choicesRoot.childCount; i++)
-            {
-                Transform child = choicesRoot.GetChild(i);
-                TextMeshProUGUI textComponent = child.GetComponent<TextMeshProUGUI>();
-
-                if (textComponent != null)
-                    choiceTexts.Add(textComponent);
-            }
-
-            _dialogueChoicesText = choiceTexts.ToArray();
+            _choiceInstances.Clear();
         }
     }
 }
