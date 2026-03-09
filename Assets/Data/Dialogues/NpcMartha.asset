@@ -1,0 +1,64 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 060d06b2c67b42cb8abae29beba71e51, type: 3}
+  m_Name: NpcMartha
+  m_EditorClassIdentifier: Assembly-CSharp::Data.DialogueData.DialogueTable
+  tableName: 
+  rows:
+  - rowId: 1
+    speaker: {fileID: 11400000, guid: 52660c3d5e2e0953bb0a343e7cdabe1a, type: 2}
+    textLines:
+    - Hi my name is Martha!
+    portraitOverride: {fileID: 0}
+    actionType: 0
+    playerChoiceAnswer: 
+    choiceRowIds: 
+    audioClip: {fileID: 0}
+    audioStartTime: 0
+    dialogSkip: 0
+    leadsTo: 2
+  - rowId: 2
+    speaker: {fileID: 11400000, guid: 52660c3d5e2e0953bb0a343e7cdabe1a, type: 2}
+    textLines:
+    - Can you please help me?
+    portraitOverride: {fileID: 0}
+    actionType: 5
+    playerChoiceAnswer: 
+    choiceRowIds: 0300000004000000
+    audioClip: {fileID: 0}
+    audioStartTime: 0
+    dialogSkip: 0
+    leadsTo: -1
+  - rowId: 3
+    speaker: {fileID: 11400000, guid: 52660c3d5e2e0953bb0a343e7cdabe1a, type: 2}
+    textLines:
+    - Okay take a look.
+    portraitOverride: {fileID: 0}
+    actionType: 1
+    playerChoiceAnswer: Sure
+    choiceRowIds: 
+    audioClip: {fileID: 0}
+    audioStartTime: 0
+    dialogSkip: 0
+    leadsTo: -1
+  - rowId: 4
+    speaker: {fileID: 11400000, guid: 52660c3d5e2e0953bb0a343e7cdabe1a, type: 2}
+    textLines:
+    - If you ever have any free time please come see me again.
+    portraitOverride: {fileID: 0}
+    actionType: 6
+    playerChoiceAnswer: I don't have the time!
+    choiceRowIds: 
+    audioClip: {fileID: 0}
+    audioStartTime: 0
+    dialogSkip: 0
+    leadsTo: -1

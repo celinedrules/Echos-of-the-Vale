@@ -1,0 +1,81 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 184f101792b44680b84c6742e132a42b, type: 3}
+  m_Name: Martha
+  m_EditorClassIdentifier: Assembly-CSharp::Data.EntityData.NpcData
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes: []
+  icon: {fileID: 0}
+  entityName: Martha
+  statsData:
+    resourceStats:
+      maxHealth:
+        baseValue: 100
+        modifiers: []
+      healthRegen:
+        baseValue: 0
+        modifiers: []
+    offenseStats:
+      attackSpeed:
+        baseValue: 1
+        modifiers: []
+      damage:
+        baseValue: 10
+        modifiers: []
+      criticalPower:
+        baseValue: 0
+        modifiers: []
+      criticalChance:
+        baseValue: 0
+        modifiers: []
+      armorReduction:
+        baseValue: 0
+        modifiers: []
+      fireDamage:
+        baseValue: 0
+        modifiers: []
+      iceDamage:
+        baseValue: 0
+        modifiers: []
+      lightningDamage:
+        baseValue: 0
+        modifiers: []
+    defenseStats:
+      armor:
+        baseValue: 0
+        modifiers: []
+      evasion:
+        baseValue: 0
+        modifiers: []
+      fireResistance:
+        baseValue: 0
+        modifiers: []
+      iceResistance:
+        baseValue: 0
+        modifiers: []
+      lightningResistance:
+        baseValue: 0
+        modifiers: []
+  bio: 
+  dialogueTable: {fileID: 11400000, guid: e1bc9325e1181b9fd9b3c6891618ac99, type: 2}
+  startRowId: 1
+  questTargetId: npc_martha
+  quests:
+  - {fileID: 11400000, guid: fc13e976337fdf924a53dc15ac857e63, type: 2}
+  rewardType: 0

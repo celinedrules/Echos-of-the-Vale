@@ -81,7 +81,7 @@ SpriteRenderer:
   m_SortingLayer: -1
   m_SortingOrder: -1
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 3030428825764806209, guid: 99d847571f787041ea98b215cc5103f8, type: 3}
+  m_Sprite: {fileID: 21300000, guid: e75bf9561e2df7d5c9bea4af9c75f8c1, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -103,7 +103,7 @@ GameObject:
   - component: {fileID: 8468291511918963589}
   - component: {fileID: 4781921512906402918}
   m_Layer: 12
-  m_Name: Object Item Pickup - Small Potion
+  m_Name: Object Item Pickup - Apple
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -173,7 +173,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 999a37c7b1064d4caf3ecd0dd32b3c9e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Interactables.ItemPickup
-  pickupId: 1dbd1ce8-caaa-4a2d-bfd0-cc6fd01d74b8
+  pickupId: 5e01ddbc-a15a-4df4-9774-5069705037fa
   dropForce: {x: 3, y: 10}
-  itemData: {fileID: 11400000, guid: d8e4f01ae1ebae719aa3ac8cbd9c2573, type: 2}
-  lastKnownInstanceId: -90288
+  itemData: {fileID: 11400000, guid: 78240689edb37c840b9fe609b63045c1, type: 2}
+  lastKnownInstanceId: -90326
