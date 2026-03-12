@@ -1,12 +1,8 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using Data.DialogueData;
-using Managers;
-using TMPro;
 using UI.Common;
 using UnityEngine;
-using UnityEngine.UI;
 using Utilities.Enums;
 
 namespace UI.Dialogue

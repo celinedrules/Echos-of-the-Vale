@@ -34,7 +34,7 @@ namespace Data.DialogueData
         [Button("Fix Duplicate IDs", ButtonSizes.Medium), GUIColor(1f, 0.85f, 0.4f)]
         private void FixDuplicateRowIds() => DialogueTableUtility.FixDuplicateRowIds(rows);
 
-        [ListDrawerSettings(Expanded = true)]
+        [ListDrawerSettings(ShowFoldout = false)]
         [SerializeField] private List<DialogueRow> rows = new();
 
         public string TableName => tableName;

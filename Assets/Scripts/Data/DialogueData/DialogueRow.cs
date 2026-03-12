@@ -8,54 +8,97 @@ namespace Data.DialogueData
     [System.Serializable]
     public class DialogueRow
     {
-        [BoxGroup("Identity")]
+        private string RowTitle
+        {
+            get
+            {
+                string speakerName = speaker != null ? speaker.SpeakerName : "No Speaker";
+
+                string previewText = IsChoiceResponseRow
+                    ? playerChoiceAnswer
+                    : GetFirstLine();
+
+                if (string.IsNullOrWhiteSpace(previewText))
+                    previewText = rowKind.ToString();
+
+                previewText = GetTrimmedPreview(previewText, 50);
+
+                return $"[{rowId}: {speakerName}] - {previewText}";
+            }
+        }
+
+        private static string GetTrimmedPreview(string text, int maxLength)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+                return string.Empty;
+
+            string trimmed = text.Trim();
+
+            if (trimmed.Length <= maxLength)
+                return trimmed;
+
+            int lastSpaceIndex = trimmed.LastIndexOf(' ', maxLength);
+            if (lastSpaceIndex > 0)
+                return $"{trimmed.Substring(0, lastSpaceIndex)}...";
+
+            return $"{trimmed.Substring(0, maxLength)}...";
+        }
+
+        [FoldoutGroup("$RowTitle", Expanded = false)]
+        [BoxGroup("$RowTitle/Identity")]
         [SerializeField] private int rowId;
 
-        [BoxGroup("Identity")]
+        [FoldoutGroup("$RowTitle", Expanded = false)]
+        [BoxGroup("$RowTitle/Identity")]
         [SerializeField] private DialogueRowKind rowKind;
 
-        [BoxGroup("Identity")]
+        [FoldoutGroup("$RowTitle", Expanded = false)]
+        [BoxGroup("$RowTitle/Identity")]
         [SerializeField] private DialogueSpeakerData speaker;
 
-        [BoxGroup("Identity")]
-        [ShowInInspector, ReadOnly, PropertyOrder(-10)]
-        [LabelText("Row Summary")]
-        private string RowSummary => GetRowSummary();
-
-        [BoxGroup("Content")]
+        [FoldoutGroup("$RowTitle", Expanded = false)]
+        [BoxGroup("$RowTitle/Content")]
         [TextArea]
         [ValidateInput(nameof(HasTextLines), "This row should have at least one text line.")]
         [SerializeField] private string[] textLines;
 
-        [BoxGroup("Content")]
+        [FoldoutGroup("$RowTitle", Expanded = false)]
+        [BoxGroup("$RowTitle/Content")]
         [SerializeField] private Sprite portraitOverride;
 
-        [BoxGroup("Interaction")]
+        [FoldoutGroup("$RowTitle", Expanded = false)]
+        [BoxGroup("$RowTitle/Interaction")]
         [FormerlySerializedAs("actionType")]
         [SerializeField] private DialogueRowAction rowAction;
 
-        [BoxGroup("Choice Settings")]
+        [FoldoutGroup("$RowTitle", Expanded = false)]
+        [BoxGroup("$RowTitle/Choice Settings")]
         [ShowIf(nameof(IsChoiceResponseRow))]
         [LabelText("Choice Answer")]
         [ValidateInput(nameof(HasChoiceAnswerIfNeeded), "Choice response rows must have a Player Choice Answer.")]
         [SerializeField] private string playerChoiceAnswer;
 
-        [BoxGroup("Choice Settings")]
+        [FoldoutGroup("$RowTitle", Expanded = false)]
+        [BoxGroup("$RowTitle/Choice Settings")]
         [ShowIf(nameof(IsChoicePromptRow))]
         [LabelText("Choice Row Ids")]
         [ValidateInput(nameof(HasChoiceRowsIfNeeded), "Choice prompt rows must define at least one Choice Row Id.")]
         [SerializeField] private int[] choiceRowIds;
 
-        [BoxGroup("Audio")]
+        [FoldoutGroup("$RowTitle", Expanded = false)]
+        [BoxGroup("$RowTitle/Audio")]
         [SerializeField] private AudioClip audioClip;
 
-        [BoxGroup("Audio")]
+        [FoldoutGroup("$RowTitle", Expanded = false)]
+        [BoxGroup("$RowTitle/Audio")]
         [SerializeField] private float audioStartTime;
 
-        [BoxGroup("Flags")]
+        [FoldoutGroup("$RowTitle", Expanded = false)]
+        [BoxGroup("$RowTitle/Flags")]
         [SerializeField] private bool dialogSkip;
 
-        [BoxGroup("Flow")]
+        [FoldoutGroup("$RowTitle", Expanded = false)]
+        [BoxGroup("$RowTitle/Flow")]
         [ShowIf(nameof(UsesLeadsTo))]
         [ValidateInput(nameof(HasValidLeadsToValue), "Leads To must be -1 or a valid non-negative row ID.")]
         [SerializeField] private int leadsTo = -1;
@@ -81,17 +124,6 @@ namespace Data.DialogueData
         public void SetRowId(int newRowId) => rowId = newRowId;
         public void SetLeadsTo(int newLeadsTo) => leadsTo = newLeadsTo;
         public void SetChoiceRowIds(int[] newChoiceRowIds) => choiceRowIds = newChoiceRowIds;
-
-        private string GetRowSummary()
-        {
-            return rowKind switch
-            {
-                DialogueRowKind.Line => "Line: shows dialogue text and optionally continues via Leads To.",
-                DialogueRowKind.ChoicePrompt => "Choice Prompt: shows dialogue text and displays options from Choice Row Ids.",
-                DialogueRowKind.ChoiceResponse => "Choice Response: uses Choice Answer as button text, then shows Text Lines after selection.",
-                _ => string.Empty
-            };
-        }
 
         private bool HasTextLines()
         {
