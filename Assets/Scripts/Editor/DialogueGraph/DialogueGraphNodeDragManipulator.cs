@@ -54,6 +54,9 @@ namespace Editor.DialogueGraph
             if (!CanStartManipulation(evt))
                 return;
 
+            if (_window.IsConnectModeActive)
+                return;
+
             _window.SelectRow(_rowId, _rowIndex);
 
             _dragging = true;

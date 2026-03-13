@@ -100,7 +100,7 @@ namespace Editor.DialogueGraph
                 if (evt.button != (int)MouseButton.LeftMouse)
                     return;
 
-                window.SelectRow(row.RowId, rowIndex);
+                window.HandleNodeClicked(row.RowId, rowIndex);
                 evt.StopPropagation();
             });
 

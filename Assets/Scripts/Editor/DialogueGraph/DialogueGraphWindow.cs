@@ -33,8 +33,12 @@ namespace Editor.DialogueGraph
         private int _selectedRowId = -1;
         private int _selectedRowIndex = -1;
 
+        private bool _isConnectModeActive;
+        private int _connectSourceRowId = -1;
+
         public bool HasSelectedTable => _selectedTable != null;
         public bool HasSelectedRow => _selectedRowId >= 0;
+        public bool IsConnectModeActive => _isConnectModeActive;
 
         [MenuItem("Tools/Dialogue/Dialogue Graph")]
         public static void Open()
@@ -137,6 +141,7 @@ namespace Editor.DialogueGraph
             _tableField.RegisterValueChangedCallback(evt =>
             {
                 _selectedTable = evt.newValue as DialogueTable;
+                CancelConnectMode();
                 ClearSelection();
                 RefreshAllViews();
             });
@@ -145,6 +150,7 @@ namespace Editor.DialogueGraph
             {
                 _selectedTable = Selection.activeObject as DialogueTable;
                 _tableField.SetValueWithoutNotify(_selectedTable);
+                CancelConnectMode();
                 ClearSelection();
                 RefreshAllViews();
             })
@@ -170,6 +176,18 @@ namespace Editor.DialogueGraph
                 text = "Add Choice Response"
             };
             addChoiceResponseButton.style.marginLeft = 8f;
+
+            Button connectSelectedButton = new Button(BeginConnectSelected)
+            {
+                text = "Connect Selected"
+            };
+            connectSelectedButton.style.marginLeft = 8f;
+
+            Button clearLinksSelectedButton = new Button(ClearLinksSelected)
+            {
+                text = "Clear Links Selected"
+            };
+            clearLinksSelectedButton.style.marginLeft = 8f;
 
             Button autoLayoutButton = new Button(AutoLayout)
             {
@@ -207,6 +225,8 @@ namespace Editor.DialogueGraph
             toolbar.Add(addLineButton);
             toolbar.Add(addChoicePromptButton);
             toolbar.Add(addChoiceResponseButton);
+            toolbar.Add(connectSelectedButton);
+            toolbar.Add(clearLinksSelectedButton);
             toolbar.Add(autoLayoutButton);
             toolbar.Add(duplicateSelectedButton);
             toolbar.Add(duplicateSelectedResetLinksButton);
@@ -247,7 +267,7 @@ namespace Editor.DialogueGraph
 
             if (_selectedTable == null)
             {
-                _tableStatusLabel.text = "No DialogueTable selected.";
+                UpdateStatusLabel();
                 _graphCanvas.Add(BuildCenteredMessage("Select a DialogueTable to build the dialogue graph view."));
                 _graphCanvas.MarkDirtyRepaint();
                 return;
@@ -256,13 +276,12 @@ namespace Editor.DialogueGraph
             _selectedTable.PruneMissingNodePositions();
             EditorUtility.SetDirty(_selectedTable);
 
-            _tableStatusLabel.text = $"{_selectedTable.name}  •  Rows: {_selectedTable.RowCount}";
-
             if (_selectedRowId >= 0 && DialogueGraphRowOperations.FindRowIndexById(_selectedTable, _selectedRowId) < 0)
                 ClearSelection();
 
             if (_selectedTable.RowCount == 0)
             {
+                UpdateStatusLabel();
                 _graphCanvas.Add(BuildCenteredMessage("This DialogueTable has no rows."));
                 _graphCanvas.MarkDirtyRepaint();
                 return;
@@ -290,8 +309,42 @@ namespace Editor.DialogueGraph
                 _graphCanvas.Add(node);
             }
 
+            UpdateStatusLabel();
             UpdateNodeSelectionVisuals();
             _graphCanvas.MarkDirtyRepaint();
+        }
+
+        private void UpdateStatusLabel()
+        {
+            if (_tableStatusLabel == null)
+                return;
+
+            if (_selectedTable == null)
+            {
+                _tableStatusLabel.text = "No DialogueTable selected.";
+                return;
+            }
+
+            string baseText = $"{_selectedTable.name}  •  Rows: {_selectedTable.RowCount}";
+
+            if (_isConnectModeActive && _connectSourceRowId >= 0)
+            {
+                _tableStatusLabel.text = $"{baseText}  •  Connect mode: click a target node for Row {_connectSourceRowId} (click empty space to cancel)";
+                return;
+            }
+
+            _tableStatusLabel.text = baseText;
+        }
+
+        public void HandleNodeClicked(int rowId, int rowIndex)
+        {
+            if (_isConnectModeActive)
+            {
+                CompleteConnectionTo(rowId, rowIndex);
+                return;
+            }
+
+            SelectRow(rowId, rowIndex);
         }
 
         public void SelectRow(int rowId, int rowIndex)
@@ -301,6 +354,7 @@ namespace Editor.DialogueGraph
             UpdateNodeSelectionVisuals();
             RefreshInspector();
             RefreshValidation();
+            UpdateStatusLabel();
         }
 
         public void SelectRowById(int rowId)
@@ -319,6 +373,88 @@ namespace Editor.DialogueGraph
                 node.BringToFront();
                 FrameNode(node);
             }
+        }
+
+        private void BeginConnectSelected()
+        {
+            if (_selectedTable == null)
+            {
+                EditorUtility.DisplayDialog("Dialogue Graph", "Select a DialogueTable first.", "OK");
+                return;
+            }
+
+            if (_selectedRowId < 0)
+            {
+                EditorUtility.DisplayDialog("Dialogue Graph", "Select a source row first.", "OK");
+                return;
+            }
+
+            _isConnectModeActive = true;
+            _connectSourceRowId = _selectedRowId;
+            UpdateStatusLabel();
+            MarkGraphDirty();
+        }
+        
+
+        private void CompleteConnectionTo(int targetRowId, int targetRowIndex)
+        {
+            if (!_isConnectModeActive || _connectSourceRowId < 0 || _selectedTable == null)
+                return;
+
+            int sourceRowId = _connectSourceRowId;
+            CancelConnectMode();
+
+            bool connected = DialogueGraphRowOperations.ConnectRows(_selectedTable, sourceRowId, targetRowId, out string errorMessage);
+            if (!connected)
+            {
+                if (!string.IsNullOrWhiteSpace(errorMessage))
+                    EditorUtility.DisplayDialog("Dialogue Graph", errorMessage, "OK");
+
+                RefreshAllViews();
+                return;
+            }
+
+            SelectRow(targetRowId, targetRowIndex);
+            RefreshAllViews();
+        }
+        
+        public void BeginConnectSelectedFromMenu()
+        {
+            BeginConnectSelected();
+        }
+
+        private void ClearLinksSelected()
+        {
+            if (_selectedTable == null)
+            {
+                EditorUtility.DisplayDialog("Dialogue Graph", "Select a DialogueTable first.", "OK");
+                return;
+            }
+
+            if (_selectedRowId < 0)
+            {
+                EditorUtility.DisplayDialog("Dialogue Graph", "Select a row first.", "OK");
+                return;
+            }
+
+            CancelConnectMode();
+
+            if (!DialogueGraphRowOperations.ClearOutgoingLinks(_selectedTable, _selectedRowId))
+                return;
+
+            RefreshAllViews();
+        }
+
+        public void ClearLinksSelectedFromMenu()
+        {
+            ClearLinksSelected();
+        }
+        
+        private void CancelConnectMode()
+        {
+            _isConnectModeActive = false;
+            _connectSourceRowId = -1;
+            UpdateStatusLabel();
         }
 
         private void FrameNode(VisualElement node)
@@ -403,6 +539,7 @@ namespace Editor.DialogueGraph
             _selectedRowId = -1;
             _selectedRowIndex = -1;
             UpdateNodeSelectionVisuals();
+            UpdateStatusLabel();
         }
 
         private void SetSelectedRowIndex(DialogueTable table, int rowIndex)
@@ -439,6 +576,7 @@ namespace Editor.DialogueGraph
                 return;
             }
 
+            CancelConnectMode();
             DialogueGraphAutoLayoutUtility.AutoLayout(_selectedTable);
             RefreshAllViews();
 
@@ -566,6 +704,8 @@ namespace Editor.DialogueGraph
                 return;
             }
 
+            CancelConnectMode();
+
             bool deleted = DialogueGraphRowOperations.DeleteSelectedRow(_selectedTable, _selectedRowId);
             if (!deleted)
                 return;
@@ -603,6 +743,9 @@ namespace Editor.DialogueGraph
 
             if (evt.target == _graphCanvas)
             {
+                if (_isConnectModeActive)
+                    CancelConnectMode();
+
                 ClearSelection();
                 RefreshInspector();
                 RefreshValidation();

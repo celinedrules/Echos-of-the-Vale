@@ -27,6 +27,20 @@ namespace Editor.DialogueGraph
 
             evt.menu.AppendSeparator();
 
+            evt.menu.AppendAction("Connect Selected",
+                _ => window.BeginConnectSelectedFromMenu(),
+                window.HasSelectedRow
+                    ? DropdownMenuAction.Status.Normal
+                    : DropdownMenuAction.Status.Disabled);
+
+            evt.menu.AppendAction("Clear Links Selected",
+                _ => window.ClearLinksSelectedFromMenu(),
+                window.HasSelectedRow
+                    ? DropdownMenuAction.Status.Normal
+                    : DropdownMenuAction.Status.Disabled);
+
+            evt.menu.AppendSeparator();
+
             evt.menu.AppendAction("Auto Layout",
                 _ => window.AutoLayoutFromMenu(),
                 window.HasSelectedTable
@@ -73,6 +87,20 @@ namespace Editor.DialogueGraph
             evt.menu.AppendAction("Add/Choice Response",
                 _ => window.CreateRowFromMenu(DialogueRowKind.ChoiceResponse),
                 window.HasSelectedTable
+                    ? DropdownMenuAction.Status.Normal
+                    : DropdownMenuAction.Status.Disabled);
+
+            evt.menu.AppendSeparator();
+
+            evt.menu.AppendAction("Connect Selected",
+                _ => window.BeginConnectSelectedFromMenu(),
+                window.HasSelectedRow
+                    ? DropdownMenuAction.Status.Normal
+                    : DropdownMenuAction.Status.Disabled);
+
+            evt.menu.AppendAction("Clear Links Selected",
+                _ => window.ClearLinksSelectedFromMenu(),
+                window.HasSelectedRow
                     ? DropdownMenuAction.Status.Normal
                     : DropdownMenuAction.Status.Disabled);
 

@@ -72,6 +72,120 @@ namespace Editor.DialogueGraph
             return DuplicateRowInternal(table, sourceRowId, newPosition, resetLinks: true);
         }
 
+        public static bool ConnectRows(DialogueTable table, int sourceRowId, int targetRowId, out string errorMessage)
+        {
+            errorMessage = null;
+
+            if (table == null)
+            {
+                errorMessage = "No DialogueTable selected.";
+                return false;
+            }
+
+            if (sourceRowId < 0 || targetRowId < 0)
+            {
+                errorMessage = "Source or target row is invalid.";
+                return false;
+            }
+
+            if (sourceRowId == targetRowId)
+            {
+                errorMessage = "Cannot connect a row to itself.";
+                return false;
+            }
+
+            int sourceRowIndex = FindRowIndexById(table, sourceRowId);
+            int targetRowIndex = FindRowIndexById(table, targetRowId);
+
+            if (sourceRowIndex < 0 || targetRowIndex < 0)
+            {
+                errorMessage = "Source or target row was not found.";
+                return false;
+            }
+
+            Undo.RecordObject(table, $"Connect Dialogue Row {sourceRowId} -> {targetRowId}");
+
+            SerializedObject tableObject = new SerializedObject(table);
+            SerializedProperty rowsProperty = tableObject.FindProperty("rows");
+            SerializedProperty sourceRowProperty = rowsProperty.GetArrayElementAtIndex(sourceRowIndex);
+            SerializedProperty targetRowProperty = rowsProperty.GetArrayElementAtIndex(targetRowIndex);
+
+            DialogueRowKind sourceKind =
+                (DialogueRowKind)sourceRowProperty.FindPropertyRelative("rowKind").enumValueIndex;
+
+            DialogueRowKind targetKind =
+                (DialogueRowKind)targetRowProperty.FindPropertyRelative("rowKind").enumValueIndex;
+
+            if (sourceKind == DialogueRowKind.ChoicePrompt)
+            {
+                if (targetKind != DialogueRowKind.ChoiceResponse)
+                {
+                    errorMessage = "Choice Prompt rows can only connect to Choice Response rows.";
+                    return false;
+                }
+
+                SerializedProperty choiceRowIdsProperty = sourceRowProperty.FindPropertyRelative("choiceRowIds");
+
+                for (int i = 0; i < choiceRowIdsProperty.arraySize; i++)
+                {
+                    if (choiceRowIdsProperty.GetArrayElementAtIndex(i).intValue == targetRowId)
+                    {
+                        tableObject.ApplyModifiedProperties();
+                        EditorUtility.SetDirty(table);
+                        AssetDatabase.SaveAssets();
+                        return true;
+                    }
+                }
+
+                int newChoiceIndex = choiceRowIdsProperty.arraySize;
+                choiceRowIdsProperty.arraySize++;
+                choiceRowIdsProperty.GetArrayElementAtIndex(newChoiceIndex).intValue = targetRowId;
+            }
+            else
+            {
+                sourceRowProperty.FindPropertyRelative("leadsTo").intValue = targetRowId;
+            }
+
+            tableObject.ApplyModifiedProperties();
+            EditorUtility.SetDirty(table);
+            AssetDatabase.SaveAssets();
+            return true;
+        }
+
+        public static bool ClearOutgoingLinks(DialogueTable table, int rowId)
+        {
+            if (table == null || rowId < 0)
+                return false;
+
+            int rowIndex = FindRowIndexById(table, rowId);
+            if (rowIndex < 0)
+                return false;
+
+            Undo.RecordObject(table, $"Clear Dialogue Links {rowId}");
+
+            SerializedObject tableObject = new SerializedObject(table);
+            SerializedProperty rowsProperty = tableObject.FindProperty("rows");
+            SerializedProperty rowProperty = rowsProperty.GetArrayElementAtIndex(rowIndex);
+
+            DialogueRowKind rowKind =
+                (DialogueRowKind)rowProperty.FindPropertyRelative("rowKind").enumValueIndex;
+
+            if (rowKind == DialogueRowKind.ChoicePrompt)
+            {
+                SerializedProperty choiceRowIdsProperty = rowProperty.FindPropertyRelative("choiceRowIds");
+                choiceRowIdsProperty.arraySize = 0;
+            }
+            else
+            {
+                rowProperty.FindPropertyRelative("leadsTo").intValue = -1;
+            }
+
+            tableObject.ApplyModifiedProperties();
+            EditorUtility.SetDirty(table);
+            AssetDatabase.SaveAssets();
+            return true;
+        }
+
         public static bool DeleteSelectedRow(DialogueTable table, int selectedRowId)
         {
             if (table == null || selectedRowId < 0)
