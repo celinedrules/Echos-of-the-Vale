@@ -27,6 +27,14 @@ namespace Editor.DialogueGraph
 
             evt.menu.AppendSeparator();
 
+            evt.menu.AppendAction("Auto Layout",
+                _ => window.AutoLayoutFromMenu(),
+                window.HasSelectedTable
+                    ? DropdownMenuAction.Status.Normal
+                    : DropdownMenuAction.Status.Disabled);
+
+            evt.menu.AppendSeparator();
+
             evt.menu.AppendAction("Duplicate Selected",
                 _ => window.DuplicateSelectedRowFromMenu(),
                 window.HasSelectedRow
@@ -64,6 +72,14 @@ namespace Editor.DialogueGraph
 
             evt.menu.AppendAction("Add/Choice Response",
                 _ => window.CreateRowFromMenu(DialogueRowKind.ChoiceResponse),
+                window.HasSelectedTable
+                    ? DropdownMenuAction.Status.Normal
+                    : DropdownMenuAction.Status.Disabled);
+
+            evt.menu.AppendSeparator();
+
+            evt.menu.AppendAction("Auto Layout",
+                _ => window.AutoLayoutFromMenu(),
                 window.HasSelectedTable
                     ? DropdownMenuAction.Status.Normal
                     : DropdownMenuAction.Status.Disabled);

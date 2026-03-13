@@ -117,8 +117,8 @@ namespace Editor.DialogueGraph
             toolbar.style.alignItems = Align.Center;
             toolbar.style.paddingLeft = 10;
             toolbar.style.paddingRight = 10;
-            toolbar.style.paddingTop = 8;
-            toolbar.style.paddingBottom = 8;
+            toolbar.style.paddingTop = 8f;
+            toolbar.style.paddingBottom = 8f;
             toolbar.style.backgroundColor = new Color(0.15f, 0.15f, 0.15f);
 
             Label tableLabel = new Label("Dialogue Table");
@@ -171,6 +171,12 @@ namespace Editor.DialogueGraph
             };
             addChoiceResponseButton.style.marginLeft = 8f;
 
+            Button autoLayoutButton = new Button(AutoLayout)
+            {
+                text = "Auto Layout"
+            };
+            autoLayoutButton.style.marginLeft = 8f;
+
             Button duplicateSelectedButton = new Button(DuplicateSelectedRow)
             {
                 text = "Duplicate Selected"
@@ -201,6 +207,7 @@ namespace Editor.DialogueGraph
             toolbar.Add(addLineButton);
             toolbar.Add(addChoicePromptButton);
             toolbar.Add(addChoiceResponseButton);
+            toolbar.Add(autoLayoutButton);
             toolbar.Add(duplicateSelectedButton);
             toolbar.Add(duplicateSelectedResetLinksButton);
             toolbar.Add(deleteSelectedButton);
@@ -354,6 +361,43 @@ namespace Editor.DialogueGraph
             _graphScrollView.scrollOffset = new Vector2(targetX, targetY);
         }
 
+        private void FrameAllNodes()
+        {
+            if (_graphScrollView == null || _nodeViewsByRowId.Count == 0)
+                return;
+
+            bool hasBounds = false;
+            Rect bounds = default;
+
+            foreach (KeyValuePair<int, VisualElement> pair in _nodeViewsByRowId)
+            {
+                Rect rect = pair.Value.layout;
+                if (rect.width <= 0f || rect.height <= 0f)
+                    continue;
+
+                if (!hasBounds)
+                {
+                    bounds = rect;
+                    hasBounds = true;
+                }
+                else
+                {
+                    bounds.xMin = Mathf.Min(bounds.xMin, rect.xMin);
+                    bounds.yMin = Mathf.Min(bounds.yMin, rect.yMin);
+                    bounds.xMax = Mathf.Max(bounds.xMax, rect.xMax);
+                    bounds.yMax = Mathf.Max(bounds.yMax, rect.yMax);
+                }
+            }
+
+            if (!hasBounds)
+                return;
+
+            float targetX = Mathf.Max(0f, bounds.xMin - FramePadding);
+            float targetY = Mathf.Max(0f, bounds.yMin - FramePadding);
+
+            _graphScrollView.scrollOffset = new Vector2(targetX, targetY);
+        }
+
         private void ClearSelection()
         {
             _selectedRowId = -1;
@@ -385,6 +429,25 @@ namespace Editor.DialogueGraph
         private void RefreshValidation()
         {
             _validationView?.Refresh(_selectedTable);
+        }
+
+        private void AutoLayout()
+        {
+            if (_selectedTable == null)
+            {
+                EditorUtility.DisplayDialog("Dialogue Graph", "Select a DialogueTable first.", "OK");
+                return;
+            }
+
+            DialogueGraphAutoLayoutUtility.AutoLayout(_selectedTable);
+            RefreshAllViews();
+
+            rootVisualElement.schedule.Execute(FrameAllNodes);
+        }
+
+        public void AutoLayoutFromMenu()
+        {
+            AutoLayout();
         }
 
         private void CreateRow(DialogueRowKind rowKind)

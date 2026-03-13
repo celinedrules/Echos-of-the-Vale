@@ -77,12 +77,12 @@ MonoBehaviour:
   graphEditorData:
     nodeLayouts:
     - rowId: 1
-      position: {x: 135, y: 245}
+      position: {x: 80, y: 80}
     - rowId: 2
-      position: {x: 599, y: 335}
+      position: {x: 460, y: 380}
     - rowId: 3
-      position: {x: 944, y: 571}
+      position: {x: 840, y: 680}
     - rowId: 4
-      position: {x: 977, y: 130}
+      position: {x: 840, y: 860}
     panPosition: {x: 0, y: 0}
     zoomScale: 1
