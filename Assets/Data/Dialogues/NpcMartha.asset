@@ -27,7 +27,7 @@ MonoBehaviour:
     audioStartTime: 0
     dialogSkip: 0
     leadsTo: 2
-    changeStartRowId: 1
+    changeStartRowId: 0
     newStartRowId: 2
   - rowId: 2
     rowKind: 1
@@ -74,3 +74,15 @@ MonoBehaviour:
     leadsTo: -1
     changeStartRowId: 0
     newStartRowId: 0
+  graphEditorData:
+    nodeLayouts:
+    - rowId: 1
+      position: {x: 135, y: 245}
+    - rowId: 2
+      position: {x: 599, y: 335}
+    - rowId: 3
+      position: {x: 944, y: 571}
+    - rowId: 4
+      position: {x: 977, y: 130}
+    panPosition: {x: 0, y: 0}
+    zoomScale: 1

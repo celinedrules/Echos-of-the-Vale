@@ -15,6 +15,7 @@ MonoBehaviour:
   tableName: 
   rows:
   - rowId: 1
+    rowKind: 0
     speaker: {fileID: 11400000, guid: 4e5d83a1306f98a9cb2b27fde2681927, type: 2}
     textLines:
     - If this takes longer than a pint, I'm bust.
@@ -23,68 +24,89 @@ MonoBehaviour:
     - Joe took me tools again. I swear, I'll bury that bastard...
     - If ye break it, you but it. If I break it... well, that's a tradition.
     portraitOverride: {fileID: 0}
-    actionType: 5
+    rowAction: 5
     playerChoiceAnswer: 
     choiceRowIds: 020000000300000006000000
     audioClip: {fileID: 0}
     audioStartTime: 0
     dialogSkip: 0
     leadsTo: -1
+    changeStartRowId: 0
+    newStartRowId: 0
   - rowId: 2
+    rowKind: 0
     speaker: {fileID: 11400000, guid: 4e5d83a1306f98a9cb2b27fde2681927, type: 2}
     textLines:
     - Here check out my wares.
     portraitOverride: {fileID: 0}
-    actionType: 2
+    rowAction: 2
     playerChoiceAnswer: Do you have something to trade?
     choiceRowIds: 
     audioClip: {fileID: 0}
     audioStartTime: 0
     dialogSkip: 0
     leadsTo: -1
+    changeStartRowId: 0
+    newStartRowId: 0
   - rowId: 3
+    rowKind: 0
     speaker: {fileID: 11400000, guid: 4e5d83a1306f98a9cb2b27fde2681927, type: 2}
     textLines:
     - You came to the right place.
     portraitOverride: {fileID: 0}
-    actionType: 5
+    rowAction: 5
     playerChoiceAnswer: About the job...
     choiceRowIds: 0400000005000000
     audioClip: {fileID: 0}
     audioStartTime: 0
     dialogSkip: 0
     leadsTo: -1
+    changeStartRowId: 0
+    newStartRowId: 0
   - rowId: 4
+    rowKind: 0
     speaker: {fileID: 11400000, guid: 4e5d83a1306f98a9cb2b27fde2681927, type: 2}
     textLines:
     - Sure take a look!
     portraitOverride: {fileID: 0}
-    actionType: 1
+    rowAction: 1
     playerChoiceAnswer: Do you have a new job for me?
     choiceRowIds: 
     audioClip: {fileID: 0}
     audioStartTime: 0
     dialogSkip: 0
     leadsTo: -1
+    changeStartRowId: 0
+    newStartRowId: 0
   - rowId: 5
+    rowKind: 0
     speaker: {fileID: 11400000, guid: 4e5d83a1306f98a9cb2b27fde2681927, type: 2}
     textLines: []
     portraitOverride: {fileID: 0}
-    actionType: 4
+    rowAction: 4
     playerChoiceAnswer: I want to get my reward.
     choiceRowIds: 
     audioClip: {fileID: 0}
     audioStartTime: 0
     dialogSkip: 0
     leadsTo: -1
+    changeStartRowId: 0
+    newStartRowId: 0
   - rowId: 6
+    rowKind: 0
     speaker: {fileID: 11400000, guid: 4e5d83a1306f98a9cb2b27fde2681927, type: 2}
     textLines: []
     portraitOverride: {fileID: 0}
-    actionType: 6
+    rowAction: 6
     playerChoiceAnswer: I have to go.
     choiceRowIds: 
     audioClip: {fileID: 0}
     audioStartTime: 0
     dialogSkip: 0
     leadsTo: -1
+    changeStartRowId: 0
+    newStartRowId: 0
+  graphEditorData:
+    nodeLayouts: []
+    panPosition: {x: 0, y: 0}
+    zoomScale: 1
