@@ -39,6 +39,11 @@ namespace Data.DialogueData
         [ValidateInput(nameof(HasValidLeadsToValue), "Leads To must be -1 or a valid non-negative row ID.")]
         [SerializeField] private int leadsTo = -1;
 
+        [SerializeField] private bool changeStartRowId;
+
+        [ShowIf(nameof(changeStartRowId))]
+        [SerializeField] private int newStartRowId;
+        
         public int RowId => rowId;
         public DialogueRowKind RowKind => rowKind;
         public DialogueSpeakerData Speaker => speaker;
@@ -51,6 +56,8 @@ namespace Data.DialogueData
         public float AudioStartTime => audioStartTime;
         public bool DialogSkip => dialogSkip;
         public int LeadsTo => leadsTo;
+        public bool ChangeStartRowId => changeStartRowId;
+        public int NewStartRowId => newStartRowId;
 
         public bool IsLineRow => rowKind == DialogueRowKind.Line;
         public bool IsChoicePromptRow => rowKind == DialogueRowKind.ChoicePrompt;

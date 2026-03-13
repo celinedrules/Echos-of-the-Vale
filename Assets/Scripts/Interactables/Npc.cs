@@ -21,6 +21,9 @@ namespace Interactables
         [ValidateInput(nameof(ValidateNpcData), "Wrong NpcData type for this NPC!")]
         [LabelText("$DataLabel")]
         [SerializeField] private NpcData data;
+        
+        [Header("Runtime Data")]
+        [SerializeField] private DialogueRuntimeData dialogueRuntimeData;
 
         [Header("Tooltip")]
         [SerializeField] private GameObject interactTooltip;
@@ -144,16 +147,21 @@ namespace Interactables
                 return;
             }
 
-            DialogueRow startRow = data.DialogueTable.GetRowById(data.StartRowId);
+            int startRowId = dialogueRuntimeData
+                ? dialogueRuntimeData.GetStartRowId(data.EntityName, data.StartRowId)
+                : data.StartRowId;
+
+            DialogueRow startRow = data.DialogueTable.GetRowById(startRowId);
             if (startRow == null)
             {
-                Debug.LogWarning($"Row ID {data.StartRowId} not found in {data.DialogueTable.name}");
+                Debug.LogWarning($"Row ID {startRowId} not found in {data.DialogueTable.name}");
                 return;
             }
 
             UiManager.OpenDialogue();
             UiManager.Dialogue.SetupNpcData(new DialogueNpcData(data.QuestTargetId, data.RewardType, data.Quests));
-            UiManager.Dialogue.PlayDialogue(data.DialogueTable, data.StartRowId);
+            UiManager.Dialogue.SetNpcName(data.EntityName);
+            UiManager.Dialogue.PlayDialogue(data.DialogueTable, startRowId);
         }
 
         private string DataLabel => RequiredDataType.Name.Replace("NpcData", "") is { Length: > 0 } label

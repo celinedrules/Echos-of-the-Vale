@@ -27,6 +27,8 @@ MonoBehaviour:
     audioStartTime: 0
     dialogSkip: 0
     leadsTo: 2
+    changeStartRowId: 1
+    newStartRowId: 2
   - rowId: 2
     rowKind: 1
     speaker: {fileID: 11400000, guid: 52660c3d5e2e0953bb0a343e7cdabe1a, type: 2}
@@ -40,6 +42,8 @@ MonoBehaviour:
     audioStartTime: 0
     dialogSkip: 0
     leadsTo: -1
+    changeStartRowId: 0
+    newStartRowId: 0
   - rowId: 3
     rowKind: 2
     speaker: {fileID: 11400000, guid: 52660c3d5e2e0953bb0a343e7cdabe1a, type: 2}
@@ -53,6 +57,8 @@ MonoBehaviour:
     audioStartTime: 0
     dialogSkip: 0
     leadsTo: -1
+    changeStartRowId: 0
+    newStartRowId: 0
   - rowId: 4
     rowKind: 2
     speaker: {fileID: 11400000, guid: 52660c3d5e2e0953bb0a343e7cdabe1a, type: 2}
@@ -66,3 +72,5 @@ MonoBehaviour:
     audioStartTime: 0
     dialogSkip: 0
     leadsTo: -1
+    changeStartRowId: 0
+    newStartRowId: 0

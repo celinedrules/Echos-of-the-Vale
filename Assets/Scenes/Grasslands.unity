@@ -44096,11 +44096,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4781921512906402918, guid: e75f5f039fd3a5241be3d1c23d529443, type: 3}
       propertyPath: pickupId
-      value: 7a1fa8a0-6c10-4d10-ad00-de44d9147ae3
+      value: 44f5fb35-4673-410a-80ed-d0df37541a25
       objectReference: {fileID: 0}
     - target: {fileID: 4781921512906402918, guid: e75f5f039fd3a5241be3d1c23d529443, type: 3}
       propertyPath: lastKnownInstanceId
-      value: -1322
+      value: -3168
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -46344,6 +46344,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Interactables.Npc
   data: {fileID: 11400000, guid: 7af60494bc97a66b38cf909e31c5e0fc, type: 2}
+  dialogueRuntimeData: {fileID: 11400000, guid: ba254c50a57c6ea48974ddfb10c4fa74, type: 2}
   interactTooltip: {fileID: 1073336107}
   floatSpeed: 8
   floatRange: 0.1
@@ -91753,6 +91754,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Interactables.Merchant
   data: {fileID: 11400000, guid: ed3fc6e56da4a55999096321ef47b3d1, type: 2}
+  dialogueRuntimeData: {fileID: 11400000, guid: ba254c50a57c6ea48974ddfb10c4fa74, type: 2}
   interactTooltip: {fileID: 1884667588}
   floatSpeed: 8
   floatRange: 0.1
@@ -107618,6 +107620,7 @@ MonoBehaviour:
   view: {fileID: 1533884104}
   typewriter: {fileID: 1533884105}
   choiceDelay: 0.5
+  dialogueRuntimeData: {fileID: 11400000, guid: ba254c50a57c6ea48974ddfb10c4fa74, type: 2}
 --- !u!222 &1533884102
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -142809,11 +142812,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4781921512906402918, guid: cfbf484223ac48044916192fc135ce49, type: 3}
       propertyPath: pickupId
-      value: 4516bca0-7b5a-4627-ba3e-e09dacf61473
+      value: 5d56b5bb-9c1b-4e00-9f64-665fb13bb5ac
       objectReference: {fileID: 0}
     - target: {fileID: 4781921512906402918, guid: cfbf484223ac48044916192fc135ce49, type: 3}
       propertyPath: lastKnownInstanceId
-      value: -1336
+      value: -3182
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -12,6 +12,8 @@ namespace UI.Dialogue
         [SerializeField] private DialogueView view;
         [SerializeField] private DialogueTypewriter typewriter;
         [SerializeField] private float choiceDelay = 0.5f;
+        [SerializeField] private DialogueRuntimeData dialogueRuntimeData;
+
 
         private DialogueTable _table;
         private DialogueRow _currentRow;
@@ -23,6 +25,7 @@ namespace UI.Dialogue
         private string _currentRowText;
         private DialogueNpcData _npcData;
         private CanvasGroup _canvasGroup;
+        private string _currentNpcName;
 
         public CanvasGroup CanvasGroup => _canvasGroup;
         public bool ShowMenuButtons => false;
@@ -36,6 +39,8 @@ namespace UI.Dialogue
         }
 
         public void SetupNpcData(DialogueNpcData npcData) => _npcData = npcData;
+        public void SetNpcName(string npcName) => _currentNpcName = npcName;
+
 
         /// <summary>
         /// Starts playing a dialogue from a table, beginning at the specified row ID.
@@ -107,10 +112,22 @@ namespace UI.Dialogue
         private void PlayRow(DialogueRow row)
         {
             SetCurrentRow(row);
+            ApplyStartRowOverride(row);
             ResolveCurrentChoices(row);
             view.ClearChoiceInstances();
             view.SetSpeaker(row);
             StartTypingCurrentRow();
+        }
+        
+        private void ApplyStartRowOverride(DialogueRow row)
+        {
+            if (!row.ChangeStartRowId)
+                return;
+
+            if (dialogueRuntimeData == null || string.IsNullOrEmpty(_currentNpcName))
+                return;
+
+            dialogueRuntimeData.SetStartRowId(_currentNpcName, row.NewStartRowId);
         }
 
         private void SetCurrentRow(DialogueRow row)
