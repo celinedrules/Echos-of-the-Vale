@@ -35,6 +35,10 @@ namespace Editor.DialogueGraph
 
         private bool _isConnectModeActive;
         private int _connectSourceRowId = -1;
+        private bool _isPortDragActive;
+        private Vector2 _portDragPreviewPosition;
+        private int _hoveredConnectTargetRowId = -1;
+        private bool _hoveredConnectTargetValid;
 
         public bool HasSelectedTable => _selectedTable != null;
         public bool HasSelectedRow => _selectedRowId >= 0;
@@ -314,7 +318,7 @@ namespace Editor.DialogueGraph
             _graphCanvas.MarkDirtyRepaint();
         }
 
-         private void UpdateStatusLabel()
+          private void UpdateStatusLabel()
         {
             if (_tableStatusLabel == null)
                 return;
@@ -329,7 +333,15 @@ namespace Editor.DialogueGraph
 
             if (_isConnectModeActive && _connectSourceRowId >= 0)
             {
-                _tableStatusLabel.text = $"{baseText}  •  Connect mode: click an input handle for Row {_connectSourceRowId} (click empty space to cancel)";
+                if (_hoveredConnectTargetRowId >= 0)
+                {
+                    _tableStatusLabel.text = _hoveredConnectTargetValid
+                        ? $"{baseText}  •  Release to connect Row {_connectSourceRowId} → Row {_hoveredConnectTargetRowId}"
+                        : $"{baseText}  •  Invalid target Row {_hoveredConnectTargetRowId} for Row {_connectSourceRowId}";
+                    return;
+                }
+
+                _tableStatusLabel.text = $"{baseText}  •  Drag from an output handle to an input handle for Row {_connectSourceRowId}";
                 return;
             }
 
@@ -341,21 +353,54 @@ namespace Editor.DialogueGraph
             SelectRow(rowId, rowIndex);
         }
 
-        public void HandleOutputPortClicked(int rowId, int rowIndex)
+        public void BeginPortDragConnection(int rowId, int rowIndex)
         {
             SelectRow(rowId, rowIndex);
             BeginConnectFromRow(rowId);
+            _isPortDragActive = true;
+            _hoveredConnectTargetRowId = -1;
+            _hoveredConnectTargetValid = false;
+
+            if (_nodeViewsByRowId.TryGetValue(rowId, out VisualElement node))
+                _portDragPreviewPosition = DialogueGraphNodeViewFactory.GetOutputPortCenter(node);
+
+            MarkGraphDirty();
         }
 
-        public void HandleInputPortClicked(int rowId, int rowIndex)
+        public void UpdatePortDragPreview(Vector2 worldPointerPosition)
         {
-            if (_isConnectModeActive)
+            if (!_isConnectModeActive || !_isPortDragActive || _graphCanvas == null)
+                return;
+
+            _portDragPreviewPosition = _graphCanvas.WorldToLocal(worldPointerPosition);
+            UpdateHoveredConnectTarget(worldPointerPosition);
+            UpdateNodeSelectionVisuals();
+            UpdateStatusLabel();
+            MarkGraphDirty();
+        }
+
+        public void CompletePortDragConnection(Vector2 worldPointerPosition)
+        {
+            if (!_isConnectModeActive || !_isPortDragActive || _graphCanvas == null)
             {
-                CompleteConnectionTo(rowId, rowIndex);
+                CancelConnectMode();
                 return;
             }
 
-            SelectRow(rowId, rowIndex);
+            _portDragPreviewPosition = _graphCanvas.WorldToLocal(worldPointerPosition);
+            UpdateHoveredConnectTarget(worldPointerPosition);
+
+            if (_hoveredConnectTargetRowId >= 0 && _hoveredConnectTargetValid)
+            {
+                int targetRowIndex = DialogueGraphRowOperations.FindRowIndexById(_selectedTable, _hoveredConnectTargetRowId);
+                if (targetRowIndex >= 0)
+                {
+                    CompleteConnectionTo(_hoveredConnectTargetRowId, targetRowIndex);
+                    return;
+                }
+            }
+
+            CancelConnectMode();
         }
 
         public void SelectRow(int rowId, int rowIndex)
@@ -400,7 +445,7 @@ namespace Editor.DialogueGraph
                 return;
             }
 
-            BeginConnectFromRow(_selectedRowId);
+            EditorUtility.DisplayDialog("Dialogue Graph", "Drag from an output handle to an input handle to connect nodes.", "OK");
         }
 
         private void BeginConnectFromRow(int sourceRowId)
@@ -410,6 +455,8 @@ namespace Editor.DialogueGraph
 
             _isConnectModeActive = true;
             _connectSourceRowId = sourceRowId;
+            _hoveredConnectTargetRowId = -1;
+            _hoveredConnectTargetValid = false;
             UpdateNodeSelectionVisuals();
             UpdateStatusLabel();
             MarkGraphDirty();
@@ -469,12 +516,16 @@ namespace Editor.DialogueGraph
             ClearLinksSelected();
         }
 
-        private void CancelConnectMode()
+        public void CancelConnectMode()
         {
             _isConnectModeActive = false;
             _connectSourceRowId = -1;
+            _isPortDragActive = false;
+            _hoveredConnectTargetRowId = -1;
+            _hoveredConnectTargetValid = false;
             UpdateNodeSelectionVisuals();
             UpdateStatusLabel();
+            MarkGraphDirty();
         }
 
         private void FrameNode(VisualElement node)
@@ -572,11 +623,68 @@ namespace Editor.DialogueGraph
         {
             foreach (KeyValuePair<int, VisualElement> pair in _nodeViewsByRowId)
             {
-                bool isSelected = pair.Key == _selectedRowId;
-                bool isInvalid = _invalidRowIds.Contains(pair.Key);
-                bool isConnectSource = _isConnectModeActive && pair.Key == _connectSourceRowId;
-                DialogueGraphNodeViewFactory.SetNodeState(pair.Value, isSelected, isInvalid, isConnectSource);
+                int rowId = pair.Key;
+                bool isSelected = rowId == _selectedRowId;
+                bool isInvalid = _invalidRowIds.Contains(rowId);
+                bool isConnectSource = _isConnectModeActive && rowId == _connectSourceRowId;
+                bool isValidConnectTarget = IsValidConnectTarget(rowId);
+                bool isInvalidConnectTarget = _isConnectModeActive &&
+                                              !isConnectSource &&
+                                              !isValidConnectTarget;
+                bool isHoveredConnectTarget = rowId == _hoveredConnectTargetRowId && _hoveredConnectTargetValid;
+                bool isHoveredInvalidTarget = rowId == _hoveredConnectTargetRowId && !_hoveredConnectTargetValid;
+
+                DialogueGraphNodeViewFactory.SetNodeState(
+                    pair.Value,
+                    isSelected,
+                    isInvalid,
+                    isConnectSource,
+                    isValidConnectTarget,
+                    isInvalidConnectTarget,
+                    isHoveredConnectTarget,
+                    isHoveredInvalidTarget);
             }
+        }
+        
+        private void UpdateHoveredConnectTarget(Vector2 worldPointerPosition)
+        {
+            _hoveredConnectTargetRowId = -1;
+            _hoveredConnectTargetValid = false;
+
+            if (_selectedTable == null || !_isConnectModeActive)
+                return;
+
+            VisualElement pickedElement = _graphCanvas.panel?.Pick(worldPointerPosition) as VisualElement;
+            VisualElement inputPort = DialogueGraphNodeViewFactory.FindPortElementInHierarchy(pickedElement, inputOnly: true);
+
+            if (inputPort == null)
+                return;
+
+            if (!DialogueGraphNodeViewFactory.TryGetRowIdFromPort(inputPort, out int targetRowId))
+                return;
+
+            _hoveredConnectTargetRowId = targetRowId;
+            _hoveredConnectTargetValid = IsValidConnectTarget(targetRowId);
+        }
+        
+        private bool IsValidConnectTarget(int targetRowId)
+        {
+            if (!_isConnectModeActive || _selectedTable == null || _connectSourceRowId < 0)
+                return false;
+
+            if (targetRowId < 0 || targetRowId == _connectSourceRowId)
+                return false;
+
+            DialogueRow sourceRow = _selectedTable.GetRowById(_connectSourceRowId);
+            DialogueRow targetRow = _selectedTable.GetRowById(targetRowId);
+
+            if (sourceRow == null || targetRow == null)
+                return false;
+
+            if (sourceRow.IsChoicePromptRow)
+                return targetRow.IsChoiceResponseRow;
+
+            return true;
         }
 
         private void RefreshInspector()
@@ -775,7 +883,14 @@ namespace Editor.DialogueGraph
 
         private void OnGraphCanvasGenerateVisualContent(MeshGenerationContext context)
         {
-            DialogueGraphEdgeRenderer.Draw(_selectedTable, _nodeViewsByRowId, context);
+            DialogueGraphEdgeRenderer.Draw(
+                _selectedTable,
+                _nodeViewsByRowId,
+                context,
+                _isPortDragActive && _connectSourceRowId >= 0 ? _connectSourceRowId : -1,
+                _isPortDragActive ? _portDragPreviewPosition : Vector2.zero,
+                _isPortDragActive && _hoveredConnectTargetRowId >= 0,
+                _hoveredConnectTargetValid);
         }
 
         private static Label BuildCenteredMessage(string text)

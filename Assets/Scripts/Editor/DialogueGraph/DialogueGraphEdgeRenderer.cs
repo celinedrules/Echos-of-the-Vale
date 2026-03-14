@@ -10,58 +10,80 @@ namespace Editor.DialogueGraph
         private static readonly Color LeadsToEdgeColor = new(0.58f, 0.79f, 1f);
         private static readonly Color ChoiceEdgeColor = new(0.95f, 0.74f, 0.32f);
         private static readonly Color InvalidEdgeColor = new(0.95f, 0.28f, 0.28f);
+        private static readonly Color PreviewEdgeColor = new(1f, 0.92f, 0.45f);
+        private static readonly Color PreviewValidEdgeColor = new(0.45f, 0.9f, 0.62f);
+        private static readonly Color PreviewInvalidEdgeColor = new(0.95f, 0.32f, 0.32f);
 
         private const float MissingEdgeLength = 120f;
 
         public static void Draw(
             DialogueTable table,
             IReadOnlyDictionary<int, VisualElement> nodeViewsByRowId,
-            MeshGenerationContext context)
+            MeshGenerationContext context,
+            int previewSourceRowId,
+            Vector2 previewEnd,
+            bool isPreviewHoveringTarget,
+            bool isPreviewTargetValid)
         {
-            if (table == null || table.RowCount == 0 || nodeViewsByRowId == null || nodeViewsByRowId.Count == 0)
+            if (nodeViewsByRowId == null || nodeViewsByRowId.Count == 0)
                 return;
 
             Painter2D painter = context.painter2D;
             painter.lineWidth = 3f;
 
-            for (int i = 0; i < table.RowCount; i++)
+            if (table != null && table.RowCount > 0)
             {
-                DialogueRow sourceRow = table.GetRow(i);
-                if (sourceRow == null)
-                    continue;
-
-                if (sourceRow.IsChoicePromptRow)
+                for (int i = 0; i < table.RowCount; i++)
                 {
-                    int[] choiceRowIds = sourceRow.ChoiceRowIds;
-                    if (choiceRowIds == null)
+                    DialogueRow sourceRow = table.GetRow(i);
+                    if (sourceRow == null)
                         continue;
 
-                    for (int j = 0; j < choiceRowIds.Length; j++)
+                    if (sourceRow.IsChoicePromptRow)
                     {
-                        int targetRowId = choiceRowIds[j];
-                        bool isValidChoiceTarget = IsValidChoiceTarget(table, sourceRow.RowId, targetRowId);
+                        int[] choiceRowIds = sourceRow.ChoiceRowIds;
+                        if (choiceRowIds == null)
+                            continue;
+
+                        for (int j = 0; j < choiceRowIds.Length; j++)
+                        {
+                            int targetRowId = choiceRowIds[j];
+                            bool isValidChoiceTarget = IsValidChoiceTarget(table, sourceRow.RowId, targetRowId);
+
+                            DrawEdge(
+                                painter,
+                                nodeViewsByRowId,
+                                sourceRow.RowId,
+                                targetRowId,
+                                isValidChoiceTarget ? ChoiceEdgeColor : InvalidEdgeColor,
+                                drawDanglingIfMissing: !isValidChoiceTarget);
+                        }
+                    }
+                    else if (sourceRow.UsesLeadsTo && sourceRow.LeadsTo >= 0)
+                    {
+                        bool isValidLeadsToTarget = IsValidLeadsToTarget(table, sourceRow.RowId, sourceRow.LeadsTo);
 
                         DrawEdge(
                             painter,
                             nodeViewsByRowId,
                             sourceRow.RowId,
-                            targetRowId,
-                            isValidChoiceTarget ? ChoiceEdgeColor : InvalidEdgeColor,
-                            drawDanglingIfMissing: !isValidChoiceTarget);
+                            sourceRow.LeadsTo,
+                            isValidLeadsToTarget ? LeadsToEdgeColor : InvalidEdgeColor,
+                            drawDanglingIfMissing: !isValidLeadsToTarget);
                     }
                 }
-                else if (sourceRow.UsesLeadsTo && sourceRow.LeadsTo >= 0)
-                {
-                    bool isValidLeadsToTarget = IsValidLeadsToTarget(table, sourceRow.RowId, sourceRow.LeadsTo);
+            }
 
-                    DrawEdge(
-                        painter,
-                        nodeViewsByRowId,
-                        sourceRow.RowId,
-                        sourceRow.LeadsTo,
-                        isValidLeadsToTarget ? LeadsToEdgeColor : InvalidEdgeColor,
-                        drawDanglingIfMissing: !isValidLeadsToTarget);
-                }
+            if (previewSourceRowId >= 0 &&
+                nodeViewsByRowId.TryGetValue(previewSourceRowId, out VisualElement previewSourceNode))
+            {
+                Vector2 start = DialogueGraphNodeViewFactory.GetOutputPortCenter(previewSourceNode);
+
+                Color previewColor = PreviewEdgeColor;
+                if (isPreviewHoveringTarget)
+                    previewColor = isPreviewTargetValid ? PreviewValidEdgeColor : PreviewInvalidEdgeColor;
+
+                DrawPreviewEdge(painter, start, previewEnd, previewColor);
             }
         }
 
@@ -122,6 +144,17 @@ namespace Editor.DialogueGraph
 
             Vector2 end = DialogueGraphNodeViewFactory.GetInputPortCenter(targetNode);
 
+            DrawBezierEdge(painter, start, end, color);
+            DrawArrowHead(painter, end, color);
+        }
+
+        private static void DrawPreviewEdge(Painter2D painter, Vector2 start, Vector2 end, Color color)
+        {
+            DrawBezierEdge(painter, start, end, color);
+        }
+
+        private static void DrawBezierEdge(Painter2D painter, Vector2 start, Vector2 end, Color color)
+        {
             float tangentOffset = Mathf.Max(60f, Mathf.Abs(end.x - start.x) * 0.35f);
             Vector2 startTangent = start + Vector2.right * tangentOffset;
             Vector2 endTangent = end + Vector2.left * tangentOffset;
@@ -131,8 +164,6 @@ namespace Editor.DialogueGraph
             painter.MoveTo(start);
             painter.BezierCurveTo(startTangent, endTangent, end);
             painter.Stroke();
-
-            DrawArrowHead(painter, end, color);
         }
 
         private static void DrawDanglingEdge(Painter2D painter, Vector2 start, Color color)
@@ -150,7 +181,6 @@ namespace Editor.DialogueGraph
             painter.Stroke();
 
             DrawArrowHead(painter, end, color);
-
             DrawMissingTargetMarker(painter, end, color);
         }
 

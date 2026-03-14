@@ -51,14 +51,7 @@ namespace Editor.DialogueGraph
                 right: StyleKeyword.Auto);
 
             inputPort.tooltip = "Input port";
-            inputPort.RegisterCallback<PointerDownEvent>(evt =>
-            {
-                if (evt.button != (int)MouseButton.LeftMouse)
-                    return;
-
-                window.HandleInputPortClicked(row.RowId, rowIndex);
-                evt.StopImmediatePropagation();
-            });
+            inputPort.userData = row.RowId;
 
             VisualElement outputPort = CreatePort(
                 OutputPortElementName,
@@ -67,14 +60,8 @@ namespace Editor.DialogueGraph
                 right: -8f);
 
             outputPort.tooltip = "Output port";
-            outputPort.RegisterCallback<PointerDownEvent>(evt =>
-            {
-                if (evt.button != (int)MouseButton.LeftMouse)
-                    return;
-
-                window.HandleOutputPortClicked(row.RowId, rowIndex);
-                evt.StopImmediatePropagation();
-            });
+            outputPort.userData = row.RowId;
+            outputPort.AddManipulator(new DialogueGraphPortConnectManipulator(outputPort, row.RowId, rowIndex, window));
 
             node.Add(inputPort);
             node.Add(outputPort);
@@ -154,11 +141,26 @@ namespace Editor.DialogueGraph
             return node;
         }
 
-        public static void SetNodeState(VisualElement node, bool isSelected, bool isInvalid, bool isConnectSource)
+        public static void SetNodeState(
+            VisualElement node,
+            bool isSelected,
+            bool isInvalid,
+            bool isConnectSource,
+            bool isValidConnectTarget,
+            bool isInvalidConnectTarget,
+            bool isHoveredConnectTarget,
+            bool isHoveredInvalidTarget)
         {
             SetNodeBorderColor(node, isSelected, isInvalid, isConnectSource);
             SetWarningBadgeVisibility(node, isInvalid);
-            SetPortState(node, isSelected, isConnectSource);
+            SetPortState(
+                node,
+                isSelected,
+                isConnectSource,
+                isValidConnectTarget,
+                isInvalidConnectTarget,
+                isHoveredConnectTarget,
+                isHoveredInvalidTarget);
         }
 
         public static Vector2 GetInputPortCenter(VisualElement node)
@@ -177,6 +179,49 @@ namespace Editor.DialogueGraph
                 return false;
 
             return element.name == InputPortElementName || element.name == OutputPortElementName;
+        }
+
+        public static bool IsInputPortElement(VisualElement element)
+        {
+            return element != null && element.name == InputPortElementName;
+        }
+
+        public static bool TryGetRowIdFromPort(VisualElement element, out int rowId)
+        {
+            rowId = -1;
+
+            if (element == null || !IsPortElement(element))
+                return false;
+
+            if (element.userData is int portRowId)
+            {
+                rowId = portRowId;
+                return true;
+            }
+
+            return false;
+        }
+
+        public static VisualElement FindPortElementInHierarchy(VisualElement element, bool inputOnly)
+        {
+            VisualElement current = element;
+
+            while (current != null)
+            {
+                if (inputOnly)
+                {
+                    if (IsInputPortElement(current))
+                        return current;
+                }
+                else if (IsPortElement(current))
+                {
+                    return current;
+                }
+
+                current = current.parent;
+            }
+
+            return null;
         }
 
         private static VisualElement CreatePort(string name, Color color, StyleLength left, StyleLength right)
@@ -223,10 +268,73 @@ namespace Editor.DialogueGraph
                 : new Vector2(nodeRect.xMax, nodeRect.center.y);
         }
 
-        private static void SetPortState(VisualElement node, bool isSelected, bool isConnectSource)
+        private static void SetPortState(
+            VisualElement node,
+            bool isSelected,
+            bool isConnectSource,
+            bool isValidConnectTarget,
+            bool isInvalidConnectTarget,
+            bool isHoveredConnectTarget,
+            bool isHoveredInvalidTarget)
         {
-            SetPortBorder(node.Q<VisualElement>(InputPortElementName), isSelected ? 3f : 2f, isSelected ? new Color(1f, 0.95f, 0.5f) : new Color(0.08f, 0.08f, 0.08f));
-            SetPortBorder(node.Q<VisualElement>(OutputPortElementName), isConnectSource ? 3f : 2f, isConnectSource ? new Color(1f, 0.95f, 0.5f) : new Color(0.08f, 0.08f, 0.08f));
+            VisualElement inputPort = node.Q<VisualElement>(InputPortElementName);
+            VisualElement outputPort = node.Q<VisualElement>(OutputPortElementName);
+
+            Color defaultBorder = new Color(0.08f, 0.08f, 0.08f);
+            Color selectedBorder = new Color(1f, 0.95f, 0.5f);
+            Color validTargetBorder = new Color(0.62f, 1f, 0.74f);
+            Color invalidTargetBorder = new Color(0.92f, 0.42f, 0.42f);
+            Color hoveredValidBorder = new Color(1f, 0.95f, 0.5f);
+            Color hoveredInvalidBorder = new Color(1f, 0.35f, 0.35f);
+
+            Color defaultInputFill = new Color(0.64f, 0.78f, 1f);
+            Color validInputFill = new Color(0.45f, 0.9f, 0.62f);
+            Color invalidInputFill = new Color(0.78f, 0.38f, 0.38f);
+            Color hoveredValidInputFill = new Color(1f, 0.86f, 0.38f);
+            Color hoveredInvalidInputFill = new Color(0.95f, 0.32f, 0.32f);
+            Color defaultOutputFill = new Color(1f, 0.78f, 0.35f);
+
+            float inputBorderWidth = 2f;
+            Color inputBorderColor = defaultBorder;
+            Color inputFillColor = defaultInputFill;
+
+            if (isHoveredInvalidTarget)
+            {
+                inputBorderWidth = 3f;
+                inputBorderColor = hoveredInvalidBorder;
+                inputFillColor = hoveredInvalidInputFill;
+            }
+            else if (isHoveredConnectTarget)
+            {
+                inputBorderWidth = 3f;
+                inputBorderColor = hoveredValidBorder;
+                inputFillColor = hoveredValidInputFill;
+            }
+            else if (isValidConnectTarget)
+            {
+                inputBorderWidth = 3f;
+                inputBorderColor = validTargetBorder;
+                inputFillColor = validInputFill;
+            }
+            else if (isInvalidConnectTarget)
+            {
+                inputBorderWidth = 3f;
+                inputBorderColor = invalidTargetBorder;
+                inputFillColor = invalidInputFill;
+            }
+            else if (isSelected)
+            {
+                inputBorderWidth = 3f;
+                inputBorderColor = selectedBorder;
+            }
+
+            SetPortBorder(inputPort, inputBorderWidth, inputBorderColor);
+            if (inputPort != null)
+                inputPort.style.backgroundColor = inputFillColor;
+
+            SetPortBorder(outputPort, isConnectSource ? 3f : 2f, isConnectSource ? selectedBorder : defaultBorder);
+            if (outputPort != null)
+                outputPort.style.backgroundColor = defaultOutputFill;
         }
 
         private static void SetPortBorder(VisualElement port, float borderWidth, Color borderColor)
