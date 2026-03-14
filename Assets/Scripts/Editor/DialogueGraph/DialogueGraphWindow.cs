@@ -10,7 +10,7 @@ namespace Editor.DialogueGraph
 {
     public class DialogueGraphWindow : EditorWindow
     {
-         public const int StartNodeRowId = -1000;
+        public const int StartNodeRowId = -1000;
 
         private const float NodeWidth = 260f;
         private const float NodeMinHeight = 110f;
@@ -84,58 +84,98 @@ namespace Editor.DialogueGraph
             rootVisualElement.style.flexGrow = 1;
             rootVisualElement.style.backgroundColor = new Color(0.11f, 0.11f, 0.11f);
 
-            VisualElement rootContainer = new VisualElement();
-            rootContainer.style.flexGrow = 1;
-            rootContainer.style.flexDirection = FlexDirection.Column;
+            VisualElement rootContainer = new()
+            {
+                style =
+                {
+                    flexGrow = 1,
+                    flexDirection = FlexDirection.Column
+                }
+            };
 
             VisualElement toolbar = BuildToolbar();
 
-            _tableStatusLabel = new Label("No DialogueTable selected.");
-            _tableStatusLabel.style.paddingLeft = 10;
-            _tableStatusLabel.style.paddingRight = 10;
-            _tableStatusLabel.style.paddingTop = 6;
-            _tableStatusLabel.style.paddingBottom = 6;
-            _tableStatusLabel.style.color = new Color(0.78f, 0.78f, 0.78f);
+            _tableStatusLabel = new Label("No DialogueTable selected.")
+            {
+                style =
+                {
+                    paddingLeft = 10,
+                    paddingRight = 10,
+                    paddingTop = 6,
+                    paddingBottom = 6,
+                    color = new Color(0.78f, 0.78f, 0.78f)
+                }
+            };
 
-            VisualElement mainArea = new VisualElement();
-            mainArea.style.flexGrow = 1;
-            mainArea.style.flexDirection = FlexDirection.Column;
+            VisualElement mainArea = new()
+            {
+                style =
+                {
+                    flexGrow = 1,
+                    flexDirection = FlexDirection.Column
+                }
+            };
 
-            VisualElement contentRow = new VisualElement();
-            contentRow.style.flexGrow = 1;
-            contentRow.style.flexDirection = FlexDirection.Row;
+            VisualElement contentRow = new()
+            {
+                style =
+                {
+                    flexGrow = 1,
+                    flexDirection = FlexDirection.Row
+                }
+            };
 
-            _graphViewport = new VisualElement();
-            _graphViewport.style.flexGrow = 1;
-            _graphViewport.style.backgroundColor = new Color(0.12f, 0.12f, 0.12f);
-            _graphViewport.style.overflow = Overflow.Hidden;
+            _graphViewport = new VisualElement
+            {
+                style =
+                {
+                    flexGrow = 1,
+                    backgroundColor = new Color(0.12f, 0.12f, 0.12f),
+                    overflow = Overflow.Hidden
+                }
+            };
             _graphViewport.RegisterCallback<WheelEvent>(OnGraphWheel, TrickleDown.TrickleDown);
             _graphViewport.AddManipulator(new DialogueGraphPanManipulator(this));
 
-            _gridBackground = new VisualElement();
-            _gridBackground.style.position = Position.Absolute;
-            _gridBackground.style.left = 0f;
-            _gridBackground.style.top = 0f;
-            _gridBackground.style.right = 0f;
-            _gridBackground.style.bottom = 0f;
-            _gridBackground.pickingMode = PickingMode.Ignore;
+            _gridBackground = new VisualElement
+            {
+                style =
+                {
+                    position = Position.Absolute,
+                    left = 0f,
+                    top = 0f,
+                    right = 0f,
+                    bottom = 0f
+                },
+                pickingMode = PickingMode.Ignore
+            };
             _gridBackground.generateVisualContent += OnGridBackgroundGenerateVisualContent;
 
-            _graphContentRoot = new VisualElement();
-            _graphContentRoot.style.position = Position.Absolute;
-            _graphContentRoot.style.left = 0f;
-            _graphContentRoot.style.top = 0f;
-            _graphContentRoot.style.width = VirtualCanvasSize;
-            _graphContentRoot.style.height = VirtualCanvasSize;
-            _graphContentRoot.pickingMode = PickingMode.Ignore;
+            _graphContentRoot = new VisualElement
+            {
+                style =
+                {
+                    position = Position.Absolute,
+                    left = 0f,
+                    top = 0f,
+                    width = VirtualCanvasSize,
+                    height = VirtualCanvasSize
+                },
+                pickingMode = PickingMode.Ignore
+            };
 
-            _graphCanvas = new VisualElement();
-            _graphCanvas.style.position = Position.Absolute;
-            _graphCanvas.style.left = 0f;
-            _graphCanvas.style.top = 0f;
-            _graphCanvas.style.width = VirtualCanvasSize;
-            _graphCanvas.style.height = VirtualCanvasSize;
-            _graphCanvas.style.backgroundColor = Color.clear;
+            _graphCanvas = new VisualElement
+            {
+                style =
+                {
+                    position = Position.Absolute,
+                    left = 0f,
+                    top = 0f,
+                    width = VirtualCanvasSize,
+                    height = VirtualCanvasSize,
+                    backgroundColor = Color.clear
+                }
+            };
             _graphCanvas.generateVisualContent += OnGraphCanvasGenerateVisualContent;
             _graphCanvas.RegisterCallback<PointerDownEvent>(OnCanvasPointerDown);
             _graphCanvas.AddManipulator(new ContextualMenuManipulator(BuildGraphCanvasContextMenu));
@@ -171,30 +211,47 @@ namespace Editor.DialogueGraph
 
         private VisualElement BuildToolbar()
         {
-            VisualElement toolbar = new VisualElement();
-            toolbar.style.flexDirection = FlexDirection.Row;
-            toolbar.style.alignItems = Align.Center;
-            toolbar.style.paddingLeft = 10;
-            toolbar.style.paddingRight = 10;
-            toolbar.style.paddingTop = 8f;
-            toolbar.style.paddingBottom = 8f;
-            toolbar.style.backgroundColor = new Color(0.15f, 0.15f, 0.15f);
+            VisualElement toolbar = new()
+            {
+                style =
+                {
+                    flexDirection = FlexDirection.Row,
+                    alignItems = Align.Center,
+                    paddingLeft = 10,
+                    paddingRight = 10,
+                    paddingTop = 8f,
+                    paddingBottom = 8f,
+                    backgroundColor = new Color(0.15f, 0.15f, 0.15f)
+                }
+            };
 
-            Label tableLabel = new Label("Dialogue Table");
-            tableLabel.style.minWidth = 100f;
-            tableLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
-            tableLabel.style.color = new Color(0.92f, 0.92f, 0.92f);
+            Label tableLabel = new("Dialogue Table")
+            {
+                style =
+                {
+                    minWidth = 100f,
+                    unityFontStyleAndWeight = FontStyle.Bold,
+                    color = new Color(0.92f, 0.92f, 0.92f)
+                }
+            };
 
-            _tableDropdown = new PopupField<string>(_dialogueTableDropdownChoices, 0);
-            _tableDropdown.style.flexGrow = 1;
-            _tableDropdown.style.marginLeft = 8f;
+            _tableDropdown = new PopupField<string>(_dialogueTableDropdownChoices, 0)
+            {
+                style =
+                {
+                    flexGrow = 1,
+                    marginLeft = 8f
+                }
+            };
+            
             _tableDropdown.RegisterValueChangedCallback(evt =>
             {
                 if (evt.newValue == NoDialogueTableOption)
                 {
                     _selectedTable = null;
                 }
-                else if (_dialogueTablesByDropdownLabel.TryGetValue(evt.newValue, out DialogueTable selectedDialogueTable))
+                else if (_dialogueTablesByDropdownLabel.TryGetValue(evt.newValue,
+                             out DialogueTable selectedDialogueTable))
                 {
                     _selectedTable = selectedDialogueTable;
                 }
@@ -204,132 +261,75 @@ namespace Editor.DialogueGraph
                 RefreshAllViews();
             });
 
-            Button useSelectionButton = new Button(() =>
+            ToolbarToggle gridSnapToggle = new()
             {
-                _selectedTable = Selection.activeObject as DialogueTable;
-                RefreshDialogueTableDropdownChoices();
-                SyncDialogueTableDropdownSelection();
-                CancelConnectMode();
-                ClearSelection();
-                RefreshAllViews();
-            })
-            {
-                text = "Use Selected"
+                text = "Snap",
+                value = _isGridSnapEnabled,
+                style =
+                {
+                    marginLeft = 8f
+                },
+                tooltip = "Snap node movement to minor grid increments. Hold Shift to bypass while dragging."
             };
-            useSelectionButton.style.marginLeft = 8f;
+            gridSnapToggle.RegisterValueChangedCallback(evt => { _isGridSnapEnabled = evt.newValue; });
 
-            ToolbarToggle gridSnapToggle = new ToolbarToggle
+            Button zoomOutButton = new(() => AdjustZoom(-ZoomStep))
             {
-                text = "Snap"
+                text = "−",
+                style =
+                {
+                    marginLeft = 8f
+                },
+                tooltip = "Zoom out"
             };
-            gridSnapToggle.value = _isGridSnapEnabled;
-            gridSnapToggle.style.marginLeft = 8f;
-            gridSnapToggle.tooltip = "Snap node movement to minor grid increments. Hold Shift to bypass while dragging.";
-            gridSnapToggle.RegisterValueChangedCallback(evt =>
-            {
-                _isGridSnapEnabled = evt.newValue;
-            });
 
-            Button zoomOutButton = new Button(() => AdjustZoom(-ZoomStep))
+            _zoomLabel = new Label("100%")
             {
-                text = "−"
+                style =
+                {
+                    minWidth = 48f,
+                    unityTextAlign = TextAnchor.MiddleCenter,
+                    color = new Color(0.9f, 0.9f, 0.9f),
+                    marginLeft = 4f,
+                    marginRight = 4f
+                }
             };
-            zoomOutButton.style.marginLeft = 8f;
-            zoomOutButton.tooltip = "Zoom out";
 
-            _zoomLabel = new Label("100%");
-            _zoomLabel.style.minWidth = 48f;
-            _zoomLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
-            _zoomLabel.style.color = new Color(0.9f, 0.9f, 0.9f);
-            _zoomLabel.style.marginLeft = 4f;
-            _zoomLabel.style.marginRight = 4f;
-
-            Button zoomInButton = new Button(() => AdjustZoom(ZoomStep))
+            Button zoomInButton = new(() => AdjustZoom(ZoomStep))
             {
-                text = "+"
+                text = "+",
+                tooltip = "Zoom in"
             };
-            zoomInButton.tooltip = "Zoom in";
 
-            Button addLineButton = new Button(() => CreateRow(DialogueRowKind.Line))
+            Button autoLayoutButton = new(AutoLayout)
             {
-                text = "Add Line"
+                text = "Auto Layout",
+                style =
+                {
+                    marginLeft = 8f
+                }
             };
-            addLineButton.style.marginLeft = 8f;
 
-            Button addChoicePromptButton = new Button(() => CreateRow(DialogueRowKind.ChoicePrompt))
-            {
-                text = "Add Choice Prompt"
-            };
-            addChoicePromptButton.style.marginLeft = 8f;
-
-            Button addChoiceResponseButton = new Button(() => CreateRow(DialogueRowKind.ChoiceResponse))
-            {
-                text = "Add Choice Response"
-            };
-            addChoiceResponseButton.style.marginLeft = 8f;
-
-            Button connectSelectedButton = new Button(BeginConnectSelected)
-            {
-                text = "Connect Selected"
-            };
-            connectSelectedButton.style.marginLeft = 8f;
-
-            Button clearLinksSelectedButton = new Button(ClearLinksSelected)
-            {
-                text = "Clear Links Selected"
-            };
-            clearLinksSelectedButton.style.marginLeft = 8f;
-
-            Button autoLayoutButton = new Button(AutoLayout)
-            {
-                text = "Auto Layout"
-            };
-            autoLayoutButton.style.marginLeft = 8f;
-
-            Button duplicateSelectedButton = new Button(DuplicateSelectedRow)
-            {
-                text = "Duplicate Selected"
-            };
-            duplicateSelectedButton.style.marginLeft = 8f;
-
-            Button duplicateSelectedResetLinksButton = new Button(DuplicateSelectedRowResetLinks)
-            {
-                text = "Duplicate Selected (Reset Links)"
-            };
-            duplicateSelectedResetLinksButton.style.marginLeft = 8f;
-
-            Button deleteSelectedButton = new Button(DeleteSelectedRow)
-            {
-                text = "Delete Selected"
-            };
-            deleteSelectedButton.style.marginLeft = 8f;
-
-            Button refreshButton = new Button(() =>
+            Button refreshButton = new(() =>
             {
                 RefreshDialogueTableDropdownChoices();
                 RefreshAllViews();
             })
             {
-                text = "Refresh"
+                text = "Refresh",
+                style =
+                {
+                    marginLeft = 8f
+                }
             };
-            refreshButton.style.marginLeft = 8f;
 
             toolbar.Add(tableLabel);
             toolbar.Add(_tableDropdown);
-            toolbar.Add(useSelectionButton);
             toolbar.Add(gridSnapToggle);
             toolbar.Add(zoomOutButton);
             toolbar.Add(_zoomLabel);
             toolbar.Add(zoomInButton);
-            toolbar.Add(addLineButton);
-            toolbar.Add(addChoicePromptButton);
-            toolbar.Add(addChoiceResponseButton);
-            toolbar.Add(connectSelectedButton);
-            toolbar.Add(clearLinksSelectedButton);
             toolbar.Add(autoLayoutButton);
-            toolbar.Add(duplicateSelectedButton);
-            toolbar.Add(duplicateSelectedResetLinksButton);
-            toolbar.Add(deleteSelectedButton);
             toolbar.Add(refreshButton);
 
             return toolbar;
@@ -341,12 +341,16 @@ namespace Editor.DialogueGraph
             _dialogueTableDropdownChoices.Clear();
             _dialogueTableDropdownChoices.Add(NoDialogueTableOption);
 
+            List<(string label, DialogueTable table)> entries = new();
+
             string[] guids = AssetDatabase.FindAssets("t:DialogueTable");
-            for (int i = 0; i < guids.Length; i++)
+            
+            foreach (string guid in guids)
             {
-                string path = AssetDatabase.GUIDToAssetPath(guids[i]);
+                string path = AssetDatabase.GUIDToAssetPath(guid);
                 DialogueTable table = AssetDatabase.LoadAssetAtPath<DialogueTable>(path);
-                if (table == null)
+            
+                if (!table)
                     continue;
 
                 string tableName = string.IsNullOrWhiteSpace(table.TableName)
@@ -354,6 +358,15 @@ namespace Editor.DialogueGraph
                     : table.TableName.Trim();
 
                 string label = $"{table.name} ({tableName})";
+                entries.Add((label, table));
+            }
+
+            entries.Sort((a, b) => string.Compare(a.label, b.label, System.StringComparison.OrdinalIgnoreCase));
+
+            for (int i = 0; i < entries.Count; i++)
+            {
+                string label = entries[i].label;
+                DialogueTable table = entries[i].table;
 
                 if (_dialogueTablesByDropdownLabel.ContainsKey(label))
                 {
@@ -385,7 +398,7 @@ namespace Editor.DialogueGraph
             if (_tableDropdown == null)
                 return;
 
-            if (_selectedTable == null)
+            if (!_selectedTable)
             {
                 _tableDropdown.SetValueWithoutNotify(NoDialogueTableOption);
                 return;
@@ -403,13 +416,13 @@ namespace Editor.DialogueGraph
             _tableDropdown.SetValueWithoutNotify(NoDialogueTableOption);
         }
 
-        public Vector2 SnapToGrid(Vector2 position)
+        public Vector2 SnapToGrid(Vector2 pos)
         {
             if (!_isGridSnapEnabled)
-                return position;
+                return pos;
 
-            float x = Mathf.Round(position.x / MinorGridSpacing) * MinorGridSpacing;
-            float y = Mathf.Round(position.y / MinorGridSpacing) * MinorGridSpacing;
+            float x = Mathf.Round(pos.x / MinorGridSpacing) * MinorGridSpacing;
+            float y = Mathf.Round(pos.y / MinorGridSpacing) * MinorGridSpacing;
             return new Vector2(x, y);
         }
 
@@ -434,7 +447,7 @@ namespace Editor.DialogueGraph
         {
             float clampedZoom = Mathf.Clamp(zoom, MinZoom, MaxZoom);
 
-            if (_selectedTable != null)
+            if (_selectedTable)
             {
                 _selectedTable.GraphZoomScale = clampedZoom;
                 EditorUtility.SetDirty(_selectedTable);
@@ -548,13 +561,13 @@ namespace Editor.DialogueGraph
                 if (row == null)
                     continue;
 
-                Vector2 position = _selectedTable.GetNodePosition(row.RowId, GetDefaultPosition(i));
+                Vector2 nodePosition = _selectedTable.GetNodePosition(row.RowId, GetDefaultPosition(i));
                 _validationMessagesByRowId.TryGetValue(row.RowId, out List<string> rowValidationMessages);
 
                 VisualElement node = DialogueGraphNodeViewFactory.CreateNode(
                     this,
                     row,
-                    position,
+                    nodePosition,
                     i,
                     NodeWidth,
                     NodeMinHeight,
@@ -616,7 +629,7 @@ namespace Editor.DialogueGraph
 
         public void UpdateNodeDialogueText(int rowId, int rowIndex, string newText)
         {
-            if (_selectedTable == null || rowId == StartNodeRowId)
+            if (!_selectedTable || rowId == StartNodeRowId)
                 return;
 
             int resolvedRowIndex = DialogueGraphRowOperations.FindRowIndexById(_selectedTable, rowId);
@@ -709,14 +722,15 @@ namespace Editor.DialogueGraph
             UpdateStatusLabel();
         }
 
-        public void SelectRowById(int rowId)
+        private void SelectRowById(int rowId)
         {
-            if (_selectedTable == null)
+            if (!_selectedTable)
                 return;
 
             if (rowId == StartNodeRowId)
             {
                 SelectRow(StartNodeRowId, -1);
+                
                 if (_nodeViewsByRowId.TryGetValue(StartNodeRowId, out VisualElement startNode))
                 {
                     startNode.BringToFront();
@@ -741,7 +755,7 @@ namespace Editor.DialogueGraph
 
         private void BeginConnectSelected()
         {
-            if (_selectedTable == null)
+            if (!_selectedTable)
             {
                 EditorUtility.DisplayDialog("Dialogue Graph", "Select a DialogueTable first.", "OK");
                 return;
@@ -781,7 +795,7 @@ namespace Editor.DialogueGraph
         private void CompleteConnectionTo(int targetRowId, int targetRowIndex)
         {
             if (!_isConnectModeActive || _connectSourceRowId < 0 && _connectSourceRowId != StartNodeRowId ||
-                _selectedTable == null)
+                !_selectedTable)
                 return;
 
             int sourceRowId = _connectSourceRowId;
@@ -819,7 +833,7 @@ namespace Editor.DialogueGraph
 
         private void ClearLinksSelected()
         {
-            if (_selectedTable == null)
+            if (!_selectedTable)
             {
                 EditorUtility.DisplayDialog("Dialogue Graph", "Select a DialogueTable first.", "OK");
                 return;
@@ -890,12 +904,12 @@ namespace Editor.DialogueGraph
             Vector2 updatedPan = pan;
 
             if (transformedRect.xMin - FramePadding < 0f)
-                updatedPan.x += - (transformedRect.xMin - FramePadding);
+                updatedPan.x += -(transformedRect.xMin - FramePadding);
             else if (transformedRect.xMax + FramePadding > viewportRect.width)
                 updatedPan.x -= transformedRect.xMax + FramePadding - viewportRect.width;
 
             if (transformedRect.yMin - FramePadding < 0f)
-                updatedPan.y += - (transformedRect.yMin - FramePadding);
+                updatedPan.y += -(transformedRect.yMin - FramePadding);
             else if (transformedRect.yMax + FramePadding > viewportRect.height)
                 updatedPan.y -= transformedRect.yMax + FramePadding - viewportRect.height;
 
@@ -904,7 +918,7 @@ namespace Editor.DialogueGraph
 
         private void FrameAllNodes()
         {
-            if (_graphViewport == null || _selectedTable == null || _nodeViewsByRowId.Count == 0)
+            if (_graphViewport == null || !_selectedTable || _nodeViewsByRowId.Count == 0)
                 return;
 
             bool hasBounds = false;
@@ -957,24 +971,23 @@ namespace Editor.DialogueGraph
 
         private void UpdateNodeSelectionVisuals()
         {
-            foreach (KeyValuePair<int, VisualElement> pair in _nodeViewsByRowId)
+            foreach ((int key, VisualElement value) in _nodeViewsByRowId)
             {
-                int rowId = pair.Key;
-                bool isSelected = rowId == _selectedRowId;
-                bool isInvalid = rowId == StartNodeRowId
+                bool isSelected = key == _selectedRowId;
+                bool isInvalid = key == StartNodeRowId
                     ? _isStartNodeInvalid
-                    : rowId >= 0 && _invalidRowIds.Contains(rowId);
-                bool isConnectSource = _isConnectModeActive && rowId == _connectSourceRowId;
-                bool isValidConnectTarget = IsValidConnectTarget(rowId);
+                    : key >= 0 && _invalidRowIds.Contains(key);
+                bool isConnectSource = _isConnectModeActive && key == _connectSourceRowId;
+                bool isValidConnectTarget = IsValidConnectTarget(key);
                 bool isInvalidConnectTarget = _isConnectModeActive &&
                                               !isConnectSource &&
                                               !isValidConnectTarget &&
-                                              rowId >= 0;
-                bool isHoveredConnectTarget = rowId == _hoveredConnectTargetRowId && _hoveredConnectTargetValid;
-                bool isHoveredInvalidTarget = rowId == _hoveredConnectTargetRowId && !_hoveredConnectTargetValid;
+                                              key >= 0;
+                bool isHoveredConnectTarget = key == _hoveredConnectTargetRowId && _hoveredConnectTargetValid;
+                bool isHoveredInvalidTarget = key == _hoveredConnectTargetRowId && !_hoveredConnectTargetValid;
 
                 DialogueGraphNodeViewFactory.SetNodeState(
-                    pair.Value,
+                    value,
                     isSelected,
                     isInvalid,
                     isConnectSource,
@@ -990,10 +1003,10 @@ namespace Editor.DialogueGraph
             _hoveredConnectTargetRowId = -1;
             _hoveredConnectTargetValid = false;
 
-            if (_selectedTable == null || !_isConnectModeActive)
+            if (!_selectedTable || !_isConnectModeActive)
                 return;
 
-            VisualElement pickedElement = _graphCanvas.panel?.Pick(worldPointerPosition) as VisualElement;
+            VisualElement pickedElement = _graphCanvas.panel?.Pick(worldPointerPosition);
             VisualElement inputPort =
                 DialogueGraphNodeViewFactory.FindPortElementInHierarchy(pickedElement, inputOnly: true);
 
@@ -1009,7 +1022,7 @@ namespace Editor.DialogueGraph
 
         private bool IsValidConnectTarget(int targetRowId)
         {
-            if (!_isConnectModeActive || _selectedTable == null ||
+            if (!_isConnectModeActive || !_selectedTable ||
                 _connectSourceRowId < 0 && _connectSourceRowId != StartNodeRowId)
                 return false;
 
@@ -1046,7 +1059,7 @@ namespace Editor.DialogueGraph
 
         private void AutoLayout()
         {
-            if (_selectedTable == null)
+            if (!_selectedTable)
             {
                 EditorUtility.DisplayDialog("Dialogue Graph", "Select a DialogueTable first.", "OK");
                 return;
@@ -1066,13 +1079,13 @@ namespace Editor.DialogueGraph
 
         private void CreateRow(DialogueRowKind rowKind)
         {
-            if (_selectedTable == null)
+            if (!_selectedTable)
             {
                 EditorUtility.DisplayDialog("Dialogue Graph", "Select a DialogueTable first.", "OK");
                 return;
             }
 
-            Vector2 position = DialogueGraphRowOperations.GetNewRowPosition(
+            Vector2 newRowPosition = DialogueGraphRowOperations.GetNewRowPosition(
                 _selectedRowId >= 0 ? _selectedRowId : _selectedTable.StartRowId,
                 _nodeViewsByRowId,
                 _selectedTable.RowCount,
@@ -1080,7 +1093,7 @@ namespace Editor.DialogueGraph
                 DefaultStartY,
                 DefaultVerticalSpacing);
 
-            int newRowId = DialogueGraphRowOperations.CreateRow(_selectedTable, rowKind, _selectedRowId, position);
+            int newRowId = DialogueGraphRowOperations.CreateRow(_selectedTable, rowKind, _selectedRowId, newRowPosition);
             if (newRowId < 0)
                 return;
 
@@ -1096,7 +1109,7 @@ namespace Editor.DialogueGraph
 
         private void DuplicateSelectedRow()
         {
-            if (_selectedTable == null)
+            if (!_selectedTable)
             {
                 EditorUtility.DisplayDialog("Dialogue Graph", "Select a DialogueTable first.", "OK");
                 return;
@@ -1108,7 +1121,7 @@ namespace Editor.DialogueGraph
                 return;
             }
 
-            Vector2 position = DialogueGraphRowOperations.GetNewRowPosition(
+            Vector2 newRowPosition = DialogueGraphRowOperations.GetNewRowPosition(
                 _selectedRowId,
                 _nodeViewsByRowId,
                 _selectedTable.RowCount,
@@ -1116,7 +1129,7 @@ namespace Editor.DialogueGraph
                 DefaultStartY,
                 DefaultVerticalSpacing);
 
-            int newRowId = DialogueGraphRowOperations.DuplicateRow(_selectedTable, _selectedRowId, position);
+            int newRowId = DialogueGraphRowOperations.DuplicateRow(_selectedTable, _selectedRowId, newRowPosition);
             if (newRowId < 0)
                 return;
 
@@ -1132,7 +1145,7 @@ namespace Editor.DialogueGraph
 
         private void DuplicateSelectedRowResetLinks()
         {
-            if (_selectedTable == null)
+            if (!_selectedTable)
             {
                 EditorUtility.DisplayDialog("Dialogue Graph", "Select a DialogueTable first.", "OK");
                 return;
@@ -1144,7 +1157,7 @@ namespace Editor.DialogueGraph
                 return;
             }
 
-            Vector2 position = DialogueGraphRowOperations.GetNewRowPosition(
+            Vector2 newRowPosition = DialogueGraphRowOperations.GetNewRowPosition(
                 _selectedRowId,
                 _nodeViewsByRowId,
                 _selectedTable.RowCount,
@@ -1152,7 +1165,8 @@ namespace Editor.DialogueGraph
                 DefaultStartY,
                 DefaultVerticalSpacing);
 
-            int newRowId = DialogueGraphRowOperations.DuplicateRowResetLinks(_selectedTable, _selectedRowId, position);
+            int newRowId = DialogueGraphRowOperations.DuplicateRowResetLinks(_selectedTable, _selectedRowId, newRowPosition);
+            
             if (newRowId < 0)
                 return;
 
@@ -1168,7 +1182,7 @@ namespace Editor.DialogueGraph
 
         private void DeleteSelectedRow()
         {
-            if (_selectedTable == null)
+            if (!_selectedTable)
             {
                 EditorUtility.DisplayDialog("Dialogue Graph", "Select a DialogueTable first.", "OK");
                 return;
@@ -1197,24 +1211,24 @@ namespace Editor.DialogueGraph
 
         public void SaveNodePosition(int rowId, VisualElement node, bool snapToGrid = true)
         {
-            if (_selectedTable == null)
+            if (!_selectedTable)
                 return;
 
-            Vector2 position = new Vector2(node.resolvedStyle.left, node.resolvedStyle.top);
+            Vector2 nodePosition = new(node.resolvedStyle.left, node.resolvedStyle.top);
 
             if (snapToGrid)
-                position = SnapToGrid(position);
+                nodePosition = SnapToGrid(nodePosition);
 
-            node.style.left = position.x;
-            node.style.top = position.y;
+            node.style.left = nodePosition.x;
+            node.style.top = nodePosition.y;
 
             if (rowId == StartNodeRowId)
             {
-                _selectedTable.StartNodePosition = position;
+                _selectedTable.StartNodePosition = nodePosition;
             }
             else
             {
-                _selectedTable.SetNodePosition(rowId, position);
+                _selectedTable.SetNodePosition(rowId, nodePosition);
             }
 
             EditorUtility.SetDirty(_selectedTable);
@@ -1228,7 +1242,7 @@ namespace Editor.DialogueGraph
 
         private void BuildGraphCanvasContextMenu(ContextualMenuPopulateEvent evt)
         {
-            if (_graphCanvas == null || _selectedTable == null)
+            if (_graphCanvas == null || !_selectedTable)
             {
                 DialogueGraphContextMenus.BuildCanvasMenu(this, evt);
                 return;
@@ -1248,8 +1262,7 @@ namespace Editor.DialogueGraph
 
                 evt.menu.AppendAction(
                     label,
-                    _ => DeleteEdge(edge),
-                    DropdownMenuAction.Status.Normal);
+                    _ => DeleteEdge(edge));
 
                 return;
             }
@@ -1259,7 +1272,7 @@ namespace Editor.DialogueGraph
 
         private void DeleteEdge(DialogueGraphEdgeRenderer.EdgeReference edge)
         {
-            if (_selectedTable == null)
+            if (!_selectedTable)
                 return;
 
             CancelConnectMode();
@@ -1278,34 +1291,6 @@ namespace Editor.DialogueGraph
 
             RefreshAllViews();
         }
-
-        private bool DeleteEdgeAtCanvasPosition(Vector2 canvasPosition)
-        {
-            if (_selectedTable == null)
-                return false;
-
-            if (!DialogueGraphEdgeRenderer.TryFindEdgeAtPosition(_selectedTable, _nodeViewsByRowId, canvasPosition,
-                    out DialogueGraphEdgeRenderer.EdgeReference edge))
-                return false;
-
-            if (edge.IsStartEdge)
-            {
-                Undo.RecordObject(_selectedTable, "Delete Start Connection");
-                _selectedTable.StartRowId = -1;
-                EditorUtility.SetDirty(_selectedTable);
-                RefreshAllViews();
-                return true;
-            }
-
-            bool removed =
-                DialogueGraphRowOperations.RemoveConnection(_selectedTable, edge.SourceRowId, edge.TargetRowId);
-            if (!removed)
-                return false;
-
-            RefreshAllViews();
-            return true;
-        }
-
 
         private void OnCanvasPointerDown(PointerDownEvent evt)
         {
@@ -1347,7 +1332,7 @@ namespace Editor.DialogueGraph
 
         private void DrawGrid(MeshGenerationContext context)
         {
-            if (_graphViewport == null || _selectedTable == null)
+            if (_graphViewport == null || !_selectedTable)
                 return;
 
             Rect viewportRect = _graphViewport.contentRect;
@@ -1361,7 +1346,6 @@ namespace Editor.DialogueGraph
 
             DrawInfiniteGridLines(painter, viewportRect, MinorGridSpacing, zoom, pan, MinorGridColor, 1f);
             DrawInfiniteGridLines(painter, viewportRect, MajorGridSpacing, zoom, pan, MajorGridColor, 1.25f);
-            //DrawViewportCenterCrossLines(painter, viewportRect);
         }
 
         private static void DrawInfiniteGridLines(
@@ -1432,14 +1416,19 @@ namespace Editor.DialogueGraph
 
         private static Label BuildCenteredMessage(string text)
         {
-            Label label = new Label(text);
-            label.style.position = Position.Absolute;
-            label.style.left = 0f;
-            label.style.right = 0f;
-            label.style.top = 120f;
-            label.style.unityTextAlign = TextAnchor.MiddleCenter;
-            label.style.color = new Color(0.78f, 0.78f, 0.78f);
-            label.style.fontSize = 14;
+            Label label = new(text)
+            {
+                style =
+                {
+                    position = Position.Absolute,
+                    left = 0f,
+                    right = 0f,
+                    top = 120f,
+                    unityTextAlign = TextAnchor.MiddleCenter,
+                    color = new Color(0.78f, 0.78f, 0.78f),
+                    fontSize = 14
+                }
+            };
             return label;
         }
 
