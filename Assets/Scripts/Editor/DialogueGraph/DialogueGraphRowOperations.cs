@@ -152,6 +152,58 @@ namespace Editor.DialogueGraph
             return true;
         }
 
+        public static bool RemoveConnection(DialogueTable table, int sourceRowId, int targetRowId)
+        {
+            if (table == null || sourceRowId < 0 || targetRowId < 0)
+                return false;
+
+            int sourceRowIndex = FindRowIndexById(table, sourceRowId);
+            if (sourceRowIndex < 0)
+                return false;
+
+            Undo.RecordObject(table, $"Remove Dialogue Connection {sourceRowId} -> {targetRowId}");
+
+            SerializedObject tableObject = new SerializedObject(table);
+            SerializedProperty rowsProperty = tableObject.FindProperty("rows");
+            SerializedProperty sourceRowProperty = rowsProperty.GetArrayElementAtIndex(sourceRowIndex);
+
+            DialogueRowKind sourceKind =
+                (DialogueRowKind)sourceRowProperty.FindPropertyRelative("rowKind").enumValueIndex;
+
+            bool changed = false;
+
+            if (sourceKind == DialogueRowKind.ChoicePrompt)
+            {
+                SerializedProperty choiceRowIdsProperty = sourceRowProperty.FindPropertyRelative("choiceRowIds");
+
+                for (int i = choiceRowIdsProperty.arraySize - 1; i >= 0; i--)
+                {
+                    if (choiceRowIdsProperty.GetArrayElementAtIndex(i).intValue != targetRowId)
+                        continue;
+
+                    choiceRowIdsProperty.DeleteArrayElementAtIndex(i);
+                    changed = true;
+                }
+            }
+            else
+            {
+                SerializedProperty leadsToProperty = sourceRowProperty.FindPropertyRelative("leadsTo");
+                if (leadsToProperty.intValue == targetRowId)
+                {
+                    leadsToProperty.intValue = -1;
+                    changed = true;
+                }
+            }
+
+            if (!changed)
+                return false;
+
+            tableObject.ApplyModifiedProperties();
+            EditorUtility.SetDirty(table);
+            AssetDatabase.SaveAssets();
+            return true;
+        }
+
         public static bool ClearOutgoingLinks(DialogueTable table, int rowId)
         {
             if (table == null || rowId < 0)

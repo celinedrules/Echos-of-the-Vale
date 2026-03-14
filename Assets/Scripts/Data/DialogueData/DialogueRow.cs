@@ -47,10 +47,18 @@ namespace Data.DialogueData
         public int RowId => rowId;
         public DialogueRowKind RowKind => rowKind;
         public DialogueSpeakerData Speaker => speaker;
-        public string[] TextLines => textLines;
+        public string[] TextLines
+        {
+            get => textLines;
+            set => textLines = value;
+        }
         public Sprite PortraitOverride => portraitOverride;
         public DialogueRowAction RowAction => rowAction;
-        public string PlayerChoiceAnswer => playerChoiceAnswer;
+        public string PlayerChoiceAnswer
+        {
+            get => playerChoiceAnswer;
+            set => playerChoiceAnswer = value;
+        }
         public int[] ChoiceRowIds => choiceRowIds;
         public AudioClip AudioClip => audioClip;
         public float AudioStartTime => audioStartTime;

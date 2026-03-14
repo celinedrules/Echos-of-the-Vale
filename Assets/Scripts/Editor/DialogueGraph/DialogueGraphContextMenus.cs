@@ -68,6 +68,31 @@ namespace Editor.DialogueGraph
                     : DropdownMenuAction.Status.Disabled);
         }
 
+        public static void BuildStartNodeMenu(DialogueGraphWindow window, ContextualMenuPopulateEvent evt)
+        {
+            window.SelectRow(DialogueGraphWindow.StartNodeRowId, -1);
+
+            evt.menu.AppendAction("Connect Start",
+                _ => window.BeginConnectSelectedFromMenu(),
+                window.HasSelectedTable
+                    ? DropdownMenuAction.Status.Normal
+                    : DropdownMenuAction.Status.Disabled);
+
+            evt.menu.AppendAction("Clear Start Link",
+                _ => window.ClearLinksSelectedFromMenu(),
+                window.HasSelectedTable
+                    ? DropdownMenuAction.Status.Normal
+                    : DropdownMenuAction.Status.Disabled);
+
+            evt.menu.AppendSeparator();
+
+            evt.menu.AppendAction("Auto Layout",
+                _ => window.AutoLayoutFromMenu(),
+                window.HasSelectedTable
+                    ? DropdownMenuAction.Status.Normal
+                    : DropdownMenuAction.Status.Disabled);
+        }
+
         public static void BuildNodeMenu(DialogueGraphWindow window, ContextualMenuPopulateEvent evt, int rowId, int rowIndex)
         {
             window.SelectRow(rowId, rowIndex);

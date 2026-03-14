@@ -63,13 +63,41 @@ namespace Editor.DialogueGraph
                 return;
             }
 
-            List<string> messages = table.GetValidationMessages();
+            bool hasStartNodeIssue = DialogueGraphValidationUtility.HasStartNodeIssue(table);
+            string startNodeMessage = DialogueGraphValidationUtility.GetStartNodeValidationMessage(table);
 
-            if (messages == null || messages.Count == 0)
+            List<string> messages = table.GetValidationMessages();
+            bool hasRowMessages = messages != null && messages.Count > 0;
+
+            if (!hasStartNodeIssue && !hasRowMessages)
             {
                 _messagesScrollView.Add(BuildSuccessLabel("No validation issues found."));
                 return;
             }
+
+            if (hasStartNodeIssue && !string.IsNullOrWhiteSpace(startNodeMessage))
+            {
+                Button startMessageButton = new Button(() =>
+                {
+                    _selectRowById?.Invoke(DialogueGraphWindow.StartNodeRowId);
+                });
+
+                startMessageButton.text = $"• {startNodeMessage}";
+                startMessageButton.style.unityTextAlign = TextAnchor.MiddleLeft;
+                startMessageButton.style.whiteSpace = WhiteSpace.Normal;
+                startMessageButton.style.marginBottom = 4f;
+                startMessageButton.style.paddingTop = 6f;
+                startMessageButton.style.paddingBottom = 6f;
+                startMessageButton.style.paddingLeft = 8f;
+                startMessageButton.style.paddingRight = 8f;
+                startMessageButton.style.backgroundColor = new Color(0.23f, 0.18f, 0.18f);
+                startMessageButton.style.color = new Color(1f, 0.82f, 0.82f);
+
+                _messagesScrollView.Add(startMessageButton);
+            }
+
+            if (!hasRowMessages)
+                return;
 
             for (int i = 0; i < messages.Count; i++)
             {

@@ -12,6 +12,121 @@ namespace Editor.DialogueGraph
         private const string InputPortElementName = "dialogue-graph-input-port";
         private const string OutputPortElementName = "dialogue-graph-output-port";
 
+        public static VisualElement CreateStartNode(
+            DialogueGraphWindow window,
+            Vector2 position,
+            float nodeWidth,
+            float nodeMinHeight,
+            int connectedRowId,
+            bool isInvalid,
+            string validationMessage)
+        {
+            VisualElement node = new VisualElement();
+            node.style.position = Position.Absolute;
+            node.style.left = position.x;
+            node.style.top = position.y;
+            node.style.width = nodeWidth;
+            node.style.minHeight = nodeMinHeight * 0.8f;
+            node.style.paddingLeft = 10f;
+            node.style.paddingRight = 10f;
+            node.style.paddingTop = 10f;
+            node.style.paddingBottom = 10f;
+            node.style.backgroundColor = new Color(0.18f, 0.34f, 0.20f);
+            node.style.borderTopWidth = 2f;
+            node.style.borderBottomWidth = 2f;
+            node.style.borderLeftWidth = 2f;
+            node.style.borderRightWidth = 2f;
+            node.style.borderTopColor = new Color(0.45f, 0.9f, 0.5f);
+            node.style.borderBottomColor = new Color(0.45f, 0.9f, 0.5f);
+            node.style.borderLeftColor = new Color(0.45f, 0.9f, 0.5f);
+            node.style.borderRightColor = new Color(0.45f, 0.9f, 0.5f);
+            node.style.borderTopLeftRadius = 8f;
+            node.style.borderTopRightRadius = 8f;
+            node.style.borderBottomLeftRadius = 8f;
+            node.style.borderBottomRightRadius = 8f;
+
+            node.tooltip = string.IsNullOrWhiteSpace(validationMessage) ? null : validationMessage;
+
+            VisualElement headerRow = new VisualElement();
+            headerRow.style.flexDirection = FlexDirection.Row;
+            headerRow.style.alignItems = Align.Center;
+            headerRow.style.justifyContent = Justify.SpaceBetween;
+            headerRow.style.marginBottom = 6f;
+
+            Label titleLabel = new Label("Start");
+            titleLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
+            titleLabel.style.fontSize = 14;
+            titleLabel.style.color = Color.white;
+            titleLabel.style.flexGrow = 1;
+            titleLabel.style.marginRight = 6f;
+
+            Label warningBadge = new Label("⚠");
+            warningBadge.name = WarningBadgeElementName;
+            warningBadge.tooltip = "This node has validation issues.";
+            warningBadge.style.color = new Color(1f, 0.72f, 0.22f);
+            warningBadge.style.unityFontStyleAndWeight = FontStyle.Bold;
+            warningBadge.style.fontSize = 14f;
+            warningBadge.style.unityTextAlign = TextAnchor.MiddleCenter;
+            warningBadge.style.minWidth = 18f;
+            warningBadge.style.display = isInvalid ? DisplayStyle.Flex : DisplayStyle.None;
+
+            headerRow.Add(titleLabel);
+            headerRow.Add(warningBadge);
+
+            string startText = connectedRowId >= 0
+                ? $"Default entry → Row {connectedRowId}"
+                : "Drag from this node to choose the default entry row.";
+
+            Label infoLabel = new Label(startText);
+            infoLabel.style.whiteSpace = WhiteSpace.Normal;
+            infoLabel.style.color = new Color(0.92f, 0.96f, 0.92f);
+            infoLabel.style.fontSize = 11;
+
+            VisualElement outputPort = CreatePort(
+                OutputPortElementName,
+                new Color(0.45f, 1f, 0.55f),
+                left: StyleKeyword.Auto,
+                right: -8f);
+
+            outputPort.tooltip = "Start output";
+            outputPort.userData = DialogueGraphWindow.StartNodeRowId;
+            outputPort.AddManipulator(new DialogueGraphPortConnectManipulator(
+                outputPort,
+                DialogueGraphWindow.StartNodeRowId,
+                -1,
+                window));
+
+            node.Add(outputPort);
+            node.Add(headerRow);
+            node.Add(infoLabel);
+
+            node.RegisterCallback<ClickEvent>(evt =>
+            {
+                if (evt.button != (int)MouseButton.LeftMouse)
+                    return;
+
+                if (evt.target is VisualElement clickedElement &&
+                    (IsPortElement(clickedElement) || IsTextInputElement(clickedElement)))
+                {
+                    return;
+                }
+
+                window.HandleNodeClicked(DialogueGraphWindow.StartNodeRowId, -1);
+                evt.StopPropagation();
+            });
+
+            node.AddManipulator(new ContextualMenuManipulator(evt =>
+                DialogueGraphContextMenus.BuildStartNodeMenu(window, evt)));
+
+            node.AddManipulator(new DialogueGraphNodeDragManipulator(
+                node,
+                DialogueGraphWindow.StartNodeRowId,
+                -1,
+                window));
+
+            return node;
+        }
+
         public static VisualElement CreateNode(
             DialogueGraphWindow window,
             DialogueRow row,
@@ -92,32 +207,38 @@ namespace Editor.DialogueGraph
             headerRow.Add(titleLabel);
             headerRow.Add(warningBadge);
 
-            string previewText = row.IsChoiceResponseRow
+            Label dialogueLabel = new Label("Dialogue");
+            dialogueLabel.style.color = new Color(0.85f, 0.85f, 0.85f);
+            dialogueLabel.style.fontSize = 11;
+            dialogueLabel.style.marginBottom = 4f;
+
+            string editableText = row.IsChoiceResponseRow
                 ? row.PlayerChoiceAnswer
                 : row.GetFirstLine();
 
-            if (string.IsNullOrWhiteSpace(previewText))
-                previewText = "(No preview text)";
+            TextField dialogueField = new TextField
+            {
+                value = editableText ?? string.Empty,
+                multiline = true
+            };
 
-            Label previewLabel = new Label(previewText);
-            previewLabel.style.whiteSpace = WhiteSpace.Normal;
-            previewLabel.style.color = new Color(0.93f, 0.93f, 0.93f);
-            previewLabel.style.marginBottom = 8f;
+            dialogueField.style.whiteSpace = WhiteSpace.Normal;
+            dialogueField.style.marginBottom = 8f;
+            dialogueField.style.minHeight = 56f;
+            dialogueField.style.backgroundColor = new Color(0.16f, 0.16f, 0.16f);
+            dialogueField.style.color = new Color(0.94f, 0.94f, 0.94f);
 
-            string leadsToText = row.UsesLeadsTo ? row.LeadsTo.ToString() : "N/A";
-            Label metaLabel = new Label($"Leads To: {leadsToText}");
-            metaLabel.style.color = new Color(0.8f, 0.8f, 0.8f);
-            metaLabel.style.fontSize = 11;
+            dialogueField.RegisterValueChangedCallback(evt =>
+            {
+                if (evt.newValue == evt.previousValue)
+                    return;
 
-            Label positionLabel = new Label($"({Mathf.RoundToInt(position.x)}, {Mathf.RoundToInt(position.y)})");
-            positionLabel.style.color = new Color(0.72f, 0.72f, 0.72f);
-            positionLabel.style.fontSize = 10;
-            positionLabel.style.marginTop = 6f;
+                window.UpdateNodeDialogueText(row.RowId, rowIndex, evt.newValue);
+            });
 
             node.Add(headerRow);
-            node.Add(previewLabel);
-            node.Add(metaLabel);
-            node.Add(positionLabel);
+            node.Add(dialogueLabel);
+            node.Add(dialogueField);
 
             node.RegisterCallback<ClickEvent>(evt =>
             {
@@ -125,7 +246,7 @@ namespace Editor.DialogueGraph
                     return;
 
                 if (evt.target is VisualElement clickedElement &&
-                    IsPortElement(clickedElement))
+                    (IsPortElement(clickedElement) || IsTextInputElement(clickedElement)))
                 {
                     return;
                 }
@@ -136,7 +257,7 @@ namespace Editor.DialogueGraph
 
             node.AddManipulator(new ContextualMenuManipulator(evt =>
                 DialogueGraphContextMenus.BuildNodeMenu(window, evt, row.RowId, rowIndex)));
-            node.AddManipulator(new DialogueGraphNodeDragManipulator(node, row.RowId, rowIndex, window, positionLabel));
+            node.AddManipulator(new DialogueGraphNodeDragManipulator(node, row.RowId, rowIndex, window));
 
             return node;
         }
@@ -184,6 +305,24 @@ namespace Editor.DialogueGraph
         public static bool IsInputPortElement(VisualElement element)
         {
             return element != null && element.name == InputPortElementName;
+        }
+
+        public static bool IsTextInputElement(VisualElement element)
+        {
+            VisualElement current = element;
+
+            while (current != null)
+            {
+                if (current is TextField)
+                    return true;
+
+                if (current.GetType().Name.Contains("TextInput"))
+                    return true;
+
+                current = current.parent;
+            }
+
+            return false;
         }
 
         public static bool TryGetRowIdFromPort(VisualElement element, out int rowId)
@@ -383,7 +522,8 @@ namespace Editor.DialogueGraph
             warningBadge.style.display = isInvalid ? DisplayStyle.Flex : DisplayStyle.None;
         }
 
-        private static void SetNodeBorderColor(VisualElement node, bool isSelected, bool isInvalid, bool isConnectSource)
+        private static void SetNodeBorderColor(VisualElement node, bool isSelected, bool isInvalid,
+            bool isConnectSource)
         {
             Color borderColor;
             float borderWidth;

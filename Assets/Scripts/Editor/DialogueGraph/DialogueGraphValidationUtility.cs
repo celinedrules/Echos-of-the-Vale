@@ -58,6 +58,19 @@ namespace Editor.DialogueGraph
             return messagesByRowId;
         }
 
+        public static bool HasStartNodeIssue(DialogueTable table)
+        {
+            return table != null && table.StartRowId < 0;
+        }
+
+        public static string GetStartNodeValidationMessage(DialogueTable table)
+        {
+            if (!HasStartNodeIssue(table))
+                return null;
+
+            return "Start node is not connected.";
+        }
+
         public static int TryExtractRowId(string message)
         {
             if (string.IsNullOrWhiteSpace(message))

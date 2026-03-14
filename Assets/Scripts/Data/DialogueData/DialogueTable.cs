@@ -34,6 +34,7 @@ namespace Data.DialogueData
             [SerializeField] private List<DialogueGraphNodeLayout> nodeLayouts = new();
             [SerializeField] private Vector2 panPosition;
             [SerializeField] private float zoomScale = 1f;
+            [SerializeField] private Vector2 startNodePosition = new(60f, 60f);
 
             public List<DialogueGraphNodeLayout> NodeLayouts => nodeLayouts;
             public Vector2 PanPosition
@@ -47,9 +48,16 @@ namespace Data.DialogueData
                 get => zoomScale;
                 set => zoomScale = Mathf.Max(0.01f, value);
             }
+
+            public Vector2 StartNodePosition
+            {
+                get => startNodePosition;
+                set => startNodePosition = value;
+            }
         }
 
         [SerializeField] private string tableName;
+        [SerializeField] private int startRowId = -1;
 
         [TitleGroup("Tools")]
         [InfoBox("Renumber IDs + Remap References is disabled while duplicate Row IDs exist. Fix duplicates first.", InfoMessageType.Warning, nameof(HasDuplicateRowIds))]
@@ -85,6 +93,13 @@ namespace Data.DialogueData
         public IReadOnlyList<DialogueRow> Rows => rows;
         public DialogueRow FirstRow => rows.Count > 0 ? rows[0] : null;
         public int RowCount => rows.Count;
+
+        public int StartRowId
+        {
+            get => startRowId;
+            set => startRowId = value;
+        }
+
         public Vector2 GraphPanPosition
         {
             get => graphEditorData.PanPosition;
@@ -95,6 +110,12 @@ namespace Data.DialogueData
         {
             get => graphEditorData.ZoomScale;
             set => graphEditorData.ZoomScale = value;
+        }
+
+        public Vector2 StartNodePosition
+        {
+            get => graphEditorData.StartNodePosition;
+            set => graphEditorData.StartNodePosition = value;
         }
 
         public DialogueRow GetRow(int index)
@@ -160,6 +181,9 @@ namespace Data.DialogueData
                 if (!validRowIds.Contains(graphEditorData.NodeLayouts[i].RowId))
                     graphEditorData.NodeLayouts.RemoveAt(i);
             }
+
+            if (startRowId >= 0 && !validRowIds.Contains(startRowId))
+                startRowId = -1;
         }
 
         public List<string> GetValidationMessages() => DialogueTableValidator.GetValidationMessages(this);
