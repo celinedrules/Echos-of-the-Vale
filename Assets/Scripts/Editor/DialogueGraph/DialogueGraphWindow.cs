@@ -314,7 +314,7 @@ namespace Editor.DialogueGraph
             _graphCanvas.MarkDirtyRepaint();
         }
 
-        private void UpdateStatusLabel()
+         private void UpdateStatusLabel()
         {
             if (_tableStatusLabel == null)
                 return;
@@ -329,7 +329,7 @@ namespace Editor.DialogueGraph
 
             if (_isConnectModeActive && _connectSourceRowId >= 0)
             {
-                _tableStatusLabel.text = $"{baseText}  •  Connect mode: click a target node for Row {_connectSourceRowId} (click empty space to cancel)";
+                _tableStatusLabel.text = $"{baseText}  •  Connect mode: click an input handle for Row {_connectSourceRowId} (click empty space to cancel)";
                 return;
             }
 
@@ -337,6 +337,17 @@ namespace Editor.DialogueGraph
         }
 
         public void HandleNodeClicked(int rowId, int rowIndex)
+        {
+            SelectRow(rowId, rowIndex);
+        }
+
+        public void HandleOutputPortClicked(int rowId, int rowIndex)
+        {
+            SelectRow(rowId, rowIndex);
+            BeginConnectFromRow(rowId);
+        }
+
+        public void HandleInputPortClicked(int rowId, int rowIndex)
         {
             if (_isConnectModeActive)
             {
@@ -389,12 +400,20 @@ namespace Editor.DialogueGraph
                 return;
             }
 
+            BeginConnectFromRow(_selectedRowId);
+        }
+
+        private void BeginConnectFromRow(int sourceRowId)
+        {
+            if (_selectedTable == null || sourceRowId < 0)
+                return;
+
             _isConnectModeActive = true;
-            _connectSourceRowId = _selectedRowId;
+            _connectSourceRowId = sourceRowId;
+            UpdateNodeSelectionVisuals();
             UpdateStatusLabel();
             MarkGraphDirty();
         }
-        
 
         private void CompleteConnectionTo(int targetRowId, int targetRowIndex)
         {
@@ -417,7 +436,7 @@ namespace Editor.DialogueGraph
             SelectRow(targetRowId, targetRowIndex);
             RefreshAllViews();
         }
-        
+
         public void BeginConnectSelectedFromMenu()
         {
             BeginConnectSelected();
@@ -449,11 +468,12 @@ namespace Editor.DialogueGraph
         {
             ClearLinksSelected();
         }
-        
+
         private void CancelConnectMode()
         {
             _isConnectModeActive = false;
             _connectSourceRowId = -1;
+            UpdateNodeSelectionVisuals();
             UpdateStatusLabel();
         }
 
@@ -554,7 +574,8 @@ namespace Editor.DialogueGraph
             {
                 bool isSelected = pair.Key == _selectedRowId;
                 bool isInvalid = _invalidRowIds.Contains(pair.Key);
-                DialogueGraphNodeViewFactory.SetNodeState(pair.Value, isSelected, isInvalid);
+                bool isConnectSource = _isConnectModeActive && pair.Key == _connectSourceRowId;
+                DialogueGraphNodeViewFactory.SetNodeState(pair.Value, isSelected, isInvalid, isConnectSource);
             }
         }
 

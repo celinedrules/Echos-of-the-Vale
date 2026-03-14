@@ -106,10 +106,12 @@ namespace Editor.DialogueGraph
             if (sourceRect.width <= 0f || sourceRect.height <= 0f)
                 return;
 
+            Vector2 start = DialogueGraphNodeViewFactory.GetOutputPortCenter(sourceNode);
+
             if (!nodeViewsByRowId.TryGetValue(targetRowId, out VisualElement targetNode))
             {
                 if (drawDanglingIfMissing)
-                    DrawDanglingEdge(painter, sourceRect, color);
+                    DrawDanglingEdge(painter, start, color);
 
                 return;
             }
@@ -118,8 +120,7 @@ namespace Editor.DialogueGraph
             if (targetRect.width <= 0f || targetRect.height <= 0f)
                 return;
 
-            Vector2 start = new Vector2(sourceRect.xMax, sourceRect.center.y);
-            Vector2 end = new Vector2(targetRect.xMin, targetRect.center.y);
+            Vector2 end = DialogueGraphNodeViewFactory.GetInputPortCenter(targetNode);
 
             float tangentOffset = Mathf.Max(60f, Mathf.Abs(end.x - start.x) * 0.35f);
             Vector2 startTangent = start + Vector2.right * tangentOffset;
@@ -134,9 +135,8 @@ namespace Editor.DialogueGraph
             DrawArrowHead(painter, end, color);
         }
 
-        private static void DrawDanglingEdge(Painter2D painter, Rect sourceRect, Color color)
+        private static void DrawDanglingEdge(Painter2D painter, Vector2 start, Color color)
         {
-            Vector2 start = new Vector2(sourceRect.xMax, sourceRect.center.y);
             Vector2 end = start + Vector2.right * MissingEdgeLength;
 
             float tangentOffset = MissingEdgeLength * 0.5f;

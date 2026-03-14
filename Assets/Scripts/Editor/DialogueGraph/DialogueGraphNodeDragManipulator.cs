@@ -57,6 +57,12 @@ namespace Editor.DialogueGraph
             if (_window.IsConnectModeActive)
                 return;
 
+            if (evt.target is VisualElement clickedElement &&
+                DialogueGraphNodeViewFactory.IsPortElement(clickedElement))
+            {
+                return;
+            }
+
             _window.SelectRow(_rowId, _rowIndex);
 
             _dragging = true;
