@@ -10,7 +10,7 @@ namespace Editor.DialogueGraph
 {
     public class DialogueGraphWindow : EditorWindow
     {
-        public const int StartNodeRowId = -1000;
+         public const int StartNodeRowId = -1000;
 
         private const float NodeWidth = 260f;
         private const float NodeMinHeight = 110f;
@@ -22,17 +22,24 @@ namespace Editor.DialogueGraph
 
         private const float MinorGridSpacing = 20f;
         private const float MajorGridSpacing = 100f;
+        private const float MinZoom = 0.5f;
+        private const float MaxZoom = 1.75f;
+        private const float ZoomStep = 0.1f;
+        private const float VirtualCanvasSize = 4000f;
+
         private static readonly Color MinorGridColor = new(0.24f, 0.27f, 0.32f, 0.16f);
         private static readonly Color MajorGridColor = new(0.30f, 0.35f, 0.42f, 0.34f);
         private static readonly Color CenterGridColor = new(0.38f, 0.46f, 0.56f, 0.42f);
 
         private DialogueTable _selectedTable;
         private Label _tableStatusLabel;
-        private ScrollView _graphScrollView;
+        private VisualElement _graphViewport;
+        private VisualElement _graphContentRoot;
         private VisualElement _graphCanvas;
         private ObjectField _tableField;
         private DialogueGraphInspectorView _inspectorView;
         private DialogueGraphValidationView _validationView;
+        private Label _zoomLabel;
 
         private readonly Dictionary<int, VisualElement> _nodeViewsByRowId = new();
         private HashSet<int> _invalidRowIds = new();
@@ -54,6 +61,7 @@ namespace Editor.DialogueGraph
         public bool HasSelectedRow => _selectedRowId >= 0 || _selectedRowId == StartNodeRowId;
         public bool IsConnectModeActive => _isConnectModeActive;
         public bool IsGridSnapEnabled => _isGridSnapEnabled;
+        public Vector2 GraphPanPosition => _selectedTable != null ? _selectedTable.GraphPanPosition : Vector2.zero;
 
         [MenuItem("Tools/Dialogue/Dialogue Graph")]
         public static void Open()
@@ -90,20 +98,34 @@ namespace Editor.DialogueGraph
             contentRow.style.flexGrow = 1;
             contentRow.style.flexDirection = FlexDirection.Row;
 
-            _graphScrollView = new ScrollView(ScrollViewMode.VerticalAndHorizontal);
-            _graphScrollView.style.flexGrow = 1;
-            _graphScrollView.style.backgroundColor = new Color(0.12f, 0.12f, 0.12f);
+            _graphViewport = new VisualElement();
+            _graphViewport.style.flexGrow = 1;
+            _graphViewport.style.backgroundColor = new Color(0.12f, 0.12f, 0.12f);
+            _graphViewport.style.overflow = Overflow.Hidden;
+            _graphViewport.RegisterCallback<WheelEvent>(OnGraphWheel, TrickleDown.TrickleDown);
+            _graphViewport.AddManipulator(new DialogueGraphPanManipulator(this));
+
+            _graphContentRoot = new VisualElement();
+            _graphContentRoot.style.position = Position.Absolute;
+            _graphContentRoot.style.left = 0f;
+            _graphContentRoot.style.top = 0f;
+            _graphContentRoot.style.width = VirtualCanvasSize;
+            _graphContentRoot.style.height = VirtualCanvasSize;
+            _graphContentRoot.pickingMode = PickingMode.Ignore;
 
             _graphCanvas = new VisualElement();
-            _graphCanvas.style.position = Position.Relative;
-            _graphCanvas.style.width = 4000f;
-            _graphCanvas.style.height = 4000f;
+            _graphCanvas.style.position = Position.Absolute;
+            _graphCanvas.style.left = 0f;
+            _graphCanvas.style.top = 0f;
+            _graphCanvas.style.width = VirtualCanvasSize;
+            _graphCanvas.style.height = VirtualCanvasSize;
             _graphCanvas.style.backgroundColor = new Color(0.13f, 0.13f, 0.13f);
             _graphCanvas.generateVisualContent += OnGraphCanvasGenerateVisualContent;
             _graphCanvas.RegisterCallback<PointerDownEvent>(OnCanvasPointerDown);
             _graphCanvas.AddManipulator(new ContextualMenuManipulator(BuildGraphCanvasContextMenu));
 
-            _graphScrollView.Add(_graphCanvas);
+            _graphContentRoot.Add(_graphCanvas);
+            _graphViewport.Add(_graphContentRoot);
 
             _inspectorView = new DialogueGraphInspectorView(
                 InspectorWidth,
@@ -113,7 +135,7 @@ namespace Editor.DialogueGraph
 
             _validationView = new DialogueGraphValidationView(SelectRowById);
 
-            contentRow.Add(_graphScrollView);
+            contentRow.Add(_graphViewport);
             contentRow.Add(_inspectorView.Build());
 
             mainArea.Add(contentRow);
@@ -179,11 +201,31 @@ namespace Editor.DialogueGraph
             };
             gridSnapToggle.value = _isGridSnapEnabled;
             gridSnapToggle.style.marginLeft = 8f;
-            gridSnapToggle.tooltip = "Snap node movement to minor grid increments.";
+            gridSnapToggle.tooltip = "Snap node movement to minor grid increments. Hold Ctrl to bypass while dragging.";
             gridSnapToggle.RegisterValueChangedCallback(evt =>
             {
                 _isGridSnapEnabled = evt.newValue;
             });
+
+            Button zoomOutButton = new Button(() => AdjustZoom(-ZoomStep))
+            {
+                text = "−"
+            };
+            zoomOutButton.style.marginLeft = 8f;
+            zoomOutButton.tooltip = "Zoom out";
+
+            _zoomLabel = new Label("100%");
+            _zoomLabel.style.minWidth = 48f;
+            _zoomLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
+            _zoomLabel.style.color = new Color(0.9f, 0.9f, 0.9f);
+            _zoomLabel.style.marginLeft = 4f;
+            _zoomLabel.style.marginRight = 4f;
+
+            Button zoomInButton = new Button(() => AdjustZoom(ZoomStep))
+            {
+                text = "+"
+            };
+            zoomInButton.tooltip = "Zoom in";
 
             Button addLineButton = new Button(() => CreateRow(DialogueRowKind.Line))
             {
@@ -249,6 +291,9 @@ namespace Editor.DialogueGraph
             toolbar.Add(_tableField);
             toolbar.Add(useSelectionButton);
             toolbar.Add(gridSnapToggle);
+            toolbar.Add(zoomOutButton);
+            toolbar.Add(_zoomLabel);
+            toolbar.Add(zoomInButton);
             toolbar.Add(addLineButton);
             toolbar.Add(addChoicePromptButton);
             toolbar.Add(addChoiceResponseButton);
@@ -273,12 +318,67 @@ namespace Editor.DialogueGraph
             return new Vector2(x, y);
         }
 
+        public void SetGraphPan(Vector2 panPosition)
+        {
+            if (_selectedTable != null)
+            {
+                _selectedTable.GraphPanPosition = panPosition;
+                EditorUtility.SetDirty(_selectedTable);
+            }
+
+            ApplyGraphTransform();
+        }
+
+        private void AdjustZoom(float delta)
+        {
+            float currentZoom = _selectedTable != null ? _selectedTable.GraphZoomScale : 1f;
+            SetZoom(currentZoom + delta);
+        }
+
+        private void SetZoom(float zoom)
+        {
+            float clampedZoom = Mathf.Clamp(zoom, MinZoom, MaxZoom);
+
+            if (_selectedTable != null)
+            {
+                _selectedTable.GraphZoomScale = clampedZoom;
+                EditorUtility.SetDirty(_selectedTable);
+            }
+
+            ApplyGraphTransform();
+        }
+
+        private void ApplyGraphTransform()
+        {
+            if (_graphContentRoot == null)
+                return;
+
+            float zoom = _selectedTable != null ? _selectedTable.GraphZoomScale : 1f;
+            Vector2 pan = _selectedTable != null ? _selectedTable.GraphPanPosition : Vector2.zero;
+
+            _graphContentRoot.transform.position = new Vector3(pan.x, pan.y, 0f);
+            _graphContentRoot.transform.scale = new Vector3(zoom, zoom, 1f);
+
+            if (_zoomLabel != null)
+                _zoomLabel.text = $"{Mathf.RoundToInt(zoom * 100f)}%";
+
+            _graphCanvas?.MarkDirtyRepaint();
+        }
+
+        private void OnGraphWheel(WheelEvent evt)
+        {
+            float direction = evt.delta.y > 0f ? -1f : 1f;
+            AdjustZoom(direction * ZoomStep);
+            evt.StopPropagation();
+        }
+
         private void RefreshAllViews()
         {
             RefreshValidationState();
             RefreshGraph();
             RefreshInspector();
             RefreshValidation();
+            ApplyGraphTransform();
         }
 
         private void RefreshValidationState()
@@ -670,47 +770,44 @@ namespace Editor.DialogueGraph
 
         private void FrameNode(VisualElement node)
         {
-            if (_graphScrollView == null || node == null)
+            if (_graphViewport == null || _graphContentRoot == null || _selectedTable == null || node == null)
                 return;
 
             Rect nodeRect = node.layout;
             if (nodeRect.width <= 0f || nodeRect.height <= 0f)
                 return;
 
-            Vector2 currentOffset = _graphScrollView.scrollOffset;
-            float viewportWidth = _graphScrollView.contentViewport.layout.width;
-            float viewportHeight = _graphScrollView.contentViewport.layout.height;
+            float zoom = _selectedTable.GraphZoomScale;
+            Vector2 pan = _selectedTable.GraphPanPosition;
 
-            if (viewportWidth <= 0f || viewportHeight <= 0f)
+            Rect transformedRect = new Rect(
+                pan.x + nodeRect.xMin * zoom,
+                pan.y + nodeRect.yMin * zoom,
+                nodeRect.width * zoom,
+                nodeRect.height * zoom);
+
+            Rect viewportRect = _graphViewport.contentRect;
+            if (viewportRect.width <= 0f || viewportRect.height <= 0f)
                 return;
 
-            float targetX = currentOffset.x;
-            float targetY = currentOffset.y;
+            Vector2 updatedPan = pan;
 
-            if (nodeRect.xMin - FramePadding < currentOffset.x)
-            {
-                targetX = Mathf.Max(0f, nodeRect.xMin - FramePadding);
-            }
-            else if (nodeRect.xMax + FramePadding > currentOffset.x + viewportWidth)
-            {
-                targetX = Mathf.Max(0f, nodeRect.xMax + FramePadding - viewportWidth);
-            }
+            if (transformedRect.xMin - FramePadding < 0f)
+                updatedPan.x += - (transformedRect.xMin - FramePadding);
+            else if (transformedRect.xMax + FramePadding > viewportRect.width)
+                updatedPan.x -= transformedRect.xMax + FramePadding - viewportRect.width;
 
-            if (nodeRect.yMin - FramePadding < currentOffset.y)
-            {
-                targetY = Mathf.Max(0f, nodeRect.yMin - FramePadding);
-            }
-            else if (nodeRect.yMax + FramePadding > currentOffset.y + viewportHeight)
-            {
-                targetY = Mathf.Max(0f, nodeRect.yMax + FramePadding - viewportHeight);
-            }
+            if (transformedRect.yMin - FramePadding < 0f)
+                updatedPan.y += - (transformedRect.yMin - FramePadding);
+            else if (transformedRect.yMax + FramePadding > viewportRect.height)
+                updatedPan.y -= transformedRect.yMax + FramePadding - viewportRect.height;
 
-            _graphScrollView.scrollOffset = new Vector2(targetX, targetY);
+            SetGraphPan(updatedPan);
         }
 
         private void FrameAllNodes()
         {
-            if (_graphScrollView == null || _nodeViewsByRowId.Count == 0)
+            if (_graphViewport == null || _selectedTable == null || _nodeViewsByRowId.Count == 0)
                 return;
 
             bool hasBounds = false;
@@ -739,10 +836,12 @@ namespace Editor.DialogueGraph
             if (!hasBounds)
                 return;
 
-            float targetX = Mathf.Max(0f, bounds.xMin - FramePadding);
-            float targetY = Mathf.Max(0f, bounds.yMin - FramePadding);
+            float zoom = _selectedTable.GraphZoomScale;
+            Vector2 targetPan = new Vector2(
+                FramePadding - bounds.xMin * zoom,
+                FramePadding - bounds.yMin * zoom);
 
-            _graphScrollView.scrollOffset = new Vector2(targetX, targetY);
+            SetGraphPan(targetPan);
         }
 
         private void ClearSelection()

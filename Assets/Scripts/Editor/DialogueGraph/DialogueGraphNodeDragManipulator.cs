@@ -58,6 +58,10 @@ namespace Editor.DialogueGraph
             if (_window.IsConnectModeActive)
                 return;
 
+            if ((evt.modifiers & EventModifiers.Control) != 0 ||
+                (evt.modifiers & EventModifiers.Command) != 0)
+                return;
+
             if (evt.target is VisualElement clickedElement)
             {
                 if (DialogueGraphNodeViewFactory.IsPortElement(clickedElement))
@@ -70,7 +74,7 @@ namespace Editor.DialogueGraph
             _window.SelectRow(_rowId, _rowIndex);
 
             _dragging = true;
-            _bypassSnapForCurrentDrag = false;
+            _bypassSnapForCurrentDrag = (evt.modifiers & EventModifiers.Alt) != 0;
             _pointerOffset = evt.localPosition;
             _dragStartNodePosition = new Vector2(_targetNode.resolvedStyle.left, _targetNode.resolvedStyle.top);
             _dragStartPointerParentPosition = _targetNode.parent.WorldToLocal(evt.position);
@@ -92,10 +96,10 @@ namespace Editor.DialogueGraph
             rawPosition.x = Mathf.Max(0f, rawPosition.x);
             rawPosition.y = Mathf.Max(0f, rawPosition.y);
 
-            bool isCtrlHeld = evt.ctrlKey || evt.commandKey;
-            bool shouldSnap = _window.IsGridSnapEnabled && !isCtrlHeld;
+            bool isAltHeld = (evt.modifiers & EventModifiers.Alt) != 0;
+            bool shouldSnap = _window.IsGridSnapEnabled && !isAltHeld;
 
-            _bypassSnapForCurrentDrag = _bypassSnapForCurrentDrag || isCtrlHeld;
+            _bypassSnapForCurrentDrag = _bypassSnapForCurrentDrag || isAltHeld;
 
             Vector2 appliedPosition = shouldSnap
                 ? _window.SnapToGrid(rawPosition)
