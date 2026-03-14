@@ -27,6 +27,9 @@ namespace Editor.DialogueGraph
         private const float ZoomStep = 0.05f;
         private const float VirtualCanvasSize = 4000f;
 
+        private const string NoDialogueTableOption = "<None>";
+        private const string UnnamedTableLabel = "Unnamed";
+
         private static readonly Color MinorGridColor = new(0.24f, 0.27f, 0.32f, 0.16f);
         private static readonly Color MajorGridColor = new(0.30f, 0.35f, 0.42f, 0.34f);
 
@@ -36,12 +39,15 @@ namespace Editor.DialogueGraph
         private VisualElement _gridBackground;
         private VisualElement _graphContentRoot;
         private VisualElement _graphCanvas;
-        private ObjectField _tableField;
+        private PopupField<string> _tableDropdown;
         private DialogueGraphInspectorView _inspectorView;
         private DialogueGraphValidationView _validationView;
         private Label _zoomLabel;
 
         private readonly Dictionary<int, VisualElement> _nodeViewsByRowId = new();
+        private readonly Dictionary<string, DialogueTable> _dialogueTablesByDropdownLabel = new();
+        private readonly List<string> _dialogueTableDropdownChoices = new();
+
         private HashSet<int> _invalidRowIds = new();
         private Dictionary<int, List<string>> _validationMessagesByRowId = new();
         private bool _isStartNodeInvalid;
@@ -63,7 +69,7 @@ namespace Editor.DialogueGraph
         public bool IsGridSnapEnabled => _isGridSnapEnabled;
         public Vector2 GraphPanPosition => _selectedTable != null ? _selectedTable.GraphPanPosition : Vector2.zero;
         public float CurrentZoom => _selectedTable != null ? _selectedTable.GraphZoomScale : 1f;
-        
+
         [MenuItem("Tools/Dialogue/Dialogue Graph")]
         public static void Open()
         {
@@ -159,6 +165,7 @@ namespace Editor.DialogueGraph
 
             rootVisualElement.Add(rootContainer);
 
+            RefreshDialogueTableDropdownChoices();
             RefreshAllViews();
         }
 
@@ -178,17 +185,20 @@ namespace Editor.DialogueGraph
             tableLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
             tableLabel.style.color = new Color(0.92f, 0.92f, 0.92f);
 
-            _tableField = new ObjectField
+            _tableDropdown = new PopupField<string>(_dialogueTableDropdownChoices, 0);
+            _tableDropdown.style.flexGrow = 1;
+            _tableDropdown.style.marginLeft = 8f;
+            _tableDropdown.RegisterValueChangedCallback(evt =>
             {
-                objectType = typeof(DialogueTable),
-                allowSceneObjects = false,
-                value = _selectedTable
-            };
-            _tableField.style.flexGrow = 1;
-            _tableField.style.marginLeft = 8f;
-            _tableField.RegisterValueChangedCallback(evt =>
-            {
-                _selectedTable = evt.newValue as DialogueTable;
+                if (evt.newValue == NoDialogueTableOption)
+                {
+                    _selectedTable = null;
+                }
+                else if (_dialogueTablesByDropdownLabel.TryGetValue(evt.newValue, out DialogueTable selectedDialogueTable))
+                {
+                    _selectedTable = selectedDialogueTable;
+                }
+
                 CancelConnectMode();
                 ClearSelection();
                 RefreshAllViews();
@@ -197,7 +207,8 @@ namespace Editor.DialogueGraph
             Button useSelectionButton = new Button(() =>
             {
                 _selectedTable = Selection.activeObject as DialogueTable;
-                _tableField.SetValueWithoutNotify(_selectedTable);
+                RefreshDialogueTableDropdownChoices();
+                SyncDialogueTableDropdownSelection();
                 CancelConnectMode();
                 ClearSelection();
                 RefreshAllViews();
@@ -293,14 +304,18 @@ namespace Editor.DialogueGraph
             };
             deleteSelectedButton.style.marginLeft = 8f;
 
-            Button refreshButton = new Button(RefreshAllViews)
+            Button refreshButton = new Button(() =>
+            {
+                RefreshDialogueTableDropdownChoices();
+                RefreshAllViews();
+            })
             {
                 text = "Refresh"
             };
             refreshButton.style.marginLeft = 8f;
 
             toolbar.Add(tableLabel);
-            toolbar.Add(_tableField);
+            toolbar.Add(_tableDropdown);
             toolbar.Add(useSelectionButton);
             toolbar.Add(gridSnapToggle);
             toolbar.Add(zoomOutButton);
@@ -318,6 +333,74 @@ namespace Editor.DialogueGraph
             toolbar.Add(refreshButton);
 
             return toolbar;
+        }
+
+        private void RefreshDialogueTableDropdownChoices()
+        {
+            _dialogueTablesByDropdownLabel.Clear();
+            _dialogueTableDropdownChoices.Clear();
+            _dialogueTableDropdownChoices.Add(NoDialogueTableOption);
+
+            string[] guids = AssetDatabase.FindAssets("t:DialogueTable");
+            for (int i = 0; i < guids.Length; i++)
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guids[i]);
+                DialogueTable table = AssetDatabase.LoadAssetAtPath<DialogueTable>(path);
+                if (table == null)
+                    continue;
+
+                string tableName = string.IsNullOrWhiteSpace(table.TableName)
+                    ? UnnamedTableLabel
+                    : table.TableName.Trim();
+
+                string label = $"{table.name} ({tableName})";
+
+                if (_dialogueTablesByDropdownLabel.ContainsKey(label))
+                {
+                    int duplicateIndex = 2;
+                    string uniqueLabel = $"{label} [{duplicateIndex}]";
+
+                    while (_dialogueTablesByDropdownLabel.ContainsKey(uniqueLabel))
+                    {
+                        duplicateIndex++;
+                        uniqueLabel = $"{label} [{duplicateIndex}]";
+                    }
+
+                    label = uniqueLabel;
+                }
+
+                _dialogueTablesByDropdownLabel[label] = table;
+                _dialogueTableDropdownChoices.Add(label);
+            }
+
+            if (_tableDropdown != null)
+            {
+                _tableDropdown.choices = _dialogueTableDropdownChoices;
+                SyncDialogueTableDropdownSelection();
+            }
+        }
+
+        private void SyncDialogueTableDropdownSelection()
+        {
+            if (_tableDropdown == null)
+                return;
+
+            if (_selectedTable == null)
+            {
+                _tableDropdown.SetValueWithoutNotify(NoDialogueTableOption);
+                return;
+            }
+
+            foreach (KeyValuePair<string, DialogueTable> pair in _dialogueTablesByDropdownLabel)
+            {
+                if (pair.Value != _selectedTable)
+                    continue;
+
+                _tableDropdown.SetValueWithoutNotify(pair.Key);
+                return;
+            }
+
+            _tableDropdown.SetValueWithoutNotify(NoDialogueTableOption);
         }
 
         public Vector2 SnapToGrid(Vector2 position)
@@ -387,6 +470,7 @@ namespace Editor.DialogueGraph
 
         private void RefreshAllViews()
         {
+            RefreshDialogueTableDropdownChoices();
             RefreshValidationState();
             RefreshGraph();
             RefreshInspector();
