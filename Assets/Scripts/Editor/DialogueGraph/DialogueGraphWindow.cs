@@ -24,16 +24,16 @@ namespace Editor.DialogueGraph
         private const float MajorGridSpacing = 100f;
         private const float MinZoom = 0.5f;
         private const float MaxZoom = 1.75f;
-        private const float ZoomStep = 0.1f;
+        private const float ZoomStep = 0.05f;
         private const float VirtualCanvasSize = 4000f;
 
         private static readonly Color MinorGridColor = new(0.24f, 0.27f, 0.32f, 0.16f);
         private static readonly Color MajorGridColor = new(0.30f, 0.35f, 0.42f, 0.34f);
-        private static readonly Color CenterGridColor = new(0.38f, 0.46f, 0.56f, 0.42f);
 
         private DialogueTable _selectedTable;
         private Label _tableStatusLabel;
         private VisualElement _graphViewport;
+        private VisualElement _gridBackground;
         private VisualElement _graphContentRoot;
         private VisualElement _graphCanvas;
         private ObjectField _tableField;
@@ -62,7 +62,8 @@ namespace Editor.DialogueGraph
         public bool IsConnectModeActive => _isConnectModeActive;
         public bool IsGridSnapEnabled => _isGridSnapEnabled;
         public Vector2 GraphPanPosition => _selectedTable != null ? _selectedTable.GraphPanPosition : Vector2.zero;
-
+        public float CurrentZoom => _selectedTable != null ? _selectedTable.GraphZoomScale : 1f;
+        
         [MenuItem("Tools/Dialogue/Dialogue Graph")]
         public static void Open()
         {
@@ -105,6 +106,15 @@ namespace Editor.DialogueGraph
             _graphViewport.RegisterCallback<WheelEvent>(OnGraphWheel, TrickleDown.TrickleDown);
             _graphViewport.AddManipulator(new DialogueGraphPanManipulator(this));
 
+            _gridBackground = new VisualElement();
+            _gridBackground.style.position = Position.Absolute;
+            _gridBackground.style.left = 0f;
+            _gridBackground.style.top = 0f;
+            _gridBackground.style.right = 0f;
+            _gridBackground.style.bottom = 0f;
+            _gridBackground.pickingMode = PickingMode.Ignore;
+            _gridBackground.generateVisualContent += OnGridBackgroundGenerateVisualContent;
+
             _graphContentRoot = new VisualElement();
             _graphContentRoot.style.position = Position.Absolute;
             _graphContentRoot.style.left = 0f;
@@ -119,12 +129,14 @@ namespace Editor.DialogueGraph
             _graphCanvas.style.top = 0f;
             _graphCanvas.style.width = VirtualCanvasSize;
             _graphCanvas.style.height = VirtualCanvasSize;
-            _graphCanvas.style.backgroundColor = new Color(0.13f, 0.13f, 0.13f);
+            _graphCanvas.style.backgroundColor = Color.clear;
             _graphCanvas.generateVisualContent += OnGraphCanvasGenerateVisualContent;
             _graphCanvas.RegisterCallback<PointerDownEvent>(OnCanvasPointerDown);
             _graphCanvas.AddManipulator(new ContextualMenuManipulator(BuildGraphCanvasContextMenu));
 
             _graphContentRoot.Add(_graphCanvas);
+
+            _graphViewport.Add(_gridBackground);
             _graphViewport.Add(_graphContentRoot);
 
             _inspectorView = new DialogueGraphInspectorView(
@@ -201,7 +213,7 @@ namespace Editor.DialogueGraph
             };
             gridSnapToggle.value = _isGridSnapEnabled;
             gridSnapToggle.style.marginLeft = 8f;
-            gridSnapToggle.tooltip = "Snap node movement to minor grid increments. Hold Ctrl to bypass while dragging.";
+            gridSnapToggle.tooltip = "Snap node movement to minor grid increments. Hold Shift to bypass while dragging.";
             gridSnapToggle.RegisterValueChangedCallback(evt =>
             {
                 _isGridSnapEnabled = evt.newValue;
@@ -362,6 +374,7 @@ namespace Editor.DialogueGraph
             if (_zoomLabel != null)
                 _zoomLabel.text = $"{Mathf.RoundToInt(zoom * 100f)}%";
 
+            _gridBackground?.MarkDirtyRepaint();
             _graphCanvas?.MarkDirtyRepaint();
         }
 
@@ -1228,8 +1241,6 @@ namespace Editor.DialogueGraph
 
         private void OnGraphCanvasGenerateVisualContent(MeshGenerationContext context)
         {
-            DrawGrid(context);
-
             int previewSourceRowId =
                 _isPortDragActive && (_connectSourceRowId >= 0 || _connectSourceRowId == StartNodeRowId)
                     ? _connectSourceRowId
@@ -1245,61 +1256,94 @@ namespace Editor.DialogueGraph
                 _hoveredConnectTargetValid);
         }
 
+        private void OnGridBackgroundGenerateVisualContent(MeshGenerationContext context)
+        {
+            DrawGrid(context);
+        }
+
         private void DrawGrid(MeshGenerationContext context)
         {
-            if (_graphCanvas == null)
+            if (_graphViewport == null || _selectedTable == null)
                 return;
 
-            Rect rect = _graphCanvas.contentRect;
-            if (rect.width <= 0f || rect.height <= 0f)
+            Rect viewportRect = _graphViewport.contentRect;
+            if (viewportRect.width <= 0f || viewportRect.height <= 0f)
                 return;
 
             Painter2D painter = context.painter2D;
 
-            DrawGridLines(painter, rect, MinorGridSpacing, MinorGridColor, 1f);
-            DrawGridLines(painter, rect, MajorGridSpacing, MajorGridColor, 1.25f);
-            DrawCenterCrossLines(painter, rect);
+            float zoom = _selectedTable.GraphZoomScale;
+            Vector2 pan = _selectedTable.GraphPanPosition;
+
+            DrawInfiniteGridLines(painter, viewportRect, MinorGridSpacing, zoom, pan, MinorGridColor, 1f);
+            DrawInfiniteGridLines(painter, viewportRect, MajorGridSpacing, zoom, pan, MajorGridColor, 1.25f);
+            //DrawViewportCenterCrossLines(painter, viewportRect);
         }
 
-        private static void DrawGridLines(Painter2D painter, Rect rect, float spacing, Color color, float lineWidth)
+        private static void DrawInfiniteGridLines(
+            Painter2D painter,
+            Rect viewportRect,
+            float worldSpacing,
+            float zoom,
+            Vector2 pan,
+            Color color,
+            float lineWidth)
         {
+            float screenSpacing = worldSpacing * zoom;
+            if (screenSpacing <= 0.01f)
+                return;
+
             painter.strokeColor = color;
             painter.lineWidth = lineWidth;
 
-            for (float x = 0f; x <= rect.width; x += spacing)
+            float xOffset = Repeat(pan.x, screenSpacing);
+            float yOffset = Repeat(pan.y, screenSpacing);
+
+            for (float x = xOffset; x <= viewportRect.width; x += screenSpacing)
             {
                 painter.BeginPath();
                 painter.MoveTo(new Vector2(x, 0f));
-                painter.LineTo(new Vector2(x, rect.height));
+                painter.LineTo(new Vector2(x, viewportRect.height));
                 painter.Stroke();
             }
 
-            for (float y = 0f; y <= rect.height; y += spacing)
+            if (xOffset > 0f)
+            {
+                for (float x = xOffset - screenSpacing; x >= 0f; x -= screenSpacing)
+                {
+                    painter.BeginPath();
+                    painter.MoveTo(new Vector2(x, 0f));
+                    painter.LineTo(new Vector2(x, viewportRect.height));
+                    painter.Stroke();
+                }
+            }
+
+            for (float y = yOffset; y <= viewportRect.height; y += screenSpacing)
             {
                 painter.BeginPath();
                 painter.MoveTo(new Vector2(0f, y));
-                painter.LineTo(new Vector2(rect.width, y));
+                painter.LineTo(new Vector2(viewportRect.width, y));
                 painter.Stroke();
+            }
+
+            if (yOffset > 0f)
+            {
+                for (float y = yOffset - screenSpacing; y >= 0f; y -= screenSpacing)
+                {
+                    painter.BeginPath();
+                    painter.MoveTo(new Vector2(0f, y));
+                    painter.LineTo(new Vector2(viewportRect.width, y));
+                    painter.Stroke();
+                }
             }
         }
 
-        private static void DrawCenterCrossLines(Painter2D painter, Rect rect)
+        private static float Repeat(float value, float length)
         {
-            float centerX = rect.width * 0.5f;
-            float centerY = rect.height * 0.5f;
+            if (length <= 0f)
+                return 0f;
 
-            painter.strokeColor = CenterGridColor;
-            painter.lineWidth = 1.4f;
-
-            painter.BeginPath();
-            painter.MoveTo(new Vector2(centerX, 0f));
-            painter.LineTo(new Vector2(centerX, rect.height));
-            painter.Stroke();
-
-            painter.BeginPath();
-            painter.MoveTo(new Vector2(0f, centerY));
-            painter.LineTo(new Vector2(rect.width, centerY));
-            painter.Stroke();
+            return value - Mathf.Floor(value / length) * length;
         }
 
         private static Label BuildCenteredMessage(string text)

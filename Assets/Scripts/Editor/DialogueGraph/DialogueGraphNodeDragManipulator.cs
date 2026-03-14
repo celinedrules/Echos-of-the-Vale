@@ -12,9 +12,8 @@ namespace Editor.DialogueGraph
 
         private bool _dragging;
         private bool _bypassSnapForCurrentDrag;
-        private Vector2 _pointerOffset;
         private Vector2 _dragStartNodePosition;
-        private Vector2 _dragStartPointerParentPosition;
+        private Vector2 _dragStartPointerViewportPosition;
         private Vector2 _lastAppliedPosition;
 
         public DialogueGraphNodeDragManipulator(
@@ -75,9 +74,8 @@ namespace Editor.DialogueGraph
 
             _dragging = true;
             _bypassSnapForCurrentDrag = (evt.modifiers & EventModifiers.Alt) != 0;
-            _pointerOffset = evt.localPosition;
             _dragStartNodePosition = new Vector2(_targetNode.resolvedStyle.left, _targetNode.resolvedStyle.top);
-            _dragStartPointerParentPosition = _targetNode.parent.WorldToLocal(evt.position);
+            _dragStartPointerViewportPosition = new Vector2(evt.position.x, evt.position.y);
             _lastAppliedPosition = _dragStartNodePosition;
 
             target.CapturePointer(evt.pointerId);
@@ -89,12 +87,15 @@ namespace Editor.DialogueGraph
             if (!_dragging || !target.HasPointerCapture(evt.pointerId))
                 return;
 
-            Vector2 currentPointerParentPosition = _targetNode.parent.WorldToLocal(evt.position);
-            Vector2 pointerDelta = currentPointerParentPosition - _dragStartPointerParentPosition;
+            Vector2 currentPointerViewportPosition = new Vector2(evt.position.x, evt.position.y);
+            Vector2 pointerDeltaInViewport = currentPointerViewportPosition - _dragStartPointerViewportPosition;
 
-            Vector2 rawPosition = _dragStartNodePosition + pointerDelta;
-            rawPosition.x = Mathf.Max(0f, rawPosition.x);
-            rawPosition.y = Mathf.Max(0f, rawPosition.y);
+            float zoom = _window.CurrentZoom;
+            if (zoom <= 0.0001f)
+                zoom = 1f;
+
+            Vector2 pointerDeltaInGraph = pointerDeltaInViewport / zoom;
+            Vector2 rawPosition = _dragStartNodePosition + pointerDeltaInGraph;
 
             bool isAltHeld = (evt.modifiers & EventModifiers.Alt) != 0;
             bool shouldSnap = _window.IsGridSnapEnabled && !isAltHeld;
