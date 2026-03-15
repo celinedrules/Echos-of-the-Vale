@@ -35,6 +35,7 @@ namespace Data.DialogueData
             [SerializeField] private Vector2 panPosition;
             [SerializeField] private float zoomScale = 1f;
             [SerializeField] private Vector2 startNodePosition = new(60f, 60f);
+            [SerializeField] private DialogueBlackboardData blackboard = new();
 
             public List<DialogueGraphNodeLayout> NodeLayouts => nodeLayouts;
             public Vector2 PanPosition
@@ -54,6 +55,8 @@ namespace Data.DialogueData
                 get => startNodePosition;
                 set => startNodePosition = value;
             }
+
+            public DialogueBlackboardData Blackboard => blackboard;
         }
 
         [SerializeField] private string tableName;
@@ -93,6 +96,8 @@ namespace Data.DialogueData
         public IReadOnlyList<DialogueRow> Rows => rows;
         public DialogueRow FirstRow => rows.Count > 0 ? rows[0] : null;
         public int RowCount => rows.Count;
+        public DialogueBlackboardData Blackboard => graphEditorData.Blackboard;
+        public IReadOnlyList<DialogueSpeakerData> BlackboardSpeakers => graphEditorData.Blackboard.Speakers;
 
         public int StartRowId
         {
@@ -184,6 +189,16 @@ namespace Data.DialogueData
 
             if (startRowId >= 0 && !validRowIds.Contains(startRowId))
                 startRowId = -1;
+        }
+
+        public bool AddBlackboardSpeaker(DialogueSpeakerData speaker)
+        {
+            return graphEditorData.Blackboard.AddSpeaker(speaker);
+        }
+
+        public bool RemoveBlackboardSpeaker(DialogueSpeakerData speaker)
+        {
+            return graphEditorData.Blackboard.RemoveSpeaker(speaker);
         }
 
         public List<string> GetValidationMessages() => DialogueTableValidator.GetValidationMessages(this);

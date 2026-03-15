@@ -17,6 +17,7 @@ namespace Editor.DialogueGraph
         private const float DefaultStartX = 60f;
         private const float DefaultStartY = 60f;
         private const float DefaultVerticalSpacing = 170f;
+        private const float BlackboardWidth = 260f;
         private const float InspectorWidth = 360f;
         private const float FramePadding = 40f;
 
@@ -40,6 +41,7 @@ namespace Editor.DialogueGraph
         private VisualElement _graphContentRoot;
         private VisualElement _graphCanvas;
         private PopupField<string> _tableDropdown;
+        private DialogueGraphBlackboardView _blackboardView;
         private DialogueGraphInspectorView _inspectorView;
         private DialogueGraphValidationView _validationView;
         private Label _zoomLabel;
@@ -185,6 +187,8 @@ namespace Editor.DialogueGraph
             _graphViewport.Add(_gridBackground);
             _graphViewport.Add(_graphContentRoot);
 
+            _blackboardView = new DialogueGraphBlackboardView(BlackboardWidth);
+
             _inspectorView = new DialogueGraphInspectorView(
                 InspectorWidth,
                 RefreshGraph,
@@ -193,6 +197,7 @@ namespace Editor.DialogueGraph
 
             _validationView = new DialogueGraphValidationView(SelectRowById);
 
+            contentRow.Add(_blackboardView.Build());
             contentRow.Add(_graphViewport);
             contentRow.Add(_inspectorView.Build());
 
@@ -243,7 +248,7 @@ namespace Editor.DialogueGraph
                     marginLeft = 8f
                 }
             };
-            
+
             _tableDropdown.RegisterValueChangedCallback(evt =>
             {
                 if (evt.newValue == NoDialogueTableOption)
@@ -344,12 +349,12 @@ namespace Editor.DialogueGraph
             List<(string label, DialogueTable table)> entries = new();
 
             string[] guids = AssetDatabase.FindAssets("t:DialogueTable");
-            
+
             foreach (string guid in guids)
             {
                 string path = AssetDatabase.GUIDToAssetPath(guid);
                 DialogueTable table = AssetDatabase.LoadAssetAtPath<DialogueTable>(path);
-            
+
                 if (!table)
                     continue;
 
@@ -484,6 +489,7 @@ namespace Editor.DialogueGraph
         private void RefreshAllViews()
         {
             RefreshDialogueTableDropdownChoices();
+            _blackboardView?.SetSelectedTable(_selectedTable);
             RefreshValidationState();
             RefreshGraph();
             RefreshInspector();
@@ -730,7 +736,7 @@ namespace Editor.DialogueGraph
             if (rowId == StartNodeRowId)
             {
                 SelectRow(StartNodeRowId, -1);
-                
+
                 if (_nodeViewsByRowId.TryGetValue(StartNodeRowId, out VisualElement startNode))
                 {
                     startNode.BringToFront();
@@ -1093,7 +1099,8 @@ namespace Editor.DialogueGraph
                 DefaultStartY,
                 DefaultVerticalSpacing);
 
-            int newRowId = DialogueGraphRowOperations.CreateRow(_selectedTable, rowKind, _selectedRowId, newRowPosition);
+            int newRowId =
+                DialogueGraphRowOperations.CreateRow(_selectedTable, rowKind, _selectedRowId, newRowPosition);
             if (newRowId < 0)
                 return;
 
@@ -1165,8 +1172,9 @@ namespace Editor.DialogueGraph
                 DefaultStartY,
                 DefaultVerticalSpacing);
 
-            int newRowId = DialogueGraphRowOperations.DuplicateRowResetLinks(_selectedTable, _selectedRowId, newRowPosition);
-            
+            int newRowId =
+                DialogueGraphRowOperations.DuplicateRowResetLinks(_selectedTable, _selectedRowId, newRowPosition);
+
             if (newRowId < 0)
                 return;
 
