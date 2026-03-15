@@ -11,6 +11,8 @@ namespace Editor.DialogueGraph
         private const string WarningBadgeElementName = "dialogue-graph-warning-badge";
         private const string InputPortElementName = "dialogue-graph-input-port";
         private const string OutputPortElementName = "dialogue-graph-output-port";
+        private const string SpeakerBodyElementName = "dialogue-graph-speaker-body";
+        private const float SpeakerPortInsetWidth = 8f;
 
         public static VisualElement CreateStartNode(
             DialogueGraphWindow window,
@@ -122,6 +124,81 @@ namespace Editor.DialogueGraph
                 node,
                 DialogueGraphWindow.StartNodeRowId,
                 -1,
+                window));
+
+            return node;
+        }
+
+        public static VisualElement CreateSpeakerNode(
+            DialogueGraphWindow window,
+            DialogueBlackboardSpeakerNodeData speakerNode,
+            int rowIndex)
+        {
+            VisualElement node = new VisualElement();
+            node.style.position = Position.Absolute;
+            node.style.left = speakerNode.Position.x;
+            node.style.top = speakerNode.Position.y;
+            node.style.width = DialogueGraphBlackboardItemFactory.ItemWidth + SpeakerPortInsetWidth;
+            node.style.minWidth = DialogueGraphBlackboardItemFactory.ItemWidth + SpeakerPortInsetWidth;
+            node.style.maxWidth = DialogueGraphBlackboardItemFactory.ItemWidth + SpeakerPortInsetWidth;
+            node.style.height = DialogueGraphBlackboardItemFactory.ItemHeight;
+            node.style.minHeight = DialogueGraphBlackboardItemFactory.ItemHeight;
+            node.style.maxHeight = DialogueGraphBlackboardItemFactory.ItemHeight;
+            node.style.backgroundColor = Color.clear;
+            node.style.overflow = Overflow.Visible;
+
+            VisualElement body = DialogueGraphBlackboardItemFactory.CreateLabelItem(
+                speakerNode.Speaker != null ? speakerNode.Speaker.SpeakerName : "(Missing Speaker)",
+                new Color(0.86f, 0.60f, 0.16f),
+                clipContents: true);
+
+            body.name = SpeakerBodyElementName;
+            body.style.position = Position.Absolute;
+            body.style.left = 0f;
+            body.style.top = 0f;
+            body.style.marginBottom = 0f;
+
+            Label nameLabel = body.Q<Label>();
+            if (nameLabel != null)
+                nameLabel.style.paddingRight = 18f;
+
+            VisualElement outputPort = CreatePort(
+                OutputPortElementName,
+                new Color(1f, 0.78f, 0.35f),
+                left: StyleKeyword.Auto,
+                right: 0f);
+
+            outputPort.style.top = (DialogueGraphBlackboardItemFactory.ItemHeight - 16f) * 0.5f;
+            outputPort.tooltip = "Speaker output";
+            outputPort.userData = speakerNode.NodeId;
+            outputPort.AddManipulator(new DialogueGraphPortConnectManipulator(
+                outputPort,
+                speakerNode.NodeId,
+                rowIndex,
+                window));
+
+            node.Add(body);
+            node.Add(outputPort);
+
+            node.RegisterCallback<ClickEvent>(evt =>
+            {
+                if (evt.button != (int)MouseButton.LeftMouse)
+                    return;
+
+                if (evt.target is VisualElement clickedElement &&
+                    (IsPortElement(clickedElement) || IsTextInputElement(clickedElement)))
+                {
+                    return;
+                }
+
+                window.HandleNodeClicked(speakerNode.NodeId, rowIndex);
+                evt.StopPropagation();
+            });
+
+            node.AddManipulator(new DialogueGraphNodeDragManipulator(
+                node,
+                speakerNode.NodeId,
+                rowIndex,
                 window));
 
             return node;
@@ -272,7 +349,9 @@ namespace Editor.DialogueGraph
             bool isHoveredConnectTarget,
             bool isHoveredInvalidTarget)
         {
-            SetNodeBorderColor(node, isSelected, isInvalid, isConnectSource);
+            VisualElement borderTarget = node.Q<VisualElement>(SpeakerBodyElementName) ?? node;
+
+            SetNodeBorderColor(borderTarget, isSelected, isInvalid, isConnectSource);
             SetWarningBadgeVisibility(node, isInvalid);
             SetPortState(
                 node,

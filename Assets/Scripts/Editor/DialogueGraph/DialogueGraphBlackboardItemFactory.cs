@@ -9,19 +9,22 @@ namespace Editor.DialogueGraph
         private static readonly Color EntryBorderColor = new(0.10f, 0.10f, 0.10f);
         private static readonly Color EntryTextColor = new(0.88f, 0.88f, 0.88f);
 
-        private const float ItemWidth = 120f;
-        private const float ItemHeight = 32f;
+        public const float ItemWidth = 120f;
+        public const float ItemHeight = 32f;
         private const float AccentWidth = 4f;
 
-        public static VisualElement CreateLabelItem(string text, Color accentColor)
+        public static VisualElement CreateLabelItem(string text, Color accentColor, bool clipContents = true)
         {
             VisualElement entry = new VisualElement();
+            entry.style.position = Position.Relative;
             entry.style.flexDirection = FlexDirection.Row;
             entry.style.alignItems = Align.Center;
             entry.style.width = ItemWidth;
             entry.style.minWidth = ItemWidth;
             entry.style.maxWidth = ItemWidth;
             entry.style.height = ItemHeight;
+            entry.style.minHeight = ItemHeight;
+            entry.style.maxHeight = ItemHeight;
             entry.style.marginBottom = 6f;
             entry.style.backgroundColor = EntryBackgroundColor;
             entry.style.borderTopWidth = 1f;
@@ -36,13 +39,15 @@ namespace Editor.DialogueGraph
             entry.style.borderTopRightRadius = 4f;
             entry.style.borderBottomLeftRadius = 4f;
             entry.style.borderBottomRightRadius = 4f;
-            entry.style.overflow = Overflow.Hidden;
+            entry.style.overflow = clipContents ? Overflow.Hidden : Overflow.Visible;
 
             VisualElement accent = new VisualElement();
             accent.style.width = AccentWidth;
             accent.style.alignSelf = Align.Stretch;
             accent.style.backgroundColor = accentColor;
             accent.style.flexShrink = 0;
+            accent.style.borderTopLeftRadius = 4f;
+            accent.style.borderBottomLeftRadius = 4f;
 
             Label nameLabel = new Label(text);
             nameLabel.style.flexGrow = 1;

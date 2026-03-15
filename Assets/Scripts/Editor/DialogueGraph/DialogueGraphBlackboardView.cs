@@ -243,6 +243,7 @@ namespace Editor.DialogueGraph
                 GetSpeakerDisplayName(speaker),
                 SpeakerAccentColor);
 
+            item.AddManipulator(new DialogueGraphBlackboardSpeakerDragManipulator(speaker));
             item.AddManipulator(new ContextualMenuManipulator(evt =>
             {
                 evt.menu.AppendAction("Remove", _ => RemoveSpeakerFromBlackboard(speaker));

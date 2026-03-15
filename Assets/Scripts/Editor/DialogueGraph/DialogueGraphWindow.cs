@@ -66,7 +66,8 @@ namespace Editor.DialogueGraph
         private bool _isGridSnapEnabled = true;
 
         public bool HasSelectedTable => _selectedTable != null;
-        public bool HasSelectedRow => _selectedRowId >= 0 || _selectedRowId == StartNodeRowId;
+        public bool HasSelectedRow =>
+            _selectedRowId >= 0 || _selectedRowId == StartNodeRowId || IsSpeakerNodeId(_selectedRowId);
         public bool IsConnectModeActive => _isConnectModeActive;
         public bool IsGridSnapEnabled => _isGridSnapEnabled;
         public Vector2 GraphPanPosition => _selectedTable != null ? _selectedTable.GraphPanPosition : Vector2.zero;
@@ -137,6 +138,8 @@ namespace Editor.DialogueGraph
                 }
             };
             _graphViewport.RegisterCallback<WheelEvent>(OnGraphWheel, TrickleDown.TrickleDown);
+            _graphViewport.RegisterCallback<DragUpdatedEvent>(OnGraphDragUpdated);
+            _graphViewport.RegisterCallback<DragPerformEvent>(OnGraphDragPerform);
             _graphViewport.AddManipulator(new DialogueGraphPanManipulator(this));
 
             _gridBackground = new VisualElement
@@ -533,10 +536,14 @@ namespace Editor.DialogueGraph
 
             if (_selectedRowId >= 0 &&
                 _selectedRowId != StartNodeRowId &&
+                !IsSpeakerNodeId(_selectedRowId) &&
                 DialogueGraphRowOperations.FindRowIndexById(_selectedTable, _selectedRowId) < 0)
             {
                 ClearSelection();
             }
+
+            if (IsSpeakerNodeId(_selectedRowId) && !_selectedTable.HasBlackboardSpeakerNode(_selectedRowId))
+                ClearSelection();
 
             string startNodeValidationMessage =
                 DialogueGraphValidationUtility.GetStartNodeValidationMessage(_selectedTable);
@@ -552,6 +559,21 @@ namespace Editor.DialogueGraph
 
             _nodeViewsByRowId[StartNodeRowId] = startNode;
             _graphCanvas.Add(startNode);
+
+            IReadOnlyList<DialogueBlackboardSpeakerNodeData> speakerNodes = _selectedTable.BlackboardSpeakerNodes;
+            if (speakerNodes != null)
+            {
+                for (int i = 0; i < speakerNodes.Count; i++)
+                {
+                    DialogueBlackboardSpeakerNodeData speakerNode = speakerNodes[i];
+                    if (speakerNode == null)
+                        continue;
+
+                    VisualElement speakerVisual = DialogueGraphNodeViewFactory.CreateSpeakerNode(this, speakerNode, -1);
+                    _nodeViewsByRowId[speakerNode.NodeId] = speakerVisual;
+                    _graphCanvas.Add(speakerVisual);
+                }
+            }
 
             if (_selectedTable.RowCount == 0)
             {
@@ -605,13 +627,12 @@ namespace Editor.DialogueGraph
 
             string baseText = $"{_selectedTable.name}  •  Rows: {_selectedTable.RowCount}{startText}";
 
-            if (_isConnectModeActive && _connectSourceRowId >= 0)
+            if (_isConnectModeActive && (_connectSourceRowId >= 0 || _connectSourceRowId == StartNodeRowId ||
+                                         IsSpeakerNodeId(_connectSourceRowId)))
             {
                 if (_hoveredConnectTargetRowId >= 0)
                 {
-                    string sourceLabel = _connectSourceRowId == StartNodeRowId
-                        ? "Start"
-                        : $"Row {_connectSourceRowId}";
+                    string sourceLabel = GetSourceLabel(_connectSourceRowId);
 
                     _tableStatusLabel.text = _hoveredConnectTargetValid
                         ? $"{baseText}  •  Release to connect {sourceLabel} → Row {_hoveredConnectTargetRowId}"
@@ -619,18 +640,88 @@ namespace Editor.DialogueGraph
                     return;
                 }
 
-                if (_connectSourceRowId == StartNodeRowId)
-                {
-                    _tableStatusLabel.text = $"{baseText}  •  Drag from Start to a row input handle";
-                    return;
-                }
-
                 _tableStatusLabel.text =
-                    $"{baseText}  •  Drag from an output handle to an input handle for Row {_connectSourceRowId}";
+                    $"{baseText}  •  Drag from an output handle to an input handle for {GetSourceLabel(_connectSourceRowId)}";
                 return;
             }
 
             _tableStatusLabel.text = baseText;
+        }
+
+        private string GetSourceLabel(int sourceRowId)
+        {
+            if (sourceRowId == StartNodeRowId)
+                return "Start";
+
+            if (IsSpeakerNodeId(sourceRowId))
+            {
+                DialogueBlackboardSpeakerNodeData speakerNode = _selectedTable?.GetBlackboardSpeakerNode(sourceRowId);
+                if (speakerNode?.Speaker != null)
+                    return speakerNode.Speaker.SpeakerName;
+
+                return "Speaker";
+            }
+
+            return $"Row {sourceRowId}";
+        }
+
+        private void OnGraphDragUpdated(DragUpdatedEvent evt)
+        {
+            if (_selectedTable == null)
+                return;
+
+            object dragData =
+                DragAndDrop.GetGenericData(DialogueGraphBlackboardSpeakerDragManipulator.SpeakerDragDataKey);
+            if (dragData is not DialogueSpeakerData)
+                return;
+
+            DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
+            evt.StopPropagation();
+        }
+
+        private void OnGraphDragPerform(DragPerformEvent evt)
+        {
+            if (_selectedTable == null)
+                return;
+
+            object dragData =
+                DragAndDrop.GetGenericData(DialogueGraphBlackboardSpeakerDragManipulator.SpeakerDragDataKey);
+            if (dragData is not DialogueSpeakerData speaker)
+                return;
+
+            DragAndDrop.AcceptDrag();
+
+            Vector2 worldPosition = _graphViewport.LocalToWorld(evt.localMousePosition);
+            Vector2 canvasPosition = _graphCanvas.WorldToLocal(worldPosition);
+            CreateSpeakerNodeFromBlackboard(speaker, canvasPosition);
+
+            evt.StopPropagation();
+        }
+
+        private void CreateSpeakerNodeFromBlackboard(DialogueSpeakerData speaker, Vector2 canvasPosition)
+        {
+            if (_selectedTable == null || speaker == null)
+                return;
+
+            Undo.RecordObject(_selectedTable, "Create Blackboard Speaker Node");
+
+            DialogueBlackboardSpeakerNodeData createdNode = _selectedTable.CreateBlackboardSpeakerNode(
+                speaker,
+                SnapToGrid(canvasPosition));
+
+            if (createdNode == null)
+                return;
+
+            EditorUtility.SetDirty(_selectedTable);
+            AssetDatabase.SaveAssets();
+
+            SelectRow(createdNode.NodeId, -1);
+            RefreshAllViews();
+        }
+
+        private static bool IsSpeakerNodeId(int nodeId)
+        {
+            return nodeId <= -2001;
         }
 
         public void UpdateNodeDialogueText(int rowId, int rowIndex, string newText)
@@ -786,7 +877,10 @@ namespace Editor.DialogueGraph
 
         private void BeginConnectFromRow(int sourceRowId)
         {
-            if (_selectedTable == null || sourceRowId < 0 && sourceRowId != StartNodeRowId)
+            if (_selectedTable == null)
+                return;
+
+            if (sourceRowId < 0 && sourceRowId != StartNodeRowId && !IsSpeakerNodeId(sourceRowId))
                 return;
 
             _isConnectModeActive = true;
@@ -800,8 +894,7 @@ namespace Editor.DialogueGraph
 
         private void CompleteConnectionTo(int targetRowId, int targetRowIndex)
         {
-            if (!_isConnectModeActive || _connectSourceRowId < 0 && _connectSourceRowId != StartNodeRowId ||
-                !_selectedTable)
+            if (!_isConnectModeActive || !_selectedTable)
                 return;
 
             int sourceRowId = _connectSourceRowId;
@@ -816,9 +909,23 @@ namespace Editor.DialogueGraph
                 return;
             }
 
+            if (IsSpeakerNodeId(sourceRowId))
+            {
+                Undo.RecordObject(_selectedTable, "Connect Speaker Node");
+
+                if (!_selectedTable.AddBlackboardSpeakerNodeLink(sourceRowId, targetRowId))
+                    return;
+
+                EditorUtility.SetDirty(_selectedTable);
+                AssetDatabase.SaveAssets();
+                RefreshAllViews();
+                return;
+            }
+
             bool connected =
                 DialogueGraphRowOperations.ConnectRows(_selectedTable, sourceRowId, targetRowId,
                     out string errorMessage);
+
             if (!connected)
             {
                 if (!string.IsNullOrWhiteSpace(errorMessage))
@@ -845,7 +952,7 @@ namespace Editor.DialogueGraph
                 return;
             }
 
-            if (_selectedRowId < 0 && _selectedRowId != StartNodeRowId)
+            if (_selectedRowId < 0 && _selectedRowId != StartNodeRowId && !IsSpeakerNodeId(_selectedRowId))
             {
                 EditorUtility.DisplayDialog("Dialogue Graph", "Select a row first.", "OK");
                 return;
@@ -858,6 +965,19 @@ namespace Editor.DialogueGraph
                 Undo.RecordObject(_selectedTable, "Clear Dialogue Start Row");
                 _selectedTable.StartRowId = -1;
                 EditorUtility.SetDirty(_selectedTable);
+                RefreshAllViews();
+                return;
+            }
+
+            if (IsSpeakerNodeId(_selectedRowId))
+            {
+                Undo.RecordObject(_selectedTable, "Clear Speaker Node Links");
+
+                if (!_selectedTable.ClearBlackboardSpeakerNodeLinks(_selectedRowId))
+                    return;
+
+                EditorUtility.SetDirty(_selectedTable);
+                AssetDatabase.SaveAssets();
                 RefreshAllViews();
                 return;
             }
@@ -1029,13 +1149,17 @@ namespace Editor.DialogueGraph
         private bool IsValidConnectTarget(int targetRowId)
         {
             if (!_isConnectModeActive || !_selectedTable ||
-                _connectSourceRowId < 0 && _connectSourceRowId != StartNodeRowId)
+                _connectSourceRowId < 0 && _connectSourceRowId != StartNodeRowId &&
+                !IsSpeakerNodeId(_connectSourceRowId))
                 return false;
 
             if (targetRowId < 0)
                 return false;
 
             if (_connectSourceRowId == StartNodeRowId)
+                return _selectedTable.HasRowId(targetRowId);
+
+            if (IsSpeakerNodeId(_connectSourceRowId))
                 return _selectedTable.HasRowId(targetRowId);
 
             if (targetRowId == _connectSourceRowId)
@@ -1234,6 +1358,12 @@ namespace Editor.DialogueGraph
             {
                 _selectedTable.StartNodePosition = nodePosition;
             }
+            else if (IsSpeakerNodeId(rowId))
+            {
+                DialogueBlackboardSpeakerNodeData speakerNode = _selectedTable.GetBlackboardSpeakerNode(rowId);
+                if (speakerNode != null)
+                    speakerNode.Position = nodePosition;
+            }
             else
             {
                 _selectedTable.SetNodePosition(rowId, nodePosition);
@@ -1319,7 +1449,10 @@ namespace Editor.DialogueGraph
         private void OnGraphCanvasGenerateVisualContent(MeshGenerationContext context)
         {
             int previewSourceRowId =
-                _isPortDragActive && (_connectSourceRowId >= 0 || _connectSourceRowId == StartNodeRowId)
+                _isPortDragActive &&
+                (_connectSourceRowId >= 0 ||
+                 _connectSourceRowId == StartNodeRowId ||
+                 IsSpeakerNodeId(_connectSourceRowId))
                     ? _connectSourceRowId
                     : -1;
 

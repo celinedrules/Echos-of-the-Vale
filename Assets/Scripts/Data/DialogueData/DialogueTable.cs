@@ -98,6 +98,7 @@ namespace Data.DialogueData
         public int RowCount => rows.Count;
         public DialogueBlackboardData Blackboard => graphEditorData.Blackboard;
         public IReadOnlyList<DialogueSpeakerData> BlackboardSpeakers => graphEditorData.Blackboard.Speakers;
+        public IReadOnlyList<DialogueBlackboardSpeakerNodeData> BlackboardSpeakerNodes => graphEditorData.Blackboard.SpeakerNodes;
 
         public int StartRowId
         {
@@ -199,6 +200,42 @@ namespace Data.DialogueData
         public bool RemoveBlackboardSpeaker(DialogueSpeakerData speaker)
         {
             return graphEditorData.Blackboard.RemoveSpeaker(speaker);
+        }
+
+        public DialogueBlackboardSpeakerNodeData CreateBlackboardSpeakerNode(DialogueSpeakerData speaker, Vector2 position)
+        {
+            int nodeId = graphEditorData.Blackboard.GetNextSpeakerNodeId();
+            return graphEditorData.Blackboard.AddSpeakerNode(nodeId, speaker, position);
+        }
+
+        public DialogueBlackboardSpeakerNodeData GetBlackboardSpeakerNode(int nodeId)
+        {
+            return graphEditorData.Blackboard.GetSpeakerNode(nodeId);
+        }
+
+        public bool HasBlackboardSpeakerNode(int nodeId)
+        {
+            return graphEditorData.Blackboard.HasSpeakerNode(nodeId);
+        }
+
+        public bool RemoveBlackboardSpeakerNode(int nodeId)
+        {
+            return graphEditorData.Blackboard.RemoveSpeakerNode(nodeId);
+        }
+
+        public bool AddBlackboardSpeakerNodeLink(int nodeId, int targetRowId)
+        {
+            return graphEditorData.Blackboard.AddSpeakerNodeLink(nodeId, targetRowId);
+        }
+
+        public bool RemoveBlackboardSpeakerNodeLink(int nodeId, int targetRowId)
+        {
+            return graphEditorData.Blackboard.RemoveSpeakerNodeLink(nodeId, targetRowId);
+        }
+
+        public bool ClearBlackboardSpeakerNodeLinks(int nodeId)
+        {
+            return graphEditorData.Blackboard.ClearSpeakerNodeLinks(nodeId);
         }
 
         public List<string> GetValidationMessages() => DialogueTableValidator.GetValidationMessages(this);
